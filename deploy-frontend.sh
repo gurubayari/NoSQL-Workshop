@@ -8,7 +8,7 @@ set -e
 # Configuration
 PROJECT_NAME="unicorn-ecommerce"
 ENVIRONMENT="dev"
-STACK_NAME="${PROJECT_NAME}-${ENVIRONMENT}-stack"
+STACK_NAME=$1
 REGION=${AWS_DEFAULT_REGION:-us-east-1}
 
 # Colors for output
