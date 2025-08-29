@@ -9,7 +9,7 @@ set -e
 PROJECT_NAME="unicorn-ecommerce"
 ENVIRONMENT="dev"
 REGION="us-east-1"
-STACK_NAME="${PROJECT_NAME}-${ENVIRONMENT}-stack"
+STACK_NAME=$1
 
 # Colors for output
 RED='\033[0;31m'
