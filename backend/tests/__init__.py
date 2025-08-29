@@ -1,0 +1,1 @@
+# Test suite for AWS NoSQL Workshop backend

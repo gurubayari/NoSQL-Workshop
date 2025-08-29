@@ -1,0 +1,59 @@
+[
+  {
+    "title": "Standard Shipping Options",
+    "content": "\n            Free Standard Shipping on orders over $50.\n            Delivery in 5-7 business days.\n            Expedited shipping available for $9.99.\n            ",
+    "category": "shipping_policies",
+    "subcategory": "shipping_options",
+    "tags": [
+      "shipping",
+      "delivery",
+      "free shipping"
+    ],
+    "priority": 1,
+    "contentId": "7ac22309-21fc-4d67-95f2-6cefd7c10a1e",
+    "searchableText": "Standard Shipping Options \n            Free Standard Shipping on orders over $50.\n            Delivery in 5-7 business days.\n            Expedited shipping available for $9.99.\n             shipping delivery free shipping",
+    "wordCount": 17,
+    "readingTimeMinutes": 1,
+    "createdAt": "2025-08-28T09:22:38.163890",
+    "status": "published",
+    "language": "en"
+  },
+  {
+    "title": "30-Day Return Policy",
+    "content": "\n            Most items can be returned within 30 days of delivery.\n            Items must be in original condition.\n            Free return shipping on defective items.\n            ",
+    "category": "return_policies",
+    "subcategory": "general_returns",
+    "tags": [
+      "returns",
+      "30 days",
+      "refund"
+    ],
+    "priority": 1,
+    "contentId": "d21eb368-1c5e-42e5-a2f8-b9893c6d8571",
+    "searchableText": "30-Day Return Policy \n            Most items can be returned within 30 days of delivery.\n            Items must be in original condition.\n            Free return shipping on defective items.\n             returns 30 days refund",
+    "wordCount": 22,
+    "readingTimeMinutes": 1,
+    "createdAt": "2025-08-28T09:22:38.164926",
+    "status": "published",
+    "language": "en"
+  },
+  {
+    "title": "How do I track my order?",
+    "content": "\n            You can track your order by:\n            1. Logging into your account\n            2. Going to Order History\n            3. Clicking on the tracking number\n            You'll also receive tracking updates via email.\n            ",
+    "category": "account_management",
+    "subcategory": "order_tracking",
+    "tags": [
+      "tracking",
+      "order",
+      "account"
+    ],
+    "priority": 2,
+    "contentId": "4c748901-ebd9-43ae-beb7-8a3003505ee3",
+    "searchableText": "How do I track my order? \n            You can track your order by:\n            1. Logging into your account\n            2. Going to Order History\n            3. Clicking on the tracking number\n            You'll also receive tracking updates via email.\n             tracking order account",
+    "wordCount": 29,
+    "readingTimeMinutes": 1,
+    "createdAt": "2025-08-28T09:22:38.164948",
+    "status": "published",
+    "language": "en"
+  }
+]

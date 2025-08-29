@@ -1,0 +1,42 @@
+# AWS NoSQL Workshop - Backend Dependencies
+# Core AWS SDK and utilities
+boto3==1.34.34
+botocore==1.34.34
+
+# Database drivers
+pymongo==4.6.1
+redis==5.0.1
+
+# Web framework and API utilities
+fastapi==0.109.0
+uvicorn==0.27.0
+pydantic==2.5.3
+
+# Authentication and security
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+python-multipart==0.0.6
+
+# Data processing and ML
+numpy==1.26.3
+pandas==2.2.0
+scikit-learn==1.4.0
+
+# Text processing and embeddings
+sentence-transformers==2.2.2
+transformers==4.37.2
+
+# Utilities
+python-dotenv==1.0.0
+requests==2.31.0
+Pillow==10.2.0
+
+# Testing
+pytest==8.0.0
+pytest-asyncio==0.23.4
+moto==4.2.14
+
+# Development
+black==24.1.1
+flake8==7.0.0
+mypy==1.8.0
