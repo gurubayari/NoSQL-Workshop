@@ -8,54 +8,14 @@ import sys
 from datetime import datetime
 from typing import List, Dict, Any
 
-try:
-    import pymongo
-    from pymongo import MongoClient
-    PYMONGO_AVAILABLE = True
-except ImportError:
-    PYMONGO_AVAILABLE = False
-    print("pymongo not available - running in mock mode")
-
-# Add backend to path for imports
-sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 'backend'))
-
-try:
-    from shared.config import config
-    from shared.database import get_documentdb_client
-    AWS_AVAILABLE = True
-except ImportError:
-    # Fallback for development without AWS dependencies
-    AWS_AVAILABLE = False
-    
-    class MockConfig:
-        DOCUMENTDB_HOST = 'localhost'
-        DOCUMENTDB_PORT = 27017
-        DOCUMENTDB_DATABASE = 'unicorn_ecommerce_dev'
-    
-    config = MockConfig()
-    
-    def get_documentdb_client():
-        print("Mock DocumentDB client")
-        return None
+# Import common database connections
+from database_connections import get_documentdb_collection
 
 class KnowledgeBaseSeeder:
     """Seed knowledge base data to DocumentDB"""
     
     def __init__(self):
-        if AWS_AVAILABLE and PYMONGO_AVAILABLE:
-            self.client = get_documentdb_client()
-            if self.client:
-                self.db = self.client[config.DOCUMENTDB_DATABASE]
-                self.kb_collection = self.db.knowledge_base
-            else:
-                self.client = None
-                self.db = None
-                self.kb_collection = None
-        else:
-            self.client = None
-            self.db = None
-            self.kb_collection = None
-            print("Running in mock mode - DocumentDB services not available")
+        self.kb_collection = get_documentdb_collection('knowledge_base')
     
     def load_knowledge_base_from_json(self, filename: str = "knowledge_base.json") -> List[Dict[str, Any]]:
         """Load knowledge base records from JSON file"""
@@ -77,10 +37,6 @@ class KnowledgeBaseSeeder:
     
     def seed_to_documentdb(self, kb_articles: List[Dict[str, Any]]) -> bool:
         """Seed knowledge base records to DocumentDB"""
-        if not AWS_AVAILABLE or not PYMONGO_AVAILABLE or not self.kb_collection:
-            print("DocumentDB services not available - skipping DocumentDB seeding")
-            print(f"Would have seeded {len(kb_articles)} knowledge base articles to DocumentDB collection: knowledge_base")
-            return True
             
         try:
             # Clear existing knowledge base (for development)

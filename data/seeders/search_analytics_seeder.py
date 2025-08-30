@@ -8,44 +8,14 @@ import sys
 from datetime import datetime
 from typing import List, Dict, Any
 
-try:
-    import boto3
-    from botocore.exceptions import ClientError
-    BOTO3_AVAILABLE = True
-except ImportError:
-    BOTO3_AVAILABLE = False
-    print("boto3 not available - running in mock mode")
-
-# Add backend to path for imports
-sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 'backend'))
-
-try:
-    from shared.config import config
-    from shared.database import get_dynamodb_table
-    AWS_AVAILABLE = True
-except ImportError:
-    # Fallback for development without AWS dependencies
-    AWS_AVAILABLE = False
-    
-    class MockConfig:
-        AWS_REGION = 'us-west-2'
-        SEARCH_ANALYTICS_TABLE = 'unicorn-ecommerce-dev-search-analytics'
-    
-    config = MockConfig()
-    
-    def get_dynamodb_table(table_name):
-        print(f"Mock DynamoDB table: {table_name}")
-        return None
+# Import common database connections
+from database_connections import get_dynamodb_table
 
 class SearchAnalyticsSeeder:
     """Seed search analytics data to DynamoDB"""
     
     def __init__(self):
-        if AWS_AVAILABLE and BOTO3_AVAILABLE:
-            self.dynamodb = boto3.resource('dynamodb', region_name=config.AWS_REGION)
-        else:
-            self.dynamodb = None
-            print("Running in mock mode - AWS services not available")
+        self.search_analytics_table = get_dynamodb_table('SEARCH_ANALYTICS_TABLE')
     
     def load_search_analytics_from_json(self, filename: str = "search_analytics.json") -> List[Dict[str, Any]]:
         """Load search analytics records from JSON file"""
@@ -67,17 +37,8 @@ class SearchAnalyticsSeeder:
     
     def seed_to_dynamodb(self, search_data: List[Dict[str, Any]]) -> bool:
         """Seed search analytics records to DynamoDB"""
-        if not AWS_AVAILABLE or not BOTO3_AVAILABLE:
-            print("AWS services not available - skipping DynamoDB seeding")
-            print(f"Would have seeded search analytics data to DynamoDB table: {config.SEARCH_ANALYTICS_TABLE}")
-            return True
-            
         try:
-            table = get_dynamodb_table(config.SEARCH_ANALYTICS_TABLE)
-            
-            if not table:
-                print(f"Failed to get DynamoDB table: {config.SEARCH_ANALYTICS_TABLE}")
-                return False
+            table = self.search_analytics_table
             
             # Clear existing search analytics (for development)
             print("Clearing existing search analytics records...")
