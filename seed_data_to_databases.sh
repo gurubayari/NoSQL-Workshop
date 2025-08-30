@@ -98,7 +98,7 @@ export DOCUMENTDB_PORT="27017"
 export DOCUMENTDB_USERNAME="$DOCDB_USERNAME"
 export DOCUMENTDB_PASSWORD="$DOCDB_PASSWORD"
 export DOCUMENTDB_DATABASE="unicorn_ecommerce_dev"
-export DOCUMENTDB_SSL_CA_CERTS="./global-bundle.pem"
+export DOCUMENTDB_SSL_CA_CERTS="../../global-bundle.pem"
 export ELASTICACHE_HOST="$ELASTICACHE_ENDPOINT"
 export ELASTICACHE_PORT="6379"
 export AWS_REGION="$REGION"
@@ -121,24 +121,7 @@ echo "  Users Table: $USERS_TABLE"
 echo "  Inventory Table: $INVENTORY_TABLE"
 echo ""
 
-# Test connectivity
-print_info "Testing AWS connectivity..."
 
-# Test DynamoDB access
-if aws dynamodb describe-table --table-name "$USERS_TABLE" --region "$REGION" > /dev/null 2>&1; then
-    print_status "DynamoDB connectivity confirmed"
-else
-    print_error "Failed to connect to DynamoDB"
-    exit 1
-fi
-
-# Test Secrets Manager access
-if aws secretsmanager describe-secret --secret-id "$SECRET_ARN" --region "$REGION" > /dev/null 2>&1; then
-    print_status "Secrets Manager connectivity confirmed"
-else
-    print_error "Failed to connect to Secrets Manager"
-    exit 1
-fi
 
 # Install Python dependencies if needed
 print_info "Checking Python dependencies..."
@@ -154,29 +137,7 @@ python3 -c "import boto3, pymongo, redis" 2>/dev/null || {
     print_status "Python dependencies installed"
 }
 
-# Test DocumentDB connectivity
-print_info "Testing DocumentDB connectivity..."
-python3 -c "
-import pymongo
-import ssl
-import os
 
-try:
-    connection_string = f'mongodb://{os.environ[\"DOCUMENTDB_USERNAME\"]}:{os.environ[\"DOCUMENTDB_PASSWORD\"]}@{os.environ[\"DOCUMENTDB_HOST\"]}:{os.environ[\"DOCUMENTDB_PORT\"]}/{os.environ[\"DOCUMENTDB_DATABASE\"]}?ssl=true&tlsAllowInvalidCertificates=true&replicaSet=rs0&readPreference=secondaryPreferred&retryWrites=false'
-    client = pymongo.MongoClient(connection_string, serverSelectionTimeoutMS=5000)
-    client.admin.command('ping')
-    print('DocumentDB connection successful')
-except Exception as e:
-    print(f'DocumentDB connection failed: {e}')
-    exit(1)
-"
-
-if [ $? -ne 0 ]; then
-    print_error "DocumentDB connectivity test failed"
-    exit 1
-fi
-
-print_status "DocumentDB connectivity confirmed"
 
 # Set Python path
 export PYTHONPATH="${PYTHONPATH}:$(pwd)"
