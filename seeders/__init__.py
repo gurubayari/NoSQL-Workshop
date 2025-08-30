@@ -1,1 +1,0 @@
-# Database seeding scripts for AWS NoSQL Workshop
