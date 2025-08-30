@@ -1,0 +1,17 @@
+{
+    "project_name": "unicorn-ecommerce",
+    "environment": "dev",
+    "created_at": "2025-08-30T09:43:28Z",
+    "functions": [
+        "unicorn-ecommerce-dev-product-api",
+        "unicorn-ecommerce-dev-cart-api",
+        "unicorn-ecommerce-dev-order-api",
+        "unicorn-ecommerce-dev-auth-api",
+        "unicorn-ecommerce-dev-review-api",
+        "unicorn-ecommerce-dev-review-analytics",
+        "unicorn-ecommerce-dev-search-api",
+        "unicorn-ecommerce-dev-search-analytics",
+        "unicorn-ecommerce-dev-chat-api",
+        "unicorn-ecommerce-dev-analytics-api"
+    ]
+}
