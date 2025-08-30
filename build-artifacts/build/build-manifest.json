@@ -1,31 +1,31 @@
 {
-  "buildTime": "2025-08-30T09:09:13.753Z",
+  "buildTime": "2025-08-30T16:57:35.950Z",
   "version": "1.0.0",
   "environment": "production",
   "files": {
     "asset-manifest.json": {
       "size": 243,
-      "modified": "2025-08-30T09:09:12.433Z"
+      "modified": "2025-08-30T16:57:34.544Z"
     },
     "cache-config.json": {
       "size": 434,
-      "modified": "2025-08-30T09:09:12.527Z"
+      "modified": "2025-08-30T16:57:34.659Z"
     },
     "index.html": {
       "size": 953,
-      "modified": "2025-08-30T09:09:12.527Z"
+      "modified": "2025-08-30T16:57:34.658Z"
     },
-    "static/css/main.d155f7d2.css": {
-      "size": 7934,
-      "modified": "2025-08-30T09:09:12.433Z"
+    "static/css/main.ff851366.css": {
+      "size": 37803,
+      "modified": "2025-08-30T16:57:34.544Z"
     },
     "static/js/main.03b24f42.js": {
       "size": 514404,
-      "modified": "2025-08-30T09:09:12.433Z"
+      "modified": "2025-08-30T16:57:34.544Z"
     },
     "static/js/main.03b24f42.js.LICENSE.txt": {
       "size": 1652,
-      "modified": "2025-08-30T09:09:12.433Z"
+      "modified": "2025-08-30T16:57:34.544Z"
     }
   }
 }
