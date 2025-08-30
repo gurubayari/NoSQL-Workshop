@@ -1,0 +1,21 @@
+{
+  "totalSize": 523990,
+  "files": {
+    "js": {
+      "count": 1,
+      "size": 514404
+    },
+    "css": {
+      "count": 1,
+      "size": 7934
+    },
+    "media": {
+      "count": 0,
+      "size": 0
+    },
+    "other": {
+      "count": 1,
+      "size": 1652
+    }
+  }
+}
