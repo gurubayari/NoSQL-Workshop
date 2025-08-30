@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # AWS NoSQL Workshop - Lambda Functions Deployment Script
-# This script deploys all Lambda functions for the Unicorn E-Commerce platform
+# This script deploys pre-packaged Lambda functions to AWS
 
 set -e
 
@@ -9,7 +9,6 @@ set -e
 PROJECT_NAME="unicorn-ecommerce"
 ENVIRONMENT="dev"
 REGION="us-east-1"
-
 
 # Colors for output
 RED='\033[0;31m'
@@ -50,11 +49,50 @@ fi
 
 print_status "AWS CLI is configured"
 
-LAMBDA_EXECUTION_ROLE_ARN=$1
-LAMBDA_SECURITY_GROUP_ID=$2
-PRIVATE_SUBNET_1_ID=$3
-PRIVATE_SUBNET_2_ID=$4
-API_GATEWAY_ID=$5
+# Check if packages directory exists
+if [ ! -d "packages" ]; then
+    print_error "Packages directory not found. Please run ./package-lambda-functions.sh first"
+    exit 1
+fi
+
+# Check if deployment manifest exists
+if [ ! -f "packages/deployment-manifest.json" ]; then
+    print_error "Deployment manifest not found. Please run ./package-lambda-functions.sh first"
+    exit 1
+fi
+
+# Get parameters from command line or environment
+LAMBDA_EXECUTION_ROLE_ARN=${1:-$LAMBDA_EXECUTION_ROLE_ARN}
+LAMBDA_SECURITY_GROUP_ID=${2:-$LAMBDA_SECURITY_GROUP_ID}
+PRIVATE_SUBNET_1_ID=${3:-$PRIVATE_SUBNET_1_ID}
+PRIVATE_SUBNET_2_ID=${4:-$PRIVATE_SUBNET_2_ID}
+API_GATEWAY_ID=${5:-$API_GATEWAY_ID}
+
+# Validate required parameters
+if [ -z "$LAMBDA_EXECUTION_ROLE_ARN" ]; then
+    print_error "Lambda Execution Role ARN is required (parameter 1 or LAMBDA_EXECUTION_ROLE_ARN env var)"
+    exit 1
+fi
+
+if [ -z "$LAMBDA_SECURITY_GROUP_ID" ]; then
+    print_error "Lambda Security Group ID is required (parameter 2 or LAMBDA_SECURITY_GROUP_ID env var)"
+    exit 1
+fi
+
+if [ -z "$PRIVATE_SUBNET_1_ID" ]; then
+    print_error "Private Subnet 1 ID is required (parameter 3 or PRIVATE_SUBNET_1_ID env var)"
+    exit 1
+fi
+
+if [ -z "$PRIVATE_SUBNET_2_ID" ]; then
+    print_error "Private Subnet 2 ID is required (parameter 4 or PRIVATE_SUBNET_2_ID env var)"
+    exit 1
+fi
+
+if [ -z "$API_GATEWAY_ID" ]; then
+    print_error "API Gateway ID is required (parameter 5 or API_GATEWAY_ID env var)"
+    exit 1
+fi
 
 print_info "Lambda Execution Role ARN: $LAMBDA_EXECUTION_ROLE_ARN"
 print_info "Lambda Security Group ID: $LAMBDA_SECURITY_GROUP_ID"
@@ -62,85 +100,33 @@ print_info "Private Subnet 1 ID: $PRIVATE_SUBNET_1_ID"
 print_info "Private Subnet 2 ID: $PRIVATE_SUBNET_2_ID"
 print_info "API Gateway ID: $API_GATEWAY_ID"
 
-# Create deployment package function
-create_deployment_package() {
-    local function_name=$1
-    local function_file=$2
-    
-    print_info "Creating deployment package for $function_name..." >&2
-    
-    # Check if function file exists
-    if [ ! -f "backend/functions/$function_file" ]; then
-        print_error "Function file backend/functions/$function_file not found" >&2
-        return 1
-    fi
-    
-    # Create temporary directory
-    local temp_dir=$(mktemp -d)
-    print_info "Using temporary directory: $temp_dir" >&2
-    
-    # Copy function code
-    if ! cp "backend/functions/$function_file" "$temp_dir/lambda_function.py"; then
-        print_error "Failed to copy function file: backend/functions/$function_file" >&2
-        rm -rf "$temp_dir"
-        return 1
-    fi
-    
-    # Copy shared modules
-    if [ -d "backend/shared" ]; then
-        if ! cp -r backend/shared/* "$temp_dir/"; then
-            print_error "Failed to copy shared modules" >&2
-            rm -rf "$temp_dir"
-            return 1
-        fi
-    fi
-    
-    # Skip pip installation for now - Lambda runtime has boto3 built-in
-    # We'll create a minimal package with just our code
-    print_info "Creating minimal deployment package (using Lambda runtime dependencies)..." >&2
-    
-    # Create a simple __init__.py if it doesn't exist
-    touch "$temp_dir/__init__.py"
-    
-    # Create zip file
-    local zip_file="${function_name}.zip"
-    local current_dir=$(pwd)
-    if (cd "$temp_dir" && zip -r "$current_dir/$zip_file" . > /dev/null 2>&1); then
-        print_status "Created deployment package: $zip_file" >&2
-    else
-        print_error "Failed to create zip file for $function_name" >&2
-        rm -rf "$temp_dir"
-        return 1
-    fi
-    
-    # Cleanup
-    rm -rf "$temp_dir"
-    
-    echo "$zip_file"
-}
-
-# Deploy Lambda function
+# Deploy Lambda function from package
 deploy_lambda_function() {
     local function_name=$1
-    local function_file=$2
-    local description=$3
-    local timeout=${4:-30}
-    local memory=${5:-256}
     
     print_info "Deploying Lambda function: $function_name"
     
-    # Create deployment package
-    local zip_file
-    zip_file=$(create_deployment_package "$function_name" "$function_file")
-    if [ $? -ne 0 ] || [ -z "$zip_file" ]; then
-        print_error "Failed to create deployment package for $function_name"
+    # Check if package exists
+    local zip_file="packages/${function_name}.zip"
+    local metadata_file="packages/${function_name}.json"
+    
+    if [ ! -f "$zip_file" ]; then
+        print_error "Package file $zip_file not found for $function_name"
         return 1
     fi
     
-    if [ ! -f "$zip_file" ]; then
-        print_error "Deployment package file $zip_file not found for $function_name"
+    if [ ! -f "$metadata_file" ]; then
+        print_error "Metadata file $metadata_file not found for $function_name"
         return 1
     fi
+    
+    # Read metadata
+    local description=$(jq -r '.description' "$metadata_file")
+    local timeout=$(jq -r '.timeout' "$metadata_file")
+    local memory=$(jq -r '.memory' "$metadata_file")
+    
+    print_info "Description: $description"
+    print_info "Timeout: ${timeout}s, Memory: ${memory}MB"
     
     # Check if function exists
     if aws lambda get-function --function-name "$function_name" --region "$REGION" > /dev/null 2>&1; then
@@ -181,30 +167,18 @@ deploy_lambda_function() {
     print_info "Waiting for function $function_name to be active..."
     aws lambda wait function-active --function-name "$function_name" --region "$REGION"
     
-    # Cleanup zip file
-    rm -f "$zip_file"
-    
     print_status "Successfully deployed $function_name"
 }
 
-# Deploy all Lambda functions
+# Deploy all Lambda functions from manifest
 print_info "Starting Lambda function deployment..."
 
-# Core API functions
-deploy_lambda_function "${PROJECT_NAME}-${ENVIRONMENT}-product-api" "product_api.py" "Product API for Unicorn E-Commerce" 30 512
-deploy_lambda_function "${PROJECT_NAME}-${ENVIRONMENT}-cart-api" "cart_api.py" "Shopping Cart API for Unicorn E-Commerce" 30 256
-deploy_lambda_function "${PROJECT_NAME}-${ENVIRONMENT}-order-api" "order_api.py" "Order Management API for Unicorn E-Commerce" 30 256
-deploy_lambda_function "${PROJECT_NAME}-${ENVIRONMENT}-auth-api" "auth_api.py" "Authentication API for Unicorn E-Commerce" 30 256
+# Read function list from manifest
+functions=$(jq -r '.functions[]' packages/deployment-manifest.json)
 
-# Review and Search functions
-deploy_lambda_function "${PROJECT_NAME}-${ENVIRONMENT}-review-api" "review_api.py" "Review API for Unicorn E-Commerce" 30 512
-deploy_lambda_function "${PROJECT_NAME}-${ENVIRONMENT}-review-analytics" "review_analytics.py" "Review Analytics API for Unicorn E-Commerce" 60 1024
-deploy_lambda_function "${PROJECT_NAME}-${ENVIRONMENT}-search-api" "search_api.py" "Search API for Unicorn E-Commerce" 30 512
-deploy_lambda_function "${PROJECT_NAME}-${ENVIRONMENT}-search-analytics" "search_analytics.py" "Search Analytics API for Unicorn E-Commerce" 30 256
-
-# AI and Analytics functions
-deploy_lambda_function "${PROJECT_NAME}-${ENVIRONMENT}-chat-api" "chat_api.py" "AI Chat API for Unicorn E-Commerce" 60 1024
-deploy_lambda_function "${PROJECT_NAME}-${ENVIRONMENT}-analytics-api" "analytics_api.py" "Analytics API for Unicorn E-Commerce" 60 1024
+for function_name in $functions; do
+    deploy_lambda_function "$function_name"
+done
 
 print_status "All Lambda functions deployed successfully!"
 
@@ -304,16 +278,9 @@ echo -e "${GREEN}🎉 Lambda Functions Deployment Complete!${NC}"
 echo "=================================================="
 echo ""
 echo "Deployed Functions:"
-echo "- ${PROJECT_NAME}-${ENVIRONMENT}-product-api"
-echo "- ${PROJECT_NAME}-${ENVIRONMENT}-cart-api"
-echo "- ${PROJECT_NAME}-${ENVIRONMENT}-order-api"
-echo "- ${PROJECT_NAME}-${ENVIRONMENT}-auth-api"
-echo "- ${PROJECT_NAME}-${ENVIRONMENT}-review-api"
-echo "- ${PROJECT_NAME}-${ENVIRONMENT}-review-analytics"
-echo "- ${PROJECT_NAME}-${ENVIRONMENT}-search-api"
-echo "- ${PROJECT_NAME}-${ENVIRONMENT}-search-analytics"
-echo "- ${PROJECT_NAME}-${ENVIRONMENT}-chat-api"
-echo "- ${PROJECT_NAME}-${ENVIRONMENT}-analytics-api"
+for function_name in $functions; do
+    echo "- $function_name"
+done
 echo ""
 echo "API Gateway Endpoint:"
 echo "https://$API_GATEWAY_ID.execute-api.$REGION.amazonaws.com/$ENVIRONMENT"
