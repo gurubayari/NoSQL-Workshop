@@ -8,7 +8,6 @@ set -e
 # Configuration
 PROJECT_NAME="unicorn-ecommerce"
 ENVIRONMENT="dev"
-STACK_NAME=$1
 REGION=${AWS_DEFAULT_REGION:-us-east-1}
 
 # Colors for output
@@ -71,58 +70,23 @@ check_prerequisites() {
     success "Prerequisites check passed"
 }
 
-# Get stack outputs
-get_stack_outputs() {
-    log "Retrieving stack outputs..."
-    
-    if ! aws cloudformation describe-stacks --stack-name $STACK_NAME --region $REGION &> /dev/null; then
-        error "CloudFormation stack $STACK_NAME not found. Please deploy infrastructure first."
-        exit 1
-    fi
+get_inputs() {
+    log "Retrieving inputs..."
     
     # Get key outputs
-    S3_BUCKET_NAME=$(aws cloudformation describe-stacks \
-        --stack-name $STACK_NAME \
-        --region $REGION \
-        --query 'Stacks[0].Outputs[?OutputKey==`WebsiteBucketName`].OutputValue' \
-        --output text)
+    S3_BUCKET_NAME=$1
     
-    CLOUDFRONT_DISTRIBUTION_ID=$(aws cloudformation describe-stacks \
-        --stack-name $STACK_NAME \
-        --region $REGION \
-        --query 'Stacks[0].Outputs[?OutputKey==`CloudFrontDistributionId`].OutputValue' \
-        --output text)
+    CLOUDFRONT_DISTRIBUTION_ID=$2
     
-    CLOUDFRONT_DOMAIN=$(aws cloudformation describe-stacks \
-        --stack-name $STACK_NAME \
-        --region $REGION \
-        --query 'Stacks[0].Outputs[?OutputKey==`CloudFrontDistributionDomainName`].OutputValue' \
-        --output text)
+    CLOUDFRONT_DOMAIN=$3
     
-    API_GATEWAY_URL=$(aws cloudformation describe-stacks \
-        --stack-name $STACK_NAME \
-        --region $REGION \
-        --query 'Stacks[0].Outputs[?OutputKey==`ApiGatewayURL`].OutputValue' \
-        --output text)
+    API_GATEWAY_URL=$4
     
-    USER_POOL_ID=$(aws cloudformation describe-stacks \
-        --stack-name $STACK_NAME \
-        --region $REGION \
-        --query 'Stacks[0].Outputs[?OutputKey==`UserPoolId`].OutputValue' \
-        --output text)
+    USER_POOL_ID=$5
     
-    USER_POOL_CLIENT_ID=$(aws cloudformation describe-stacks \
-        --stack-name $STACK_NAME \
-        --region $REGION \
-        --query 'Stacks[0].Outputs[?OutputKey==`UserPoolClientId`].OutputValue' \
-        --output text)
+    USER_POOL_CLIENT_ID=$6
     
-    if [ -z "$S3_BUCKET_NAME" ] || [ "$S3_BUCKET_NAME" = "None" ]; then
-        error "Could not retrieve S3 bucket name from stack outputs"
-        exit 1
-    fi
-    
-    success "Stack outputs retrieved successfully"
+    success "parameters retrieved successfully"
     log "S3 Bucket: $S3_BUCKET_NAME"
     log "CloudFront Distribution: $CLOUDFRONT_DISTRIBUTION_ID"
     log "CloudFront Domain: $CLOUDFRONT_DOMAIN"
@@ -419,7 +383,7 @@ main() {
     log "Starting Unicorn E-Commerce frontend deployment..."
     
     check_prerequisites
-    get_stack_outputs
+    get_inputs
     create_env_config
     install_dependencies
     run_tests

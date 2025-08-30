@@ -9,7 +9,7 @@ set -e
 PROJECT_NAME="unicorn-ecommerce"
 ENVIRONMENT="dev"
 REGION="us-east-1"
-STACK_NAME=$1
+
 
 # Colors for output
 RED='\033[0;31m'
@@ -23,7 +23,6 @@ echo "=================================================="
 echo "Project: $PROJECT_NAME"
 echo "Environment: $ENVIRONMENT"
 echo "Region: $REGION"
-echo "Stack: $STACK_NAME"
 echo ""
 
 # Function to print status
@@ -51,25 +50,11 @@ fi
 
 print_status "AWS CLI is configured"
 
-# Get stack outputs
-print_info "Retrieving stack outputs..."
-STACK_OUTPUTS=$(aws cloudformation describe-stacks \
-    --stack-name "$STACK_NAME" \
-    --region "$REGION" \
-    --query 'Stacks[0].Outputs' \
-    --output json)
-
-if [ $? -ne 0 ]; then
-    print_error "Failed to retrieve stack outputs. Make sure the infrastructure is deployed."
-    exit 1
-fi
-
-# Extract required values from stack outputs
-LAMBDA_EXECUTION_ROLE_ARN=$(echo "$STACK_OUTPUTS" | jq -r '.[] | select(.OutputKey=="LambdaExecutionRoleArn") | .OutputValue')
-LAMBDA_SECURITY_GROUP_ID=$(echo "$STACK_OUTPUTS" | jq -r '.[] | select(.OutputKey=="LambdaSecurityGroupId") | .OutputValue')
-PRIVATE_SUBNET_1_ID=$(echo "$STACK_OUTPUTS" | jq -r '.[] | select(.OutputKey=="PrivateSubnet1Id") | .OutputValue')
-PRIVATE_SUBNET_2_ID=$(echo "$STACK_OUTPUTS" | jq -r '.[] | select(.OutputKey=="PrivateSubnet2Id") | .OutputValue')
-API_GATEWAY_ID=$(echo "$STACK_OUTPUTS" | jq -r '.[] | select(.OutputKey=="ApiGatewayId") | .OutputValue')
+LAMBDA_EXECUTION_ROLE_ARN=$1
+LAMBDA_SECURITY_GROUP_ID=$2
+PRIVATE_SUBNET_1_ID=$3
+PRIVATE_SUBNET_2_ID=$4
+API_GATEWAY_ID=$5
 
 print_info "Lambda Execution Role ARN: $LAMBDA_EXECUTION_ROLE_ARN"
 print_info "Lambda Security Group ID: $LAMBDA_SECURITY_GROUP_ID"
