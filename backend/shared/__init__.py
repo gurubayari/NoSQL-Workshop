@@ -1,1 +1,0 @@
-# Shared utilities and models for AWS NoSQL Workshop backend
