@@ -1,0 +1,161 @@
+{
+  "summaryId": "9df545da-7a1f-4899-ae2a-c05f911e6a86",
+  "reportDate": "2025-08-30T12:06:35.386918",
+  "period": "last_30_days",
+  "totalSearches": 1832,
+  "uniqueUsers": 100,
+  "uniqueSearchTerms": 133,
+  "conversionRate": 0.4001,
+  "averageResultsPerSearch": 255.7,
+  "averageTimeSpentSeconds": 153.6,
+  "deviceDistribution": {
+    "mobile": 605,
+    "desktop": 591,
+    "tablet": 636
+  },
+  "platformDistribution": {
+    "mobile_app": 876,
+    "web": 956
+  },
+  "topSearchTerms": [
+    {
+      "term": "toys",
+      "frequency": 4911,
+      "rank": 1
+    },
+    {
+      "term": "music",
+      "frequency": 4792,
+      "rank": 2
+    },
+    {
+      "term": "educational",
+      "frequency": 4781,
+      "rank": 3
+    },
+    {
+      "term": "home",
+      "frequency": 3869,
+      "rank": 4
+    },
+    {
+      "term": "automotive",
+      "frequency": 3809,
+      "rank": 5
+    },
+    {
+      "term": "makeup",
+      "frequency": 3541,
+      "rank": 6
+    },
+    {
+      "term": "fragrances",
+      "frequency": 3407,
+      "rank": 7
+    },
+    {
+      "term": "tools",
+      "frequency": 3359,
+      "rank": 8
+    },
+    {
+      "term": "purina",
+      "frequency": 3238,
+      "rank": 9
+    },
+    {
+      "term": "stationery",
+      "frequency": 3195,
+      "rank": 10
+    },
+    {
+      "term": "waterproof bluetooth speaker for beach",
+      "frequency": 3183,
+      "rank": 11
+    },
+    {
+      "term": "nike",
+      "frequency": 3129,
+      "rank": 12
+    },
+    {
+      "term": "supplements",
+      "frequency": 3049,
+      "rank": 13
+    },
+    {
+      "term": "games",
+      "frequency": 2842,
+      "rank": 14
+    },
+    {
+      "term": "exercise",
+      "frequency": 2716,
+      "rank": 15
+    },
+    {
+      "term": "books",
+      "frequency": 2601,
+      "rank": 16
+    },
+    {
+      "term": "jeans",
+      "frequency": 2550,
+      "rank": 17
+    },
+    {
+      "term": "hill's",
+      "frequency": 2470,
+      "rank": 18
+    },
+    {
+      "term": "electronics",
+      "frequency": 2465,
+      "rank": 19
+    },
+    {
+      "term": "levi's",
+      "frequency": 2436,
+      "rank": 20
+    }
+  ],
+  "searchTrends": {
+    "growingTerms": [
+      "fragrances",
+      "zara",
+      "music",
+      "makeup",
+      "books",
+      "tools",
+      "furniture",
+      "toys",
+      "indoor",
+      "electronics"
+    ],
+    "decliningTerms": [
+      "professional",
+      "long battery",
+      "portable",
+      "best price",
+      "wireless"
+    ],
+    "seasonalTerms": [
+      "coolers",
+      "swimwear",
+      "beach",
+      "outdoor games",
+      "summer dresses",
+      "sunscreen",
+      "hiking",
+      "pool",
+      "fans",
+      "vacation"
+    ]
+  },
+  "performanceMetrics": {
+    "averageSearchLatency": 148.8,
+    "searchSuccessRate": 0.898,
+    "zeroResultsRate": 0.134,
+    "refinementRate": 0.271
+  }
+}
