@@ -1,161 +1,97 @@
 {
-  "summaryId": "9df545da-7a1f-4899-ae2a-c05f911e6a86",
-  "reportDate": "2025-08-30T12:06:35.386918",
+  "summaryId": "18f76678-4cc0-4891-b77b-298785c372c1",
+  "reportDate": "2025-08-31T22:42:08.962807",
   "period": "last_30_days",
-  "totalSearches": 1832,
+  "totalSearches": 1652,
   "uniqueUsers": 100,
-  "uniqueSearchTerms": 133,
-  "conversionRate": 0.4001,
-  "averageResultsPerSearch": 255.7,
-  "averageTimeSpentSeconds": 153.6,
+  "uniqueSearchTerms": 232,
+  "conversionRate": 0.7494,
+  "averageResultsPerSearch": 249.3,
+  "averageTimeSpentSeconds": 159.1,
   "deviceDistribution": {
-    "mobile": 605,
-    "desktop": 591,
-    "tablet": 636
+    "tablet": 565,
+    "desktop": 537,
+    "mobile": 550
   },
   "platformDistribution": {
-    "mobile_app": 876,
-    "web": 956
+    "web": 800,
+    "mobile_app": 852
   },
   "topSearchTerms": [
     {
-      "term": "toys",
-      "frequency": 4911,
-      "rank": 1
+      "term": "wireless",
+      "frequency": 5899,
+      "rank": 29
     },
     {
-      "term": "music",
-      "frequency": 4792,
-      "rank": 2
-    },
-    {
-      "term": "educational",
-      "frequency": 4781,
-      "rank": 3
-    },
-    {
-      "term": "home",
-      "frequency": 3869,
-      "rank": 4
-    },
-    {
-      "term": "automotive",
-      "frequency": 3809,
-      "rank": 5
-    },
-    {
-      "term": "makeup",
-      "frequency": 3541,
-      "rank": 6
-    },
-    {
-      "term": "fragrances",
-      "frequency": 3407,
+      "term": "beauty",
+      "frequency": 5679,
       "rank": 7
     },
     {
-      "term": "tools",
-      "frequency": 3359,
-      "rank": 8
+      "term": "discount",
+      "frequency": 5604,
+      "rank": 44
     },
     {
-      "term": "purina",
-      "frequency": 3238,
-      "rank": 9
+      "term": "office",
+      "frequency": 5472,
+      "rank": 22
     },
     {
-      "term": "stationery",
-      "frequency": 3195,
-      "rank": 10
-    },
-    {
-      "term": "waterproof bluetooth speaker for beach",
-      "frequency": 3183,
-      "rank": 11
-    },
-    {
-      "term": "nike",
-      "frequency": 3129,
-      "rank": 12
-    },
-    {
-      "term": "supplements",
-      "frequency": 3049,
-      "rank": 13
-    },
-    {
-      "term": "games",
-      "frequency": 2842,
-      "rank": 14
-    },
-    {
-      "term": "exercise",
-      "frequency": 2716,
-      "rank": 15
-    },
-    {
-      "term": "books",
-      "frequency": 2601,
-      "rank": 16
-    },
-    {
-      "term": "jeans",
-      "frequency": 2550,
-      "rank": 17
-    },
-    {
-      "term": "hill's",
-      "frequency": 2470,
+      "term": "amazon basics",
+      "frequency": 5202,
       "rank": 18
     },
     {
-      "term": "electronics",
-      "frequency": 2465,
-      "rank": 19
+      "term": "garden",
+      "frequency": 5062,
+      "rank": 41
     },
     {
-      "term": "levi's",
-      "frequency": 2436,
-      "rank": 20
+      "term": "apple",
+      "frequency": 4919,
+      "rank": 14
+    },
+    {
+      "term": "camping",
+      "frequency": 4530,
+      "rank": 39
+    },
+    {
+      "term": "beach",
+      "frequency": 4498,
+      "rank": 28
+    },
+    {
+      "term": "nike",
+      "frequency": 4435,
+      "rank": 48
     }
   ],
   "searchTrends": {
     "growingTerms": [
-      "fragrances",
-      "zara",
-      "music",
-      "makeup",
-      "books",
-      "tools",
-      "furniture",
-      "toys",
-      "indoor",
-      "electronics"
+      "wireless",
+      "beauty",
+      "discount",
+      "office",
+      "amazon basics"
     ],
     "decliningTerms": [
-      "professional",
-      "long battery",
-      "portable",
-      "best price",
-      "wireless"
+      "dvd player",
+      "cd player",
+      "fax machine"
     ],
     "seasonalTerms": [
-      "coolers",
       "swimwear",
       "beach",
-      "outdoor games",
-      "summer dresses",
-      "sunscreen",
-      "hiking",
-      "pool",
-      "fans",
-      "vacation"
+      "camping"
     ]
   },
   "performanceMetrics": {
-    "averageSearchLatency": 148.8,
-    "searchSuccessRate": 0.898,
+    "averageSearchLatency": 126.5,
+    "searchSuccessRate": 0.881,
     "zeroResultsRate": 0.134,
-    "refinementRate": 0.271
+    "refinementRate": 0.249
   }
 }

@@ -13,8 +13,8 @@
       "same-day"
     ],
     "priority": 1,
-    "lastUpdated": "2025-08-30T12:06:28.248281",
-    "contentId": "adae1592-9d67-4d12-9d0a-6657a09a6629",
+    "lastUpdated": "2025-08-31T14:42:03.424360",
+    "contentId": "8949e00e-656f-4bf9-a4f3-33bd6b58bf76",
     "searchableText": "Standard Shipping Options \n            **Free Standard Shipping**\n            - Free on orders over $50\n            - Delivery in 5-7 business days\n            - Available to all US addresses\n            \n            **Expedited Shipping**\n            - $9.99 flat rate\n            - Delivery in 2-3 business days\n            - Available Monday-Friday\n            \n            **Express Shipping**\n            - $19.99 flat rate\n            - Next business day delivery\n            - Order by 2 PM EST for next-day delivery\n            \n            **Same-Day Delivery**\n            - Available in select metropolitan areas\n            - $24.99 flat rate\n            - Order by 12 PM for same-day delivery\n             shipping delivery free shipping expedited express same-day",
     "embedding": [
       0.240234375,
@@ -1557,9 +1557,9 @@
     "wordCount": 76,
     "characterCount": 692,
     "readingTimeMinutes": 1,
-    "createdAt": "2025-08-30T12:06:29.556858",
-    "viewCount": 1984,
-    "helpfulVotes": 493,
+    "createdAt": "2025-08-31T14:42:04.545806",
+    "viewCount": 3645,
+    "helpfulVotes": 105,
     "status": "published",
     "language": "en"
   },
@@ -1576,8 +1576,8 @@
       "global"
     ],
     "priority": 2,
-    "lastUpdated": "2025-08-30T12:06:28.248300",
-    "contentId": "030000d3-7cc4-4578-88da-ad516925fb3f",
+    "lastUpdated": "2025-08-31T14:42:03.424749",
+    "contentId": "eefdc9b8-361c-4ef8-80cb-dd132e3aecd4",
     "searchableText": "International Shipping \n            **International Delivery**\n            We ship to over 100 countries worldwide.\n            \n            **Shipping Costs**\n            - Calculated based on destination and weight\n            - Typically $15-$45 for standard international shipping\n            - Express international available for $35-$75\n            \n            **Delivery Times**\n            - Standard International: 7-21 business days\n            - Express International: 3-7 business days\n            \n            **Customs & Duties**\n            - Customer responsible for customs fees and duties\n            - Items may be subject to inspection delays\n            - We provide all necessary customs documentation\n            \n            **Restricted Items**\n            Some items cannot be shipped internationally due to regulations.\n            Check product pages for international shipping availability.\n             international customs duties worldwide global",
     "embedding": [
       -0.1533203125,
@@ -3120,9 +3120,9 @@
     "wordCount": 89,
     "characterCount": 910,
     "readingTimeMinutes": 1,
-    "createdAt": "2025-08-30T12:06:29.908894",
-    "viewCount": 1069,
-    "helpfulVotes": 418,
+    "createdAt": "2025-08-31T14:42:04.871611",
+    "viewCount": 2921,
+    "helpfulVotes": 463,
     "status": "published",
     "language": "en"
   },
@@ -3139,8 +3139,8 @@
       "po box"
     ],
     "priority": 3,
-    "lastUpdated": "2025-08-30T12:06:28.248307",
-    "contentId": "8f849a7d-144a-46da-ab0f-7adeee02118e",
+    "lastUpdated": "2025-08-31T14:42:03.424756",
+    "contentId": "65693592-d39e-4b63-8586-378cf32d2dc2",
     "searchableText": "Shipping Restrictions & Special Handling \n            **Address Restrictions**\n            - We cannot ship to PO Boxes for certain items\n            - APO/FPO addresses supported for most products\n            - Some items require signature confirmation\n            \n            **Special Handling Items**\n            - Electronics may require additional packaging time\n            - Fragile items include extra protection\n            - Hazardous materials have shipping restrictions\n            \n            **Weather Delays**\n            - Severe weather may cause shipping delays\n            - We'll notify you of any weather-related delays\n            - Safety is our top priority\n            \n            **Holiday Shipping**\n            - Extended processing times during peak seasons\n            - Holiday shipping cutoff dates posted on homepage\n            - Consider expedited shipping for holiday gifts\n             restrictions special handling weather holidays po box",
     "embedding": [
       0.53515625,
@@ -4683,9 +4683,9 @@
     "wordCount": 94,
     "characterCount": 885,
     "readingTimeMinutes": 1,
-    "createdAt": "2025-08-30T12:06:30.233928",
-    "viewCount": 616,
-    "helpfulVotes": 294,
+    "createdAt": "2025-08-31T14:42:05.168464",
+    "viewCount": 2003,
+    "helpfulVotes": 245,
     "status": "published",
     "language": "en"
   },
@@ -4702,8 +4702,8 @@
       "process"
     ],
     "priority": 1,
-    "lastUpdated": "2025-08-30T12:06:28.248313",
-    "contentId": "41221469-3728-4477-92e6-98d5331d6bde",
+    "lastUpdated": "2025-08-31T14:42:03.424762",
+    "contentId": "1c86203b-5e67-45eb-b8fe-5dc93c3540b5",
     "searchableText": "General Return Policy \n            **30-Day Return Window**\n            - Most items can be returned within 30 days of delivery\n            - Items must be in original condition with tags attached\n            - Original packaging required for electronics\n            \n            **Return Process**\n            1. Log into your account and go to Order History\n            2. Select the item you want to return\n            3. Choose your return reason\n            4. Print the prepaid return label\n            5. Package the item securely\n            6. Drop off at any authorized shipping location\n            \n            **Refund Timeline**\n            - Refunds processed within 3-5 business days of receipt\n            - Original payment method will be credited\n            - Shipping costs are non-refundable (unless item is defective)\n            \n            **Return Shipping**\n            - Free return shipping on defective or incorrect items\n            - $7.99 return shipping fee for other returns\n            - Return shipping fee deducted from refund\n             returns 30 days refund return shipping process",
     "embedding": [
       0.283203125,
@@ -6246,9 +6246,9 @@
     "wordCount": 127,
     "characterCount": 1056,
     "readingTimeMinutes": 1,
-    "createdAt": "2025-08-30T12:06:30.543064",
-    "viewCount": 2373,
-    "helpfulVotes": 127,
+    "createdAt": "2025-08-31T14:42:05.492147",
+    "viewCount": 609,
+    "helpfulVotes": 199,
     "status": "published",
     "language": "en"
   },
@@ -6265,8 +6265,8 @@
       "international"
     ],
     "priority": 2,
-    "lastUpdated": "2025-08-30T12:06:28.248317",
-    "contentId": "6ba7d3d7-f26f-4961-a787-6a5710a6612e",
+    "lastUpdated": "2025-08-31T14:42:03.424766",
+    "contentId": "2492c37e-f0ae-4383-8a77-347603898378",
     "searchableText": "Exchange Policy \n            **Size & Color Exchanges**\n            - Free exchanges for different sizes or colors\n            - Must be within 30 days of delivery\n            - Original item must be in new condition\n            \n            **Exchange Process**\n            1. Initiate exchange through your account\n            2. We'll send you the new item immediately\n            3. Return the original item using provided label\n            4. No additional charges for size/color exchanges\n            \n            **Product Upgrades**\n            - Exchange for higher-priced item: pay the difference\n            - Exchange for lower-priced item: receive refund difference\n            - Price differences calculated at time of original purchase\n            \n            **International Exchanges**\n            - International customers pay return shipping\n            - New item ships once we receive the return\n            - Consider carefully before ordering to avoid extra costs\n             exchanges size color upgrades international",
     "embedding": [
       0.061767578125,
@@ -7809,9 +7809,9 @@
     "wordCount": 112,
     "characterCount": 984,
     "readingTimeMinutes": 1,
-    "createdAt": "2025-08-30T12:06:30.865467",
-    "viewCount": 403,
-    "helpfulVotes": 224,
+    "createdAt": "2025-08-31T14:42:05.817179",
+    "viewCount": 4599,
+    "helpfulVotes": 170,
     "status": "published",
     "language": "en"
   },
@@ -7828,8 +7828,8 @@
       "restocking fee"
     ],
     "priority": 2,
-    "lastUpdated": "2025-08-30T12:06:28.248321",
-    "contentId": "91b8d49a-7274-4ec4-ad27-7633447e00df",
+    "lastUpdated": "2025-08-31T14:42:03.424770",
+    "contentId": "7e3d48c1-74c0-4898-bbd1-c3a1b01a48ed",
     "searchableText": "Special Return Conditions \n            **Non-Returnable Items**\n            - Personal care items (opened)\n            - Customized or personalized products\n            - Digital downloads and gift cards\n            - Perishable goods\n            - Items marked as \"Final Sale\"\n            \n            **Electronics Returns**\n            - Must include all original accessories and manuals\n            - Software/apps must be uninstalled\n            - 15% restocking fee for opened electronics (unless defective)\n            - Original packaging required\n            \n            **Clothing Returns**\n            - Must have original tags attached\n            - Items must be unworn and unwashed\n            - No odors (perfume, smoke, etc.)\n            - Undergarments and swimwear: hygienic liner must be intact\n            \n            **Defective Items**\n            - No restocking fees for defective items\n            - Free return shipping provided\n            - Full refund including original shipping costs\n            - Option to exchange for same item or receive refund\n             non-returnable electronics clothing defective restocking fee",
     "embedding": [
       0.6171875,
@@ -9372,9 +9372,9 @@
     "wordCount": 116,
     "characterCount": 1068,
     "readingTimeMinutes": 1,
-    "createdAt": "2025-08-30T12:06:31.207096",
-    "viewCount": 1918,
-    "helpfulVotes": 498,
+    "createdAt": "2025-08-31T14:42:06.165523",
+    "viewCount": 1176,
+    "helpfulVotes": 105,
     "status": "published",
     "language": "en"
   },
@@ -9391,8 +9391,8 @@
       "maintenance"
     ],
     "priority": 2,
-    "lastUpdated": "2025-08-30T12:06:28.248329",
-    "contentId": "3d84f336-c6d6-4699-9527-07dabd2a3d0e",
+    "lastUpdated": "2025-08-31T14:42:03.424774",
+    "contentId": "92b23c85-859f-4883-ab70-4acb71af81ed",
     "searchableText": "Electronics Care & Maintenance \n            **General Electronics Care**\n            - Keep devices away from extreme temperatures\n            - Avoid exposure to moisture and humidity\n            - Use original chargers and accessories when possible\n            - Clean with dry, lint-free cloth only\n            \n            **Battery Care**\n            - Don't let batteries completely drain regularly\n            - Avoid overcharging (unplug when fully charged)\n            - Store devices with 50% charge if not using for extended periods\n            - Replace batteries when performance significantly decreases\n            \n            **Screen Care**\n            - Use screen protectors to prevent scratches\n            - Clean with microfiber cloth in circular motions\n            - Avoid harsh chemicals or abrasive materials\n            - Don't press hard on touchscreens\n            \n            **Storage Tips**\n            - Store in original packaging when possible\n            - Keep in cool, dry place\n            - Avoid stacking heavy items on top\n            - Remove batteries if storing for long periods\n             electronics battery screen storage maintenance",
     "embedding": [
       0.48046875,
@@ -10935,9 +10935,9 @@
     "wordCount": 127,
     "characterCount": 1106,
     "readingTimeMinutes": 1,
-    "createdAt": "2025-08-30T12:06:31.539920",
-    "viewCount": 488,
-    "helpfulVotes": 20,
+    "createdAt": "2025-08-31T14:42:06.494120",
+    "viewCount": 1179,
+    "helpfulVotes": 105,
     "status": "published",
     "language": "en"
   },
@@ -10954,8 +10954,8 @@
       "care labels"
     ],
     "priority": 2,
-    "lastUpdated": "2025-08-30T12:06:28.248332",
-    "contentId": "eb16c6fd-b024-45a2-b6bf-d4ec66f27578",
+    "lastUpdated": "2025-08-31T14:42:03.424778",
+    "contentId": "0d2289f6-ff65-47c2-99a7-edb0e9a92943",
     "searchableText": "Clothing Care Instructions \n            **Reading Care Labels**\n            - Always check care labels before washing\n            - Follow temperature and cycle recommendations\n            - Pay attention to drying instructions\n            - Note any special requirements (dry clean only, etc.)\n            \n            **Washing Guidelines**\n            - Separate colors: whites, lights, darks\n            - Use appropriate water temperature\n            - Don't overload washing machine\n            - Turn delicate items inside out\n            \n            **Drying Best Practices**\n            - Air dry when possible to prevent shrinkage\n            - Use low heat settings for machine drying\n            - Remove promptly to prevent wrinkles\n            - Hang or lay flat for delicate items\n            \n            **Storage Tips**\n            - Clean items before storing\n            - Use padded hangers for structured items\n            - Fold knits to prevent stretching\n            - Store in cool, dry place with good ventilation\n            - Use cedar blocks or lavender to deter moths\n             clothing washing drying storage care labels",
     "embedding": [
       0.29296875,
@@ -12498,9 +12498,9 @@
     "wordCount": 126,
     "characterCount": 1085,
     "readingTimeMinutes": 1,
-    "createdAt": "2025-08-30T12:06:31.870333",
-    "viewCount": 2678,
-    "helpfulVotes": 272,
+    "createdAt": "2025-08-31T14:42:06.821965",
+    "viewCount": 2297,
+    "helpfulVotes": 240,
     "status": "published",
     "language": "en"
   },
@@ -12516,8 +12516,8 @@
       "extended warranty"
     ],
     "priority": 1,
-    "lastUpdated": "2025-08-30T12:06:28.248336",
-    "contentId": "b75eb82b-83ea-40b6-9528-0ba981cdf00f",
+    "lastUpdated": "2025-08-31T14:42:03.424782",
+    "contentId": "bb8ceb12-eeb3-42f9-9d07-b95c14b58d7c",
     "searchableText": "Warranty Coverage & Terms \n            **Standard Warranty Coverage**\n            - Electronics: 1-2 years manufacturer warranty\n            - Appliances: 1-3 years depending on product\n            - Clothing: 90 days against manufacturing defects\n            - Home goods: 1 year limited warranty\n            \n            **What's Covered**\n            - Manufacturing defects\n            - Material failures under normal use\n            - Functional problems not caused by user damage\n            - Parts and labor (varies by product)\n            \n            **What's NOT Covered**\n            - Accidental damage or misuse\n            - Normal wear and tear\n            - Damage from improper care or storage\n            - Cosmetic damage that doesn't affect function\n            - Damage from unauthorized repairs\n            \n            **Extended Warranty Options**\n            - Available for most electronics and appliances\n            - Extends coverage up to 3 additional years\n            - Includes accidental damage protection\n            - Purchase within 30 days of original purchase\n             warranty coverage manufacturing defects extended warranty",
     "embedding": [
       0.5078125,
@@ -14060,8 +14060,8 @@
     "wordCount": 119,
     "characterCount": 1087,
     "readingTimeMinutes": 1,
-    "createdAt": "2025-08-30T12:06:32.205287",
-    "viewCount": 1352,
+    "createdAt": "2025-08-31T14:42:07.115331",
+    "viewCount": 4909,
     "helpfulVotes": 171,
     "status": "published",
     "language": "en"
@@ -14079,8 +14079,8 @@
       "refund"
     ],
     "priority": 1,
-    "lastUpdated": "2025-08-30T12:06:28.248339",
-    "contentId": "02089c75-73f7-44c9-91da-49451a75c4f8",
+    "lastUpdated": "2025-08-31T14:42:03.424786",
+    "contentId": "a2d48cf2-aeca-43d2-bc7e-f85ef101bffc",
     "searchableText": "How to File a Warranty Claim \n            **Before Filing a Claim**\n            1. Check if issue is covered under warranty\n            2. Try basic troubleshooting steps\n            3. Gather purchase information and serial numbers\n            4. Take photos/videos of the issue if applicable\n            \n            **Filing Your Claim**\n            1. Log into your Unicorn E-Commerce account\n            2. Go to Order History and find your purchase\n            3. Click \"Warranty Claim\" next to the item\n            4. Fill out the claim form with detailed description\n            5. Upload any supporting photos or documents\n            6. Submit claim for review\n            \n            **Claim Processing**\n            - Initial review within 2-3 business days\n            - May require additional information or testing\n            - Approved claims processed within 5-7 business days\n            - You'll receive email updates throughout the process\n            \n            **Resolution Options**\n            - Repair: Item sent to authorized service center\n            - Replace: New item shipped to you\n            - Refund: Full purchase price credited to original payment method\n             warranty claim process repair replace refund",
     "embedding": [
       -0.251953125,
@@ -15623,9 +15623,9 @@
     "wordCount": 139,
     "characterCount": 1179,
     "readingTimeMinutes": 1,
-    "createdAt": "2025-08-30T12:06:32.532877",
-    "viewCount": 3716,
-    "helpfulVotes": 493,
+    "createdAt": "2025-08-31T14:42:07.411103",
+    "viewCount": 263,
+    "helpfulVotes": 40,
     "status": "published",
     "language": "en"
   },
@@ -15641,8 +15641,8 @@
       "benefits"
     ],
     "priority": 1,
-    "lastUpdated": "2025-08-30T12:06:28.248342",
-    "contentId": "ba23c7f3-0a6b-44d2-9511-878af23653c0",
+    "lastUpdated": "2025-08-31T14:42:03.424790",
+    "contentId": "aa4de8dd-563d-4ac8-928a-e9495159e534",
     "searchableText": "How do I create an account? \n                Creating an account is easy and free:\n                1. Click \"Sign Up\" in the top right corner\n                2. Enter your email address and create a password\n                3. Verify your email address by clicking the link we send you\n                4. Complete your profile with shipping and billing information\n                \n                **Benefits of having an account:**\n                - Faster checkout process\n                - Order tracking and history\n                - Wishlist and saved items\n                - Exclusive member offers\n                - Easy returns and exchanges\n                 account sign up registration benefits",
     "embedding": [
       -0.007080078125,
@@ -17185,9 +17185,9 @@
     "wordCount": 74,
     "characterCount": 638,
     "readingTimeMinutes": 1,
-    "createdAt": "2025-08-30T12:06:32.871591",
-    "viewCount": 1332,
-    "helpfulVotes": 419,
+    "createdAt": "2025-08-31T14:42:07.735248",
+    "viewCount": 1788,
+    "helpfulVotes": 293,
     "status": "published",
     "language": "en"
   },
@@ -17203,8 +17203,8 @@
       "refund"
     ],
     "priority": 1,
-    "lastUpdated": "2025-08-30T12:06:28.248345",
-    "contentId": "e5524206-7be1-4bbe-aba1-e5878ef5865b",
+    "lastUpdated": "2025-08-31T14:42:03.424793",
+    "contentId": "dd3e6c84-4eac-40e2-8839-4148708f199c",
     "searchableText": "Can I modify or cancel my order? \n                **Order Modifications:**\n                - Changes possible within 1 hour of placing order\n                - Contact customer service immediately for modifications\n                - Cannot change shipping address once order is processed\n                - Item substitutions may not always be possible\n                \n                **Order Cancellation:**\n                - Cancel within 1 hour of placing order for full refund\n                - After processing begins, cancellation may not be possible\n                - If shipped, you'll need to return the item instead\n                - Cancellation requests processed within 2-4 hours\n                \n                **How to Request Changes:**\n                1. Log into your account and go to Order History\n                2. Find your recent order and click \"Modify/Cancel\"\n                3. Select the changes you want to make\n                4. Submit your request\n                5. You'll receive confirmation via email\n                 modify order cancel order changes refund",
     "embedding": [
       -0.26171875,
@@ -18747,9 +18747,9 @@
     "wordCount": 114,
     "characterCount": 1020,
     "readingTimeMinutes": 1,
-    "createdAt": "2025-08-30T12:06:33.208916",
-    "viewCount": 4021,
-    "helpfulVotes": 419,
+    "createdAt": "2025-08-31T14:42:08.045937",
+    "viewCount": 4810,
+    "helpfulVotes": 458,
     "status": "published",
     "language": "en"
   },
@@ -18766,8 +18766,8 @@
       "security"
     ],
     "priority": 1,
-    "lastUpdated": "2025-08-30T12:06:28.248348",
-    "contentId": "77a9abc0-3f80-4e44-a7ff-0a0b514b8c93",
+    "lastUpdated": "2025-08-31T14:42:03.424796",
+    "contentId": "f18f406d-5290-485a-afad-65cfa7616399",
     "searchableText": "What payment methods do you accept? \n                **Credit & Debit Cards:**\n                - Visa, MasterCard, American Express, Discover\n                - All major international cards accepted\n                - Secure processing with encryption\n                \n                **Digital Wallets:**\n                - PayPal and PayPal Credit\n                - Apple Pay (on compatible devices)\n                - Google Pay (on compatible devices)\n                - Amazon Pay\n                \n                **Other Options:**\n                - Buy now, pay later with Klarna or Afterpay\n                - Gift cards and store credit\n                - Corporate accounts for business customers\n                \n                **Payment Security:**\n                - All transactions encrypted with SSL\n                - We never store your full credit card information\n                - PCI DSS compliant payment processing\n                - Fraud protection on all orders\n                 payment credit card paypal apple pay security",
     "embedding": [
       0.6015625,
@@ -20310,9 +20310,9 @@
     "wordCount": 95,
     "characterCount": 961,
     "readingTimeMinutes": 1,
-    "createdAt": "2025-08-30T12:06:33.516930",
-    "viewCount": 1650,
-    "helpfulVotes": 279,
+    "createdAt": "2025-08-31T14:42:08.369974",
+    "viewCount": 261,
+    "helpfulVotes": 287,
     "status": "published",
     "language": "en"
   },
@@ -20329,8 +20329,8 @@
       "ssl"
     ],
     "priority": 1,
-    "lastUpdated": "2025-08-30T12:06:28.248351",
-    "contentId": "6c61ba45-d817-49eb-97b3-d226e2fc7200",
+    "lastUpdated": "2025-08-31T14:42:03.424800",
+    "contentId": "a435d0ef-a2ce-4ef8-ad40-50467daf25b9",
     "searchableText": "Is my personal information secure? \n                **Data Protection:**\n                - All personal information encrypted and secure\n                - We never sell your information to third parties\n                - Strict access controls for employee data access\n                - Regular security audits and updates\n                \n                **What We Collect:**\n                - Contact information for order processing\n                - Payment information (securely processed)\n                - Browsing behavior to improve your experience\n                - Product preferences for personalized recommendations\n                \n                **Your Privacy Rights:**\n                - View and update your information anytime\n                - Delete your account and data upon request\n                - Opt out of marketing communications\n                - Control cookie preferences\n                \n                **Security Measures:**\n                - 256-bit SSL encryption for all data transmission\n                - Two-factor authentication available\n                - Regular password security checks\n                - Automatic logout for inactive sessions\n                 privacy security data protection encryption ssl",
     "embedding": [
       0.8828125,
@@ -21873,9 +21873,9 @@
     "wordCount": 112,
     "characterCount": 1171,
     "readingTimeMinutes": 1,
-    "createdAt": "2025-08-30T12:06:33.822690",
-    "viewCount": 1068,
-    "helpfulVotes": 151,
+    "createdAt": "2025-08-31T14:42:08.710232",
+    "viewCount": 1599,
+    "helpfulVotes": 214,
     "status": "published",
     "language": "en"
   }
