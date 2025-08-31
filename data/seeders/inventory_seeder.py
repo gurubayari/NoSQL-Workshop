@@ -6,10 +6,11 @@ import json
 import os
 import sys
 from datetime import datetime
+from decimal import Decimal
 from typing import List, Dict, Any
 
 # Import common database connections
-from database_connections import get_dynamodb_table
+from database_connections import get_dynamodb_table, prepare_for_dynamodb
 
 class InventorySeeder:
     """Seed inventory data to DynamoDB"""
@@ -96,7 +97,7 @@ class InventorySeeder:
             with table.batch_writer() as batch:
                 for record in inventory_records:
                     # Convert any remaining datetime objects to strings for DynamoDB
-                    dynamodb_record = self._prepare_for_dynamodb(record)
+                    dynamodb_record = prepare_for_dynamodb(record)
                     batch.put_item(Item=dynamodb_record)
                     inserted_count += 1
                     
@@ -116,22 +117,7 @@ class InventorySeeder:
             print(f"Error seeding inventory to DynamoDB: {e}")
             return False
     
-    def _prepare_for_dynamodb(self, record: Dict[str, Any]) -> Dict[str, Any]:
-        """Prepare record for DynamoDB by ensuring all data types are compatible"""
-        def convert_recursive(obj):
-            if isinstance(obj, datetime):
-                return obj.isoformat()
-            elif isinstance(obj, dict):
-                return {k: convert_recursive(v) for k, v in obj.items()}
-            elif isinstance(obj, list):
-                return [convert_recursive(item) for item in obj]
-            elif isinstance(obj, (int, float, str, bool)) or obj is None:
-                return obj
-            else:
-                # Convert any other type to string
-                return str(obj)
-        
-        return convert_recursive(record)
+
     
     def print_seeding_summary(self, inventory_records: List[Dict[str, Any]]):
         """Print summary of seeded inventory data"""
@@ -143,8 +129,8 @@ class InventorySeeder:
         
         # Basic stats
         total_products = len(inventory_records)
-        total_stock = sum(record["stockSummary"]["totalStock"] for record in inventory_records)
-        total_value = sum(record["costInfo"]["totalValue"] for record in inventory_records)
+        total_stock = sum(int(record["stockSummary"]["totalStock"]) for record in inventory_records)
+        total_value = sum(Decimal(str(record["costInfo"]["totalValue"])) for record in inventory_records)
         total_alerts = sum(len(record["alerts"]) for record in inventory_records)
         
         print(f"Products with inventory: {total_products}")
@@ -160,8 +146,8 @@ class InventorySeeder:
                 category_stats[category] = {"count": 0, "stock": 0, "value": 0}
             
             category_stats[category]["count"] += 1
-            category_stats[category]["stock"] += record["stockSummary"]["totalStock"]
-            category_stats[category]["value"] += record["costInfo"]["totalValue"]
+            category_stats[category]["stock"] += int(record["stockSummary"]["totalStock"])
+            category_stats[category]["value"] += Decimal(str(record["costInfo"]["totalValue"]))
         
         print(f"\nInventory by category:")
         for category, stats in sorted(category_stats.items()):
@@ -174,7 +160,7 @@ class InventorySeeder:
                 wh_name = ws["warehouseName"]
                 if wh_name not in warehouse_totals:
                     warehouse_totals[wh_name] = 0
-                warehouse_totals[wh_name] += ws["stockQuantity"]
+                warehouse_totals[wh_name] += int(ws["stockQuantity"])
         
         print(f"\nStock by warehouse:")
         for wh_name, stock in sorted(warehouse_totals.items()):
@@ -228,7 +214,7 @@ def main():
             print("✅ Inventory seeding completed successfully!")
             seeder.print_seeding_summary(inventory_records)
             
-            print(f"\n🚀 Inventory data is now available in DynamoDB table: {config.INVENTORY_TABLE}")
+            print(f"\n🚀 Inventory data is now available in DynamoDB table: {os.environ.get('INVENTORY_TABLE', 'INVENTORY_TABLE')}")
             print(f"   Products in DocumentDB are correlated with inventory in DynamoDB")
             print(f"   Each product has stock distributed across 5 warehouses")
             print(f"   Inventory includes alerts, movement history, and supplier info")

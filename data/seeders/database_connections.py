@@ -4,6 +4,8 @@ Provides centralized connection management for DocumentDB, DynamoDB, and ElastiC
 """
 import os
 import sys
+from datetime import datetime
+from decimal import Decimal
 from typing import Optional, Dict, Any
 from urllib.parse import quote_plus
 
@@ -128,7 +130,6 @@ class DatabaseConnections:
                 connection_string,
                 **connection_options
             )
-            
             # Test the connection
             self.documentdb_client.admin.command('ping')
             
@@ -299,6 +300,30 @@ class DatabaseConnectionManager:
     
     def __exit__(self, exc_type, exc_val, exc_tb):
         db_connections.close_connections()
+
+
+def prepare_for_dynamodb(record: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Utility function to prepare any record for DynamoDB by converting float to Decimal
+    This ensures compatibility with DynamoDB's data type requirements
+    """
+    def convert_recursive(obj):
+        if isinstance(obj, datetime):
+            return obj.isoformat()
+        elif isinstance(obj, float):
+            # Convert float to Decimal for DynamoDB compatibility
+            return Decimal(str(obj))
+        elif isinstance(obj, dict):
+            return {k: convert_recursive(v) for k, v in obj.items()}
+        elif isinstance(obj, list):
+            return [convert_recursive(item) for item in obj]
+        elif isinstance(obj, (int, str, bool)) or obj is None:
+            return obj
+        else:
+            # Convert any other type to string
+            return str(obj)
+    
+    return convert_recursive(record)
 
 
 if __name__ == "__main__":

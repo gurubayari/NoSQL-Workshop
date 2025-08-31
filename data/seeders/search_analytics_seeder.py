@@ -6,10 +6,11 @@ import json
 import os
 import sys
 from datetime import datetime
+from decimal import Decimal
 from typing import List, Dict, Any
 
 # Import common database connections
-from database_connections import get_dynamodb_table
+from database_connections import get_dynamodb_table, prepare_for_dynamodb
 
 class SearchAnalyticsSeeder:
     """Seed search analytics data to DynamoDB"""
@@ -64,7 +65,7 @@ class SearchAnalyticsSeeder:
             with table.batch_writer() as batch:
                 for record in search_data:
                     # Prepare record for DynamoDB
-                    dynamodb_record = self._prepare_for_dynamodb(record)
+                    dynamodb_record = prepare_for_dynamodb(record)
                     batch.put_item(Item=dynamodb_record)
                     inserted_count += 1
                     
@@ -84,22 +85,7 @@ class SearchAnalyticsSeeder:
             print(f"Error seeding search analytics to DynamoDB: {e}")
             return False
     
-    def _prepare_for_dynamodb(self, record: Dict[str, Any]) -> Dict[str, Any]:
-        """Prepare record for DynamoDB by ensuring all data types are compatible"""
-        def convert_recursive(obj):
-            if isinstance(obj, datetime):
-                return obj.isoformat()
-            elif isinstance(obj, dict):
-                return {k: convert_recursive(v) for k, v in obj.items()}
-            elif isinstance(obj, list):
-                return [convert_recursive(item) for item in obj]
-            elif isinstance(obj, (int, float, str, bool)) or obj is None:
-                return obj
-            else:
-                # Convert any other type to string
-                return str(obj)
-        
-        return convert_recursive(record)
+
 
 def main():
     """Main function to seed search analytics data to DynamoDB"""
@@ -124,7 +110,7 @@ def main():
         
         if success:
             print("✅ Search analytics seeding completed successfully!")
-            print(f"🚀 Search analytics data is now available in DynamoDB table: {config.SEARCH_ANALYTICS_TABLE}")
+            print(f"🚀 Search analytics data is now available in DynamoDB table: {os.environ.get('SEARCH_ANALYTICS_TABLE', 'SEARCH_ANALYTICS_TABLE')}")
         else:
             print("❌ Search analytics seeding failed")
             return
