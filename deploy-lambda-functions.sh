@@ -280,14 +280,11 @@ check_vpc_lambda_readiness() {
         print_warning "First VPC Lambda deployment may take 5-10 minutes for ENI creation"
         print_info "AWS needs to create Elastic Network Interfaces (ENIs) for VPC connectivity"
         
-        # Ask user if they want to continue
+        # Auto-continue for first VPC deployment
         echo ""
-        read -p "Continue with deployment? This may take longer than usual (y/N): " -n 1 -r
+        print_info "Continuing with first VPC Lambda deployment..."
+        print_info "This will take 5-10 minutes for ENI creation - please be patient"
         echo ""
-        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-            print_info "Deployment cancelled by user"
-            exit 0
-        fi
     else
         print_status "Existing VPC Lambda functions found - ENIs should already be available"
     fi
@@ -296,8 +293,21 @@ check_vpc_lambda_readiness() {
 # Deploy all Lambda functions from manifest
 print_info "Starting Lambda function deployment..."
 
-# Check VPC readiness
-check_vpc_lambda_readiness
+# Check if this is an update deployment (functions already exist from CloudFormation)
+existing_functions=$(aws lambda list-functions \
+    --region "$REGION" \
+    --query "Functions[?starts_with(FunctionName, '${PROJECT_NAME}-${ENVIRONMENT}-')].FunctionName" \
+    --output text 2>/dev/null || echo "")
+
+if [ -n "$existing_functions" ]; then
+    print_status "Detected existing Lambda functions from CloudFormation"
+    print_info "Running in UPDATE mode - updating existing functions with application code"
+    print_info "This should be much faster since ENIs are already created"
+else
+    print_info "Running in CREATE mode - creating new functions"
+    # Check VPC readiness
+    check_vpc_lambda_readiness
+fi
 
 # Read function list from manifest
 functions=$(jq -r '.functions[]' packages/deployment-manifest.json)
