@@ -49,6 +49,29 @@ fi
 
 print_status "AWS CLI is configured"
 
+# Cleanup function for partial deployments
+cleanup_partial_deployment() {
+    local function_name=$1
+    print_warning "Cleaning up partial deployment of $function_name..."
+    
+    # Delete the function if it exists but is in a failed state
+    if aws lambda get-function --function-name "$function_name" --region "$REGION" > /dev/null 2>&1; then
+        local state=$(aws lambda get-function \
+            --function-name "$function_name" \
+            --region "$REGION" \
+            --query 'Configuration.State' \
+            --output text 2>/dev/null || echo "Unknown")
+        
+        if [ "$state" = "Failed" ] || [ "$state" = "Inactive" ]; then
+            print_info "Deleting failed function $function_name..."
+            aws lambda delete-function \
+                --function-name "$function_name" \
+                --region "$REGION" > /dev/null 2>&1 || true
+            print_status "Cleaned up $function_name"
+        fi
+    fi
+}
+
 # Check if packages directory exists
 if [ ! -d "packages" ]; then
     print_error "Packages directory not found. Please run ./package-lambda-functions.sh first"
@@ -148,6 +171,9 @@ deploy_lambda_function() {
     else
         print_info "Creating new function $function_name..."
         
+        # Clean up any partial deployment first
+        cleanup_partial_deployment "$function_name"
+        
         # Create function
         aws lambda create-function \
             --function-name "$function_name" \
@@ -163,24 +189,175 @@ deploy_lambda_function() {
             --region "$REGION" > /dev/null
     fi
     
-    # Wait for function to be active
+    # Wait for function to be active with extended timeout for VPC functions
     print_info "Waiting for function $function_name to be active..."
-    aws lambda wait function-active --function-name "$function_name" --region "$REGION"
+    
+    # For VPC functions, we need to wait longer for ENI creation
+    local max_attempts=60  # 10 minutes (60 * 10 seconds)
+    local attempt=0
+    local wait_time=10
+    
+    while [ $attempt -lt $max_attempts ]; do
+        local state=$(aws lambda get-function \
+            --function-name "$function_name" \
+            --region "$REGION" \
+            --query 'Configuration.State' \
+            --output text 2>/dev/null || echo "Pending")
+        
+        local last_update_status=$(aws lambda get-function \
+            --function-name "$function_name" \
+            --region "$REGION" \
+            --query 'Configuration.LastUpdateStatus' \
+            --output text 2>/dev/null || echo "InProgress")
+        
+        if [ "$state" = "Active" ] && [ "$last_update_status" = "Successful" ]; then
+            print_status "Function $function_name is now active"
+            break
+        elif [ "$state" = "Failed" ] || [ "$last_update_status" = "Failed" ]; then
+            print_error "Function $function_name deployment failed"
+            
+            # Get the failure reason
+            local state_reason=$(aws lambda get-function \
+                --function-name "$function_name" \
+                --region "$REGION" \
+                --query 'Configuration.StateReason' \
+                --output text 2>/dev/null || echo "Unknown")
+            
+            print_error "Failure reason: $state_reason"
+            return 1
+        else
+            attempt=$((attempt + 1))
+            if [ $attempt -eq 1 ]; then
+                print_warning "VPC Lambda deployment detected - this may take 5-10 minutes for ENI creation"
+            fi
+            
+            # Progressive status updates
+            if [ $((attempt % 6)) -eq 0 ]; then  # Every minute
+                local elapsed=$((attempt * wait_time / 60))
+                print_info "Still waiting... (${elapsed} minutes elapsed, state: $state, status: $last_update_status)"
+            fi
+            
+            sleep $wait_time
+        fi
+    done
+    
+    if [ $attempt -eq $max_attempts ]; then
+        print_error "Timeout waiting for function $function_name to become active"
+        print_warning "This might be due to VPC ENI creation taking longer than expected"
+        print_info "You can check the function status in the AWS Console and re-run this script"
+        return 1
+    fi
+    
+    # Additional check to ensure function is truly ready
+    print_info "Verifying function $function_name is ready for invocation..."
+    local invoke_test=$(aws lambda invoke \
+        --function-name "$function_name" \
+        --payload '{"httpMethod":"GET","path":"/health"}' \
+        --region "$REGION" \
+        /tmp/test-response.json 2>&1 || echo "failed")
+    
+    if [[ "$invoke_test" == *"failed"* ]] || [[ "$invoke_test" == *"error"* ]]; then
+        print_warning "Function may not be fully ready yet, but continuing deployment..."
+    else
+        print_status "Function $function_name is ready for invocation"
+    fi
     
     print_status "Successfully deployed $function_name"
+}
+
+# Check if this is the first VPC Lambda deployment
+check_vpc_lambda_readiness() {
+    print_info "Checking VPC readiness for Lambda deployments..."
+    
+    # Check if there are existing Lambda functions in the VPC
+    local existing_vpc_functions=$(aws lambda list-functions \
+        --region "$REGION" \
+        --query "Functions[?VpcConfig.SubnetIds && contains(VpcConfig.SubnetIds, '$PRIVATE_SUBNET_1_ID')].FunctionName" \
+        --output text 2>/dev/null || echo "")
+    
+    if [ -z "$existing_vpc_functions" ]; then
+        print_warning "No existing VPC Lambda functions detected"
+        print_warning "First VPC Lambda deployment may take 5-10 minutes for ENI creation"
+        print_info "AWS needs to create Elastic Network Interfaces (ENIs) for VPC connectivity"
+        
+        # Ask user if they want to continue
+        echo ""
+        read -p "Continue with deployment? This may take longer than usual (y/N): " -n 1 -r
+        echo ""
+        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+            print_info "Deployment cancelled by user"
+            exit 0
+        fi
+    else
+        print_status "Existing VPC Lambda functions found - ENIs should already be available"
+    fi
 }
 
 # Deploy all Lambda functions from manifest
 print_info "Starting Lambda function deployment..."
 
+# Check VPC readiness
+check_vpc_lambda_readiness
+
 # Read function list from manifest
 functions=$(jq -r '.functions[]' packages/deployment-manifest.json)
 
+# Deploy functions with error handling
+failed_functions=()
+successful_functions=()
+
 for function_name in $functions; do
-    deploy_lambda_function "$function_name"
+    if deploy_lambda_function "$function_name"; then
+        successful_functions+=("$function_name")
+    else
+        failed_functions+=("$function_name")
+        print_error "Failed to deploy $function_name"
+    fi
 done
 
-print_status "All Lambda functions deployed successfully!"
+# Report deployment results
+echo ""
+if [ ${#successful_functions[@]} -gt 0 ]; then
+    print_status "Successfully deployed ${#successful_functions[@]} functions:"
+    for func in "${successful_functions[@]}"; do
+        echo "  ✅ $func"
+    done
+fi
+
+if [ ${#failed_functions[@]} -gt 0 ]; then
+    print_error "Failed to deploy ${#failed_functions[@]} functions:"
+    for func in "${failed_functions[@]}"; do
+        echo "  ❌ $func"
+    done
+    echo ""
+    print_warning "Some functions failed to deploy. Common solutions:"
+    echo "1. Wait 5-10 minutes and re-run the script (VPC ENI creation)"
+    echo "2. Check AWS Console for detailed error messages"
+    echo "3. Verify VPC configuration and security groups"
+    echo "4. Ensure Lambda execution role has proper permissions"
+    echo ""
+    
+    read -p "Do you want to retry failed deployments? (y/N): " -n 1 -r
+    echo ""
+    if [[ $REPLY =~ ^[Yy]$ ]]; then
+        print_info "Retrying failed deployments..."
+        for function_name in "${failed_functions[@]}"; do
+            print_info "Retrying deployment of $function_name..."
+            if deploy_lambda_function "$function_name"; then
+                print_status "Successfully deployed $function_name on retry"
+            else
+                print_error "Failed to deploy $function_name even on retry"
+            fi
+        done
+    fi
+fi
+
+if [ ${#failed_functions[@]} -eq 0 ]; then
+    print_status "All Lambda functions deployed successfully!"
+else
+    print_warning "Deployment completed with some failures"
+    print_info "You can re-run this script to retry failed deployments"
+fi
 
 # Create API Gateway integrations
 print_info "Setting up API Gateway integrations..."
