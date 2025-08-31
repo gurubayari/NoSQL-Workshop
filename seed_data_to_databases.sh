@@ -183,20 +183,30 @@ if [ -f "data/output/knowledge_base.json" ]; then
     fi
 fi
 
-# Seed search analytics to DynamoDB (if available)
-if [ -f "data/output/search_analytics.json" ]; then
-    print_info "Seeding search analytics to DynamoDB..."
+# Seed search behaviors to DynamoDB (if available)
+if [ -f "data/output/search_behaviors.json" ]; then
+    print_info "Seeding search behaviors to DynamoDB..."
     if python3 data/seeders/search_analytics_seeder.py; then
-        print_status "Search analytics seeded to DynamoDB successfully"
+        print_status "Search behaviors seeded to DynamoDB successfully"
     else
-        print_warning "Search analytics seeding failed, continuing..."
+        print_warning "Search behaviors seeding failed, continuing..."
+    fi
+fi
+
+# Seed popular search terms to ElastiCache (if available)
+if [ -f "data/output/popular_search_terms.json" ]; then
+    print_info "Seeding popular search terms to ElastiCache..."
+    if python3 data/seeders/elasticache_seeder.py; then
+        print_status "Popular search terms seeded to ElastiCache successfully"
+    else
+        print_warning "ElastiCache seeding failed, continuing..."
     fi
 fi
 
 print_status "Database seeding completed successfully!"
 print_info "Data has been seeded to:"
 echo "  • DocumentDB: Products, reviews, and knowledge base collections"
-echo "  • DynamoDB: Inventory and search analytics tables"
-echo "  • ElastiCache: Popular search terms and suggestions"
+echo "  • DynamoDB: Inventory and search behaviors tables"
+echo "  • ElastiCache: Popular search terms, auto-complete suggestions, and trending terms"
 echo ""
 print_status "Database seeding script completed at: $(date)"
