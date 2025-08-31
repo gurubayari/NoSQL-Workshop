@@ -12,7 +12,9 @@ Parameters:
   VpcCidr:
     Type: String
     Default: '10.0.0.0/16'
-
+  LatestAmiId:
+    Type: "AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>"
+    Default: "/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-6.1-x86_64"
 Resources:
   # VPC
   VPC:
@@ -222,6 +224,17 @@ Resources:
               AWS: !Sub 'arn:aws:iam::${AWS::AccountId}:root'
             Action: 'kms:*'
             Resource: '*'
+          - Sid: Allow DynamoDB Service
+            Effect: Allow
+            Principal:
+              Service: dynamodb.amazonaws.com
+            Action:
+              - kms:Decrypt
+              - kms:GenerateDataKey
+              - kms:ReEncrypt*
+              - kms:CreateGrant
+              - kms:DescribeKey
+            Resource: '*'
 
   DynamoDBKMSKeyAlias:
     Type: AWS::KMS::Alias
@@ -241,6 +254,17 @@ Resources:
             Principal:
               AWS: !Sub 'arn:aws:iam::${AWS::AccountId}:root'
             Action: 'kms:*'
+            Resource: '*'
+          - Sid: Allow S3 Service
+            Effect: Allow
+            Principal:
+              Service: s3.amazonaws.com
+            Action:
+              - kms:Decrypt
+              - kms:GenerateDataKey
+              - kms:ReEncrypt*
+              - kms:CreateGrant
+              - kms:DescribeKey
             Resource: '*'
 
   S3KMSKeyAlias:
@@ -710,6 +734,435 @@ Resources:
                   - secretsmanager:DescribeSecret
                 Resource: !Ref DocumentDBSecret
 
+  Ec2HostInstanceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub '${ProjectName}-${Environment}-bastion-role'
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ec2.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Path: /
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
+        - arn:aws:iam::aws:policy/SecretsManagerReadWrite
+        - arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess
+        - arn:aws:iam::aws:policy/CloudFrontFullAccess
+        - arn:aws:iam::aws:policy/AWSLambda_FullAccess
+        - arn:aws:iam::aws:policy/AmazonS3FullAccess
+        - arn:aws:iam::aws:policy/AWSKeyManagementServicePowerUser
+      Policies:
+        - PolicyName: IAMPassRoleAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - iam:PassRole
+                Resource: !GetAtt LambdaExecutionRole.Arn
+        - PolicyName: APIGatewayAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - apigateway:GET
+                  - apigateway:POST
+                  - apigateway:PUT
+                  - apigateway:DELETE
+                  - apigateway:PATCH
+                Resource: '*'
+        - PolicyName: KMSAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - kms:Decrypt
+                  - kms:GenerateDataKey
+                  - kms:GenerateDataKeyWithoutPlaintext
+                  - kms:Encrypt
+                  - kms:ReEncrypt*
+                  - kms:CreateGrant
+                  - kms:DescribeKey
+                Resource: 
+                  - !GetAtt DynamoDBKMSKey.Arn
+                  - !GetAtt S3KMSKey.Arn
+              - Effect: Allow
+                Action:
+                  - kms:ListKeys
+                  - kms:ListAliases
+                Resource: '*'
+
+  # Basic Lambda Functions (Placeholder - Updated by deploy-lambda-functions.sh)
+  ProductApiFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub '${ProjectName}-${Environment}-product-api'
+      Runtime: python3.9
+      Handler: lambda_function.lambda_handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Timeout: 30
+      MemorySize: 256
+      VpcConfig:
+        SecurityGroupIds:
+          - !Ref LambdaSecurityGroup
+        SubnetIds:
+          - !Ref PrivateSubnet1
+          - !Ref PrivateSubnet2
+      Environment:
+        Variables:
+          PROJECT_NAME: !Ref ProjectName
+          ENVIRONMENT: !Ref Environment
+          REGION: !Ref AWS::Region
+      Code:
+        ZipFile: |
+          import json
+          def lambda_handler(event, context):
+              return {
+                  'statusCode': 200,
+                  'headers': {'Content-Type': 'application/json'},
+                  'body': json.dumps({'message': 'Product API - Placeholder function'})
+              }
+
+  CartApiFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub '${ProjectName}-${Environment}-cart-api'
+      Runtime: python3.9
+      Handler: lambda_function.lambda_handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Timeout: 30
+      MemorySize: 256
+      VpcConfig:
+        SecurityGroupIds:
+          - !Ref LambdaSecurityGroup
+        SubnetIds:
+          - !Ref PrivateSubnet1
+          - !Ref PrivateSubnet2
+      Environment:
+        Variables:
+          PROJECT_NAME: !Ref ProjectName
+          ENVIRONMENT: !Ref Environment
+          REGION: !Ref AWS::Region
+      Code:
+        ZipFile: |
+          import json
+          def lambda_handler(event, context):
+              return {
+                  'statusCode': 200,
+                  'headers': {'Content-Type': 'application/json'},
+                  'body': json.dumps({'message': 'Cart API - Placeholder function'})
+              }
+
+  OrderApiFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub '${ProjectName}-${Environment}-order-api'
+      Runtime: python3.9
+      Handler: lambda_function.lambda_handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Timeout: 30
+      MemorySize: 256
+      VpcConfig:
+        SecurityGroupIds:
+          - !Ref LambdaSecurityGroup
+        SubnetIds:
+          - !Ref PrivateSubnet1
+          - !Ref PrivateSubnet2
+      Environment:
+        Variables:
+          PROJECT_NAME: !Ref ProjectName
+          ENVIRONMENT: !Ref Environment
+          REGION: !Ref AWS::Region
+      Code:
+        ZipFile: |
+          import json
+          def lambda_handler(event, context):
+              return {
+                  'statusCode': 200,
+                  'headers': {'Content-Type': 'application/json'},
+                  'body': json.dumps({'message': 'Order API - Placeholder function'})
+              }
+
+  AuthApiFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub '${ProjectName}-${Environment}-auth-api'
+      Runtime: python3.9
+      Handler: lambda_function.lambda_handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Timeout: 30
+      MemorySize: 256
+      VpcConfig:
+        SecurityGroupIds:
+          - !Ref LambdaSecurityGroup
+        SubnetIds:
+          - !Ref PrivateSubnet1
+          - !Ref PrivateSubnet2
+      Environment:
+        Variables:
+          PROJECT_NAME: !Ref ProjectName
+          ENVIRONMENT: !Ref Environment
+          REGION: !Ref AWS::Region
+      Code:
+        ZipFile: |
+          import json
+          def lambda_handler(event, context):
+              return {
+                  'statusCode': 200,
+                  'headers': {'Content-Type': 'application/json'},
+                  'body': json.dumps({'message': 'Auth API - Placeholder function'})
+              }
+
+  ReviewApiFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub '${ProjectName}-${Environment}-review-api'
+      Runtime: python3.9
+      Handler: lambda_function.lambda_handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Timeout: 30
+      MemorySize: 256
+      VpcConfig:
+        SecurityGroupIds:
+          - !Ref LambdaSecurityGroup
+        SubnetIds:
+          - !Ref PrivateSubnet1
+          - !Ref PrivateSubnet2
+      Environment:
+        Variables:
+          PROJECT_NAME: !Ref ProjectName
+          ENVIRONMENT: !Ref Environment
+          REGION: !Ref AWS::Region
+      Code:
+        ZipFile: |
+          import json
+          def lambda_handler(event, context):
+              return {
+                  'statusCode': 200,
+                  'headers': {'Content-Type': 'application/json'},
+                  'body': json.dumps({'message': 'Review API - Placeholder function'})
+              }
+
+  SearchApiFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub '${ProjectName}-${Environment}-search-api'
+      Runtime: python3.9
+      Handler: lambda_function.lambda_handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Timeout: 30
+      MemorySize: 256
+      VpcConfig:
+        SecurityGroupIds:
+          - !Ref LambdaSecurityGroup
+        SubnetIds:
+          - !Ref PrivateSubnet1
+          - !Ref PrivateSubnet2
+      Environment:
+        Variables:
+          PROJECT_NAME: !Ref ProjectName
+          ENVIRONMENT: !Ref Environment
+          REGION: !Ref AWS::Region
+      Code:
+        ZipFile: |
+          import json
+          def lambda_handler(event, context):
+              return {
+                  'statusCode': 200,
+                  'headers': {'Content-Type': 'application/json'},
+                  'body': json.dumps({'message': 'Search API - Placeholder function'})
+              }
+
+  ChatApiFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub '${ProjectName}-${Environment}-chat-api'
+      Runtime: python3.9
+      Handler: lambda_function.lambda_handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Timeout: 30
+      MemorySize: 256
+      VpcConfig:
+        SecurityGroupIds:
+          - !Ref LambdaSecurityGroup
+        SubnetIds:
+          - !Ref PrivateSubnet1
+          - !Ref PrivateSubnet2
+      Environment:
+        Variables:
+          PROJECT_NAME: !Ref ProjectName
+          ENVIRONMENT: !Ref Environment
+          REGION: !Ref AWS::Region
+      Code:
+        ZipFile: |
+          import json
+          def lambda_handler(event, context):
+              return {
+                  'statusCode': 200,
+                  'headers': {'Content-Type': 'application/json'},
+                  'body': json.dumps({'message': 'Chat API - Placeholder function'})
+              }
+
+  AnalyticsApiFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub '${ProjectName}-${Environment}-analytics-api'
+      Runtime: python3.9
+      Handler: lambda_function.lambda_handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Timeout: 30
+      MemorySize: 256
+      VpcConfig:
+        SecurityGroupIds:
+          - !Ref LambdaSecurityGroup
+        SubnetIds:
+          - !Ref PrivateSubnet1
+          - !Ref PrivateSubnet2
+      Environment:
+        Variables:
+          PROJECT_NAME: !Ref ProjectName
+          ENVIRONMENT: !Ref Environment
+          REGION: !Ref AWS::Region
+      Code:
+        ZipFile: |
+          import json
+          def lambda_handler(event, context):
+              return {
+                  'statusCode': 200,
+                  'headers': {'Content-Type': 'application/json'},
+                  'body': json.dumps({'message': 'Analytics API - Placeholder function'})
+              }
+
+  Ec2HostInstanceProfile:
+    DependsOn: Ec2HostInstanceRole
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      InstanceProfileName: !Sub '${ProjectName}-${Environment}-ec2-profile'
+      Roles:
+        - !Ref Ec2HostInstanceRole
+
+  EC2HostInstance:
+    Type: AWS::EC2::Instance
+    DependsOn: 
+      - ElastiCacheServerlessCache
+      - DocumentDBInstance
+      - ProductApiFunction
+      - CartApiFunction
+      - OrderApiFunction
+      - AuthApiFunction
+      - ReviewApiFunction
+      - SearchApiFunction
+      - ChatApiFunction
+      - AnalyticsApiFunction
+    CreationPolicy:
+      ResourceSignal:
+        Count: 1
+        Timeout: PT10M
+    Properties:
+      ImageId: !Ref "LatestAmiId"
+      InstanceType: m5.large
+      IamInstanceProfile: !Ref Ec2HostInstanceProfile
+      SubnetId: !Ref PublicSubnet1
+      SecurityGroupIds:
+        - !Ref Ec2SecurityGroup
+        - !Ref LambdaSecurityGroup
+      Tags:
+        - Key: Name
+          Value: !Sub '${ProjectName}-${Environment}-bastion-host'
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: Project
+          Value: !Ref ProjectName
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash
+
+          function prerequisites {
+            echo "updating yum..."
+            sudo dnf -q -y update
+
+            # Install CloudFormation helper scripts
+            sudo dnf install -y aws-cfn-bootstrap
+
+            # SSM agent is pre-installed on AL2023, just ensure it's running
+            sudo systemctl enable amazon-ssm-agent
+            sudo systemctl start amazon-ssm-agent
+
+            # Install additional packages
+            sudo dnf install -y git gcc python3 python3-pip unzip
+            sudo dnf -q -y install wget git jq  
+
+            # AWS CLI v2 is pre-installed on AL2023, but let's ensure it's latest
+            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+            unzip awscliv2.zip
+            ./aws/install --update
+            
+            # Set up environment
+            echo 'export AWS_DEFAULT_REGION=${AWS::Region}' >> /home/ec2-user/.bashrc
+            echo 'export PROJECT_NAME=${ProjectName}' >> /home/ec2-user/.bashrc
+            echo 'export ENVIRONMENT=${Environment}' >> /home/ec2-user/.bashrc
+          
+          }
+
+          function deploy {
+
+            sudo git clone https://github.com/gurubayari/NoSQL-Workshop.git
+
+            cd NoSQL-Workshop
+
+            echo "Deploying lambda functions"
+            nohup sudo bash ./deploy-lambda-functions.sh "${LambdaExecutionRole.Arn}" "${LambdaSecurityGroup}" "${PrivateSubnet1}" "${PrivateSubnet2}" "${ApiGateway}" "${DocumentDBCluster.Endpoint}" "${ElastiCacheServerlessCache.Endpoint.Address}" "${UserPool}" "${UserPoolClient}" "${DocumentDBSecret}" "${DocumentDBCluster.MasterUsername}" "${DocumentDBCluster.MasterUserPassword}" > deploy-lambda-functions.log 2>&1 &
+            
+            echo "Deploying front end application"
+            nohup sudo bash ./deploy-frontend.sh "${WebsiteBucket}" "${CloudFrontDistribution}" "${CloudFrontDistribution.DomainName}" "https://${ApiGateway}.execute-api.${AWS::Region}.amazonaws.com/${Environment}" "${UserPool}" "${UserPoolClient}"  > deploy-frontend.log 2>&1 &
+
+            echo "Seeding data to databses"
+            nohup sudo bash ./seed_data_to_databases.sh "${DocumentDBSecret}" "${DocumentDBCluster.Endpoint}" "${ElastiCacheServerlessCache}"  > seed_data_to_databases.log 2>&1 &
+          }
+
+          function cfn_signal {
+              # Signal CloudFormation that the instance is ready
+              /opt/aws/bin/cfn-signal -e $? --stack ${AWS::StackName} --resource EC2HostInstance --region ${AWS::Region}
+          }
+          
+          prerequisites
+          deploy
+          cfn_signal
+
+  Ec2SecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: !Sub '${ProjectName}-${Environment}-bastion-sg'
+      GroupDescription: Security group for bastion host - SSM access only
+      VpcId: !Ref VPC
+      SecurityGroupEgress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+          Description: HTTP for package updates
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 0.0.0.0/0
+          Description: HTTPS for SSM and AWS services
+        - IpProtocol: tcp
+          FromPort: 53
+          ToPort: 53
+          CidrIp: 0.0.0.0/0
+          Description: DNS resolution
+        - IpProtocol: udp
+          FromPort: 53
+          ToPort: 53
+          CidrIp: 0.0.0.0/0
+          Description: DNS resolution
 Outputs:
   VPCId:
     Description: VPC ID
@@ -817,6 +1270,12 @@ Outputs:
     Export:
       Name: !Sub '${ProjectName}-${Environment}-cloudfront-id'
 
+  CloudFrontDomainName:
+    Description: CloudFront Distribution Domain Name
+    Value: !GetAtt CloudFrontDistribution.DomainName
+    Export:
+      Name: !Sub '${ProjectName}-${Environment}-cloudfront-domain'
+
   UserPoolId:
     Description: Cognito User Pool ID
     Value: !Ref UserPool
@@ -846,3 +1305,5 @@ Outputs:
     Value: !GetAtt LambdaExecutionRole.Arn
     Export:
       Name: !Sub '${ProjectName}-${Environment}-lambda-role-arn'
+
+ 
