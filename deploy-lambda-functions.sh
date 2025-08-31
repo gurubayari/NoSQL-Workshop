@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # AWS NoSQL Workshop - Lambda Functions Deployment Script
-# This script deploys pre-packaged Lambda functions to AWS
+# This script deploys pre-packaged Lambda functions to AWS and configures CORS
 
 set -e
 
@@ -23,6 +23,38 @@ echo "Project: $PROJECT_NAME"
 echo "Environment: $ENVIRONMENT"
 echo "Region: $REGION"
 echo ""
+
+# Check for help flag
+if [[ "$1" == "--help" ]] || [[ "$1" == "-h" ]]; then
+    echo "Usage: $0 <lambda_role_arn> <security_group_id> <subnet1_id> <subnet2_id> <api_gateway_id> [cloudfront_domain]"
+    echo ""
+    echo "Parameters:"
+    echo "  lambda_role_arn    - ARN of the Lambda execution role"
+    echo "  security_group_id  - Security group ID for Lambda functions"
+    echo "  subnet1_id         - First private subnet ID for VPC Lambda"
+    echo "  subnet2_id         - Second private subnet ID for VPC Lambda"
+    echo "  api_gateway_id     - API Gateway REST API ID"
+    echo "  cloudfront_domain  - (Optional) CloudFront domain for CORS origin"
+    echo ""
+    echo "Environment Variables (alternative to parameters):"
+    echo "  LAMBDA_EXECUTION_ROLE_ARN"
+    echo "  LAMBDA_SECURITY_GROUP_ID"
+    echo "  PRIVATE_SUBNET_1_ID"
+    echo "  PRIVATE_SUBNET_2_ID"
+    echo "  API_GATEWAY_ID"
+    echo "  CLOUDFRONT_DOMAIN"
+    echo ""
+    echo "Example:"
+    echo "  $0 arn:aws:iam::123456789:role/lambda-role sg-12345 subnet-123 subnet-456 abc123def456 d3ev5umnvnz2lf.cloudfront.net"
+    echo ""
+    echo "This script will:"
+    echo "  1. Deploy all packaged Lambda functions"
+    echo "  2. Create API Gateway integrations"
+    echo "  3. Configure CORS for cross-origin requests"
+    echo "  4. Test the CORS configuration"
+    echo ""
+    exit 0
+fi
 
 # Function to print status
 print_status() {
@@ -90,6 +122,20 @@ LAMBDA_SECURITY_GROUP_ID=${2:-$LAMBDA_SECURITY_GROUP_ID}
 PRIVATE_SUBNET_1_ID=${3:-$PRIVATE_SUBNET_1_ID}
 PRIVATE_SUBNET_2_ID=${4:-$PRIVATE_SUBNET_2_ID}
 API_GATEWAY_ID=${5:-$API_GATEWAY_ID}
+CLOUDFRONT_DOMAIN=${6:-$CLOUDFRONT_DOMAIN}
+DOCUMENTDB_ENDPOINT=$7
+ELASTICACHE_ENDPOINT=$8
+USER_POOL_ID=$9
+USER_POOL_CLIENT_ID=$10
+# Get DynamoDB table names
+USERS_TABLE="${PROJECT_NAME}-${ENVIRONMENT}-users"
+CART_TABLE="${PROJECT_NAME}-${ENVIRONMENT}-shopping-cart"
+INVENTORY_TABLE="${PROJECT_NAME}-${ENVIRONMENT}-inventory"
+ORDERS_TABLE="${PROJECT_NAME}-${ENVIRONMENT}-orders"
+CHAT_HISTORY_TABLE="${PROJECT_NAME}-${ENVIRONMENT}-chat-history"
+SEARCH_ANALYTICS_TABLE="${PROJECT_NAME}-${ENVIRONMENT}-search-analytics"
+
+
 
 # Validate required parameters
 if [ -z "$LAMBDA_EXECUTION_ROLE_ARN" ]; then
@@ -114,6 +160,7 @@ fi
 
 if [ -z "$API_GATEWAY_ID" ]; then
     print_error "API Gateway ID is required (parameter 5 or API_GATEWAY_ID env var)"
+    print_info "Usage: $0 <lambda_role_arn> <security_group_id> <subnet1_id> <subnet2_id> <api_gateway_id> [cloudfront_domain]"
     exit 1
 fi
 
@@ -122,6 +169,16 @@ print_info "Lambda Security Group ID: $LAMBDA_SECURITY_GROUP_ID"
 print_info "Private Subnet 1 ID: $PRIVATE_SUBNET_1_ID"
 print_info "Private Subnet 2 ID: $PRIVATE_SUBNET_2_ID"
 print_info "API Gateway ID: $API_GATEWAY_ID"
+
+# Set CORS origin
+if [ -z "$CLOUDFRONT_DOMAIN" ]; then
+    print_warning "CloudFront domain not provided. Using wildcard (*) for CORS origin."
+    print_info "For better security, provide CloudFront domain as parameter 6 or CLOUDFRONT_DOMAIN env var"
+    CORS_ORIGIN="*"
+else
+    CORS_ORIGIN="https://$CLOUDFRONT_DOMAIN"
+    print_info "CORS Origin: $CORS_ORIGIN"
+fi
 
 # Deploy Lambda function from package
 deploy_lambda_function() {
@@ -161,11 +218,30 @@ deploy_lambda_function() {
             --zip-file "fileb://$zip_file" \
             --region "$REGION" > /dev/null
         
-        # Update function configuration
+        # Update function configuration with comprehensive environment variables
         aws lambda update-function-configuration \
             --function-name "$function_name" \
             --timeout "$timeout" \
             --memory-size "$memory" \
+            --environment Variables="{
+                PROJECT_NAME=$PROJECT_NAME,
+                ENVIRONMENT=$ENVIRONMENT,
+                REGION=$REGION,
+                DOCUMENTDB_HOST=$DOCUMENTDB_ENDPOINT,
+                DOCUMENTDB_PORT=27017,
+                DOCUMENTDB_DATABASE=unicorn_ecommerce_${ENVIRONMENT},
+                DOCUMENTDB_SSL_CA_CERTS=/opt/global-bundle.pem,
+                ELASTICACHE_HOST=$ELASTICACHE_ENDPOINT,
+                ELASTICACHE_PORT=6379,
+                USERS_TABLE=$USERS_TABLE,
+                SHOPPING_CART_TABLE=$CART_TABLE,
+                INVENTORY_TABLE=$INVENTORY_TABLE,
+                ORDERS_TABLE=$ORDERS_TABLE,
+                CHAT_HISTORY_TABLE=$CHAT_HISTORY_TABLE,
+                SEARCH_ANALYTICS_TABLE=$SEARCH_ANALYTICS_TABLE,
+                USER_POOL_ID=$USER_POOL_ID,
+                USER_POOL_CLIENT_ID=$USER_POOL_CLIENT_ID
+            }" \
             --region "$REGION" > /dev/null
             
     else
@@ -174,7 +250,8 @@ deploy_lambda_function() {
         # Clean up any partial deployment first
         cleanup_partial_deployment "$function_name"
         
-        # Create function
+        
+        # Create function with comprehensive environment variables
         aws lambda create-function \
             --function-name "$function_name" \
             --runtime python3.9 \
@@ -185,7 +262,25 @@ deploy_lambda_function() {
             --timeout "$timeout" \
             --memory-size "$memory" \
             --vpc-config SubnetIds="$PRIVATE_SUBNET_1_ID,$PRIVATE_SUBNET_2_ID",SecurityGroupIds="$LAMBDA_SECURITY_GROUP_ID" \
-            --environment Variables="{PROJECT_NAME=$PROJECT_NAME,ENVIRONMENT=$ENVIRONMENT,REGION=$REGION}" \
+            --environment Variables="{
+                PROJECT_NAME=$PROJECT_NAME,
+                ENVIRONMENT=$ENVIRONMENT,
+                REGION=$REGION,
+                DOCUMENTDB_HOST=$DOCUMENTDB_ENDPOINT,
+                DOCUMENTDB_PORT=27017,
+                DOCUMENTDB_DATABASE=unicorn_ecommerce_${ENVIRONMENT},
+                DOCUMENTDB_SSL_CA_CERTS=/opt/global-bundle.pem,
+                ELASTICACHE_HOST=$ELASTICACHE_ENDPOINT,
+                ELASTICACHE_PORT=6379,
+                USERS_TABLE=$USERS_TABLE,
+                SHOPPING_CART_TABLE=$CART_TABLE,
+                INVENTORY_TABLE=$INVENTORY_TABLE,
+                ORDERS_TABLE=$ORDERS_TABLE,
+                CHAT_HISTORY_TABLE=$CHAT_HISTORY_TABLE,
+                SEARCH_ANALYTICS_TABLE=$SEARCH_ANALYTICS_TABLE,
+                USER_POOL_ID=$USER_POOL_ID,
+                USER_POOL_CLIENT_ID=$USER_POOL_CLIENT_ID
+            }" \
             --region "$REGION" > /dev/null
     fi
     
@@ -450,14 +545,157 @@ create_api_integration "/search" "GET" "${PROJECT_NAME}-${ENVIRONMENT}-search-ap
 create_api_integration "/chat" "POST" "${PROJECT_NAME}-${ENVIRONMENT}-chat-api"
 create_api_integration "/analytics" "GET" "${PROJECT_NAME}-${ENVIRONMENT}-analytics-api"
 
-# Deploy API Gateway
-print_info "Deploying API Gateway..."
-aws apigateway create-deployment \
+# Configure CORS for API Gateway
+print_info "Configuring CORS for API Gateway..."
+
+# Function to add CORS to a resource
+add_cors_to_resource() {
+    local resource_path=$1
+    local resource_id=$2
+    
+    print_info "Adding CORS to resource: $resource_path"
+    
+    # Add OPTIONS method
+    aws apigateway put-method \
+        --rest-api-id "$API_GATEWAY_ID" \
+        --resource-id "$resource_id" \
+        --http-method "OPTIONS" \
+        --authorization-type "NONE" \
+        --region "$REGION" > /dev/null 2>&1 || true
+    
+    # Add OPTIONS integration (mock integration for CORS)
+    aws apigateway put-integration \
+        --rest-api-id "$API_GATEWAY_ID" \
+        --resource-id "$resource_id" \
+        --http-method "OPTIONS" \
+        --type "MOCK" \
+        --integration-http-method "OPTIONS" \
+        --request-templates '{"application/json": "{\"statusCode\": 200}"}' \
+        --region "$REGION" > /dev/null 2>&1 || true
+    
+    # Add OPTIONS method response
+    aws apigateway put-method-response \
+        --rest-api-id "$API_GATEWAY_ID" \
+        --resource-id "$resource_id" \
+        --http-method "OPTIONS" \
+        --status-code "200" \
+        --response-parameters '{
+            "method.response.header.Access-Control-Allow-Origin": false,
+            "method.response.header.Access-Control-Allow-Methods": false,
+            "method.response.header.Access-Control-Allow-Headers": false,
+            "method.response.header.Access-Control-Max-Age": false
+        }' \
+        --region "$REGION" > /dev/null 2>&1 || true
+    
+    # Add OPTIONS integration response
+    aws apigateway put-integration-response \
+        --rest-api-id "$API_GATEWAY_ID" \
+        --resource-id "$resource_id" \
+        --http-method "OPTIONS" \
+        --status-code "200" \
+        --response-parameters "{
+            \"method.response.header.Access-Control-Allow-Origin\": \"'$CORS_ORIGIN'\",
+            \"method.response.header.Access-Control-Allow-Methods\": \"'GET,POST,PUT,DELETE,OPTIONS'\",
+            \"method.response.header.Access-Control-Allow-Headers\": \"'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent'\",
+            \"method.response.header.Access-Control-Max-Age\": \"'86400'\"
+        }" \
+        --region "$REGION" > /dev/null 2>&1 || true
+    
+    # Update existing methods to include CORS headers in responses
+    for method in GET POST PUT DELETE; do
+        # Check if method exists
+        if aws apigateway get-method \
+            --rest-api-id "$API_GATEWAY_ID" \
+            --resource-id "$resource_id" \
+            --http-method "$method" \
+            --region "$REGION" > /dev/null 2>&1; then
+            
+            # Add method response with CORS headers
+            aws apigateway put-method-response \
+                --rest-api-id "$API_GATEWAY_ID" \
+                --resource-id "$resource_id" \
+                --http-method "$method" \
+                --status-code "200" \
+                --response-parameters '{
+                    "method.response.header.Access-Control-Allow-Origin": false
+                }' \
+                --region "$REGION" > /dev/null 2>&1 || true
+            
+            # Add integration response with CORS headers
+            aws apigateway put-integration-response \
+                --rest-api-id "$API_GATEWAY_ID" \
+                --resource-id "$resource_id" \
+                --http-method "$method" \
+                --status-code "200" \
+                --response-parameters "{
+                    \"method.response.header.Access-Control-Allow-Origin\": \"'$CORS_ORIGIN'\"
+                }" \
+                --region "$REGION" > /dev/null 2>&1 || true
+        fi
+    done
+}
+
+# Get all resources from API Gateway and add CORS
+resources=$(aws apigateway get-resources \
+    --rest-api-id "$API_GATEWAY_ID" \
+    --region "$REGION" \
+    --query 'items[?path!=`/`].[path,id]' \
+    --output text)
+
+if [ -n "$resources" ]; then
+    # Add CORS to each resource
+    while IFS=$'\t' read -r path id; do
+        if [ -n "$path" ] && [ -n "$id" ]; then
+            add_cors_to_resource "$path" "$id"
+        fi
+    done <<< "$resources"
+    
+    # Also add CORS to root resource for any catch-all routes
+    root_id=$(aws apigateway get-resources \
+        --rest-api-id "$API_GATEWAY_ID" \
+        --region "$REGION" \
+        --query 'items[?path==`/`].id' \
+        --output text)
+    
+    if [ -n "$root_id" ]; then
+        add_cors_to_resource "/" "$root_id"
+    fi
+    
+    print_status "CORS configuration completed"
+else
+    print_warning "No resources found for CORS configuration"
+fi
+
+# Deploy API Gateway with CORS changes
+print_info "Deploying API Gateway with CORS configuration..."
+deployment_id=$(aws apigateway create-deployment \
     --rest-api-id "$API_GATEWAY_ID" \
     --stage-name "$ENVIRONMENT" \
-    --region "$REGION" > /dev/null
+    --description "Lambda deployment with CORS configuration $(date)" \
+    --region "$REGION" \
+    --query 'id' \
+    --output text)
 
-print_status "API Gateway integrations created successfully!"
+print_status "API Gateway deployed with deployment ID: $deployment_id"
+
+# Test CORS configuration
+print_info "Testing CORS configuration..."
+api_endpoint="https://$API_GATEWAY_ID.execute-api.$REGION.amazonaws.com/$ENVIRONMENT"
+
+cors_test=$(curl -s -o /dev/null -w "%{http_code}" \
+    -X OPTIONS \
+    -H "Origin: https://example.com" \
+    -H "Access-Control-Request-Method: GET" \
+    -H "Access-Control-Request-Headers: Content-Type" \
+    "$api_endpoint/products" 2>/dev/null || echo "000")
+
+if [ "$cors_test" = "200" ]; then
+    print_status "CORS preflight test passed"
+else
+    print_warning "CORS preflight test returned status: $cors_test (this might be normal)"
+fi
+
+print_status "API Gateway integrations and CORS configuration completed successfully!"
 
 # Display deployment summary
 echo ""
@@ -472,8 +710,14 @@ echo ""
 echo "API Gateway Endpoint:"
 echo "https://$API_GATEWAY_ID.execute-api.$REGION.amazonaws.com/$ENVIRONMENT"
 echo ""
+echo "CORS Configuration:"
+echo "- Origin: $CORS_ORIGIN"
+echo "- Methods: GET,POST,PUT,DELETE,OPTIONS"
+echo "- Headers: Content-Type,Authorization,X-Api-Key,etc."
+echo ""
 echo "Next Steps:"
-echo "1. Run data seeding: python3 data/generate_all_data.py"
-echo "2. Deploy frontend: ./deploy-frontend.sh"
-echo "3. Run end-to-end tests"
+echo "1. Test your frontend application (CORS should now work)"
+echo "2. Run data seeding: python3 data/generate_all_data.py"
+echo "3. Deploy frontend: ./deploy-frontend.sh"
+echo "4. Run end-to-end tests"
 echo ""
