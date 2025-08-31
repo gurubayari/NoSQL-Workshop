@@ -85,33 +85,80 @@ class InventorySeeder:
             
             with table.batch_writer() as batch:
                 for item in scan_response['Items']:
-                    batch.delete_item(Key={'productId': item['productId']})
+                    batch.delete_item(Key={
+                        'productId': item['productId'],
+                        'warehouseId': item['warehouseId']
+                    })
                     deleted_count += 1
             
             print(f"Deleted {deleted_count} existing inventory records")
             
+            # Transform inventory records to match DynamoDB schema
+            # Each warehouse stock becomes a separate record with composite key
+            dynamodb_records = []
+            
+            for record in inventory_records:
+                product_id = record['productId']
+                
+                # Create a record for each warehouse
+                for warehouse_stock in record['warehouseStock']:
+                    warehouse_record = {
+                        'productId': product_id,
+                        'warehouseId': warehouse_stock['warehouseId'],
+                        'productName': record['productName'],
+                        'category': record['category'],
+                        'sku': record['sku'],
+                        
+                        # Warehouse-specific stock info
+                        'warehouseName': warehouse_stock['warehouseName'],
+                        'stockQuantity': warehouse_stock['stockQuantity'],
+                        'reservedQuantity': warehouse_stock['reservedQuantity'],
+                        'availableQuantity': warehouse_stock['availableQuantity'],
+                        'lastRestocked': warehouse_stock['lastRestocked'],
+                        'reorderPoint': warehouse_stock['reorderPoint'],
+                        'maxCapacity': warehouse_stock['maxCapacity'],
+                        'location': warehouse_stock['location'],
+                        
+                        # Product-level info (duplicated across warehouses)
+                        'stockSummary': record['stockSummary'],
+                        'reorderInfo': record['reorderInfo'],
+                        'costInfo': record['costInfo'],
+                        'metadata': record['metadata'],
+                        
+                        # Alerts specific to this warehouse
+                        'alerts': [alert for alert in record['alerts'] 
+                                 if alert.get('warehouseId') == warehouse_stock['warehouseId']],
+                        
+                        # Movement history specific to this warehouse
+                        'movementHistory': [movement for movement in record['movementHistory']
+                                          if movement.get('warehouseId') == warehouse_stock['warehouseId']]
+                    }
+                    
+                    dynamodb_records.append(warehouse_record)
+            
             # Insert new inventory records
-            print("Inserting new inventory records...")
+            print(f"Inserting {len(dynamodb_records)} warehouse inventory records...")
             inserted_count = 0
             
             with table.batch_writer() as batch:
-                for record in inventory_records:
+                for warehouse_record in dynamodb_records:
                     # Convert any remaining datetime objects to strings for DynamoDB
-                    dynamodb_record = prepare_for_dynamodb(record)
+                    dynamodb_record = prepare_for_dynamodb(warehouse_record)
                     batch.put_item(Item=dynamodb_record)
                     inserted_count += 1
                     
                     if inserted_count % 25 == 0:  # DynamoDB batch limit is 25
-                        print(f"Inserted {inserted_count}/{len(inventory_records)} inventory records")
+                        print(f"Inserted {inserted_count}/{len(dynamodb_records)} warehouse inventory records")
             
-            print(f"Successfully seeded {inserted_count} inventory records to DynamoDB")
+            print(f"Successfully seeded {inserted_count} warehouse inventory records to DynamoDB")
+            print(f"This represents {len(inventory_records)} products across {len(set(r['warehouseId'] for r in dynamodb_records))} warehouses")
             
             # Verify the seeding
             verify_response = table.scan(Select='COUNT')
             actual_count = verify_response['Count']
             print(f"Verification: {actual_count} records found in DynamoDB table")
             
-            return actual_count == len(inventory_records)
+            return actual_count == len(dynamodb_records)
             
         except Exception as e:
             print(f"Error seeding inventory to DynamoDB: {e}")
