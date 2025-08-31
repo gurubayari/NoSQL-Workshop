@@ -217,32 +217,6 @@ deploy_lambda_function() {
             --function-name "$function_name" \
             --zip-file "fileb://$zip_file" \
             --region "$REGION" > /dev/null
-        
-        # Update function configuration with comprehensive environment variables
-        aws lambda update-function-configuration \
-            --function-name "$function_name" \
-            --timeout "$timeout" \
-            --memory-size "$memory" \
-            --environment Variables="{
-                PROJECT_NAME=$PROJECT_NAME,
-                ENVIRONMENT=$ENVIRONMENT,
-                REGION=$REGION,
-                DOCUMENTDB_HOST=$DOCUMENTDB_ENDPOINT,
-                DOCUMENTDB_PORT=27017,
-                DOCUMENTDB_DATABASE=unicorn_ecommerce_${ENVIRONMENT},
-                DOCUMENTDB_SSL_CA_CERTS=/opt/global-bundle.pem,
-                ELASTICACHE_HOST=$ELASTICACHE_ENDPOINT,
-                ELASTICACHE_PORT=6379,
-                USERS_TABLE=$USERS_TABLE,
-                SHOPPING_CART_TABLE=$CART_TABLE,
-                INVENTORY_TABLE=$INVENTORY_TABLE,
-                ORDERS_TABLE=$ORDERS_TABLE,
-                CHAT_HISTORY_TABLE=$CHAT_HISTORY_TABLE,
-                SEARCH_ANALYTICS_TABLE=$SEARCH_ANALYTICS_TABLE,
-                USER_POOL_ID=$USER_POOL_ID,
-                USER_POOL_CLIENT_ID=$USER_POOL_CLIENT_ID
-            }" \
-            --region "$REGION" > /dev/null
             
     else
         print_info "Creating new function $function_name..."
@@ -307,6 +281,33 @@ deploy_lambda_function() {
         
         if [ "$state" = "Active" ] && [ "$last_update_status" = "Successful" ]; then
             print_status "Function $function_name is now active"
+
+            # Update function configuration with comprehensive environment variables
+            aws lambda update-function-configuration \
+                --function-name "$function_name" \
+                --timeout "$timeout" \
+                --memory-size "$memory" \
+                --environment Variables="{
+                    PROJECT_NAME=$PROJECT_NAME,
+                    ENVIRONMENT=$ENVIRONMENT,
+                    REGION=$REGION,
+                    DOCUMENTDB_HOST=$DOCUMENTDB_ENDPOINT,
+                    DOCUMENTDB_PORT=27017,
+                    DOCUMENTDB_DATABASE=unicorn_ecommerce_${ENVIRONMENT},
+                    DOCUMENTDB_SSL_CA_CERTS=/opt/global-bundle.pem,
+                    ELASTICACHE_HOST=$ELASTICACHE_ENDPOINT,
+                    ELASTICACHE_PORT=6379,
+                    USERS_TABLE=$USERS_TABLE,
+                    SHOPPING_CART_TABLE=$CART_TABLE,
+                    INVENTORY_TABLE=$INVENTORY_TABLE,
+                    ORDERS_TABLE=$ORDERS_TABLE,
+                    CHAT_HISTORY_TABLE=$CHAT_HISTORY_TABLE,
+                    SEARCH_ANALYTICS_TABLE=$SEARCH_ANALYTICS_TABLE,
+                    USER_POOL_ID=$USER_POOL_ID,
+                    USER_POOL_CLIENT_ID=$USER_POOL_CLIENT_ID
+                }" \
+                --region "$REGION" > /dev/null
+
             break
         elif [ "$state" = "Failed" ] || [ "$last_update_status" = "Failed" ]; then
             print_error "Function $function_name deployment failed"
