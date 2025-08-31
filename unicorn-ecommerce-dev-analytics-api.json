@@ -1,0 +1,9 @@
+{
+    "function_name": "unicorn-ecommerce-dev-analytics-api",
+    "function_file": "analytics_api.py",
+    "description": "Analytics API for Unicorn E-Commerce",
+    "timeout": 60,
+    "memory": 1024,
+    "zip_file": "packages/unicorn-ecommerce-dev-analytics-api.zip",
+    "created_at": "2025-08-31T14:55:39Z"
+}
