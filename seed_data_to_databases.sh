@@ -164,7 +164,8 @@ else
 fi
 
 # Seed reviews to DocumentDB (if available)
-if [ -f "data/output/reviews.json" ]; then
+if [ -f "data/output/reviews.json.zip" ]; then
+    unzip data/output/reviews.json.zip -d data/output
     print_info "Seeding reviews to DocumentDB..."
     if python3 data/seeders/review_seeder.py; then
         print_status "Reviews seeded to DocumentDB successfully"

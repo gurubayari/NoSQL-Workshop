@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # AWS NoSQL Workshop - Lambda Functions Deployment Script
-# This script deploys pre-packaged Lambda functions to AWS and configures CORS
+# This script deploys pre-packaged Lambda functions to AWS
 
 set -e
 
@@ -26,32 +26,37 @@ echo ""
 
 # Check for help flag
 if [[ "$1" == "--help" ]] || [[ "$1" == "-h" ]]; then
-    echo "Usage: $0 <lambda_role_arn> <security_group_id> <subnet1_id> <subnet2_id> <api_gateway_id> [cloudfront_domain]"
+    echo "Usage: $0 <lambda_role_arn> <security_group_id> <subnet1_id> <subnet2_id> [documentdb_endpoint] [elasticache_endpoint] [user_pool_id] [user_pool_client_id]"
     echo ""
     echo "Parameters:"
     echo "  lambda_role_arn    - ARN of the Lambda execution role"
     echo "  security_group_id  - Security group ID for Lambda functions"
     echo "  subnet1_id         - First private subnet ID for VPC Lambda"
     echo "  subnet2_id         - Second private subnet ID for VPC Lambda"
-    echo "  api_gateway_id     - API Gateway REST API ID"
-    echo "  cloudfront_domain  - (Optional) CloudFront domain for CORS origin"
+    echo "  documentdb_endpoint - DocumentDB cluster endpoint"
+    echo "  elasticache_endpoint - ElastiCache Redis endpoint"
+    echo "  user_pool_id       - Cognito User Pool ID"
+    echo "  user_pool_client_id - Cognito User Pool Client ID"
     echo ""
     echo "Environment Variables (alternative to parameters):"
     echo "  LAMBDA_EXECUTION_ROLE_ARN"
     echo "  LAMBDA_SECURITY_GROUP_ID"
     echo "  PRIVATE_SUBNET_1_ID"
     echo "  PRIVATE_SUBNET_2_ID"
-    echo "  API_GATEWAY_ID"
-    echo "  CLOUDFRONT_DOMAIN"
+    echo "  DOCUMENTDB_ENDPOINT"
+    echo "  ELASTICACHE_ENDPOINT"
+    echo "  USER_POOL_ID"
+    echo "  USER_POOL_CLIENT_ID"
     echo ""
     echo "Example:"
-    echo "  $0 arn:aws:iam::123456789:role/lambda-role sg-12345 subnet-123 subnet-456 abc123def456 d3ev5umnvnz2lf.cloudfront.net"
+    echo "  $0 arn:aws:iam::123456789:role/lambda-role sg-12345 subnet-123 subnet-456"
     echo ""
     echo "This script will:"
     echo "  1. Deploy all packaged Lambda functions"
-    echo "  2. Create API Gateway integrations"
-    echo "  3. Configure CORS for cross-origin requests"
-    echo "  4. Test the CORS configuration"
+    echo "  2. Configure environment variables"
+    echo "  3. Set up VPC configuration"
+    echo ""
+    echo "After running this script, use setup-api-gateway.sh to configure API Gateway integrations and CORS."
     echo ""
     exit 0
 fi
@@ -121,12 +126,11 @@ LAMBDA_EXECUTION_ROLE_ARN=${1:-$LAMBDA_EXECUTION_ROLE_ARN}
 LAMBDA_SECURITY_GROUP_ID=${2:-$LAMBDA_SECURITY_GROUP_ID}
 PRIVATE_SUBNET_1_ID=${3:-$PRIVATE_SUBNET_1_ID}
 PRIVATE_SUBNET_2_ID=${4:-$PRIVATE_SUBNET_2_ID}
-API_GATEWAY_ID=${5:-$API_GATEWAY_ID}
-CLOUDFRONT_DOMAIN=${6:-$CLOUDFRONT_DOMAIN}
-DOCUMENTDB_ENDPOINT=$7
-ELASTICACHE_ENDPOINT=$8
-USER_POOL_ID=$9
-USER_POOL_CLIENT_ID=$10
+DOCUMENTDB_ENDPOINT=${5:-$DOCUMENTDB_ENDPOINT}
+ELASTICACHE_ENDPOINT=${6:-$ELASTICACHE_ENDPOINT}
+USER_POOL_ID=${7:-$USER_POOL_ID}
+USER_POOL_CLIENT_ID=${8:-$USER_POOL_CLIENT_ID}
+
 # Get DynamoDB table names
 USERS_TABLE="${PROJECT_NAME}-${ENVIRONMENT}-users"
 CART_TABLE="${PROJECT_NAME}-${ENVIRONMENT}-shopping-cart"
@@ -134,8 +138,6 @@ INVENTORY_TABLE="${PROJECT_NAME}-${ENVIRONMENT}-inventory"
 ORDERS_TABLE="${PROJECT_NAME}-${ENVIRONMENT}-orders"
 CHAT_HISTORY_TABLE="${PROJECT_NAME}-${ENVIRONMENT}-chat-history"
 SEARCH_ANALYTICS_TABLE="${PROJECT_NAME}-${ENVIRONMENT}-search-analytics"
-
-
 
 # Validate required parameters
 if [ -z "$LAMBDA_EXECUTION_ROLE_ARN" ]; then
@@ -158,27 +160,28 @@ if [ -z "$PRIVATE_SUBNET_2_ID" ]; then
     exit 1
 fi
 
-if [ -z "$API_GATEWAY_ID" ]; then
-    print_error "API Gateway ID is required (parameter 5 or API_GATEWAY_ID env var)"
-    print_info "Usage: $0 <lambda_role_arn> <security_group_id> <subnet1_id> <subnet2_id> <api_gateway_id> [cloudfront_domain]"
-    exit 1
+if [ -z "$DOCUMENTDB_ENDPOINT" ]; then
+    print_info "DocumentDB Endpoint is required (parameter 5 or DOCUMENTDB_ENDPOINT env var)"
+fi
+
+if [ -z "$ELASTICACHE_ENDPOINT" ]; then
+    print_info "ElastiCache Endpoint: is required (parameter 6 or ELASTICACHE_ENDPOINT env var)"
+fi
+
+if [ -z "$USER_POOL_ID" ]; then
+    print_info "User Pool ID: is required (parameter 7 or USER_POOL_ID env var)"
+fi
+
+if [ -z "$USER_POOL_CLIENT_ID" ]; then
+    print_info "User Pool Client ID: is required (parameter 8 or USER_POOL_CLIENT_ID env var)"
 fi
 
 print_info "Lambda Execution Role ARN: $LAMBDA_EXECUTION_ROLE_ARN"
 print_info "Lambda Security Group ID: $LAMBDA_SECURITY_GROUP_ID"
 print_info "Private Subnet 1 ID: $PRIVATE_SUBNET_1_ID"
 print_info "Private Subnet 2 ID: $PRIVATE_SUBNET_2_ID"
-print_info "API Gateway ID: $API_GATEWAY_ID"
 
-# Set CORS origin
-if [ -z "$CLOUDFRONT_DOMAIN" ]; then
-    print_warning "CloudFront domain not provided. Using wildcard (*) for CORS origin."
-    print_info "For better security, provide CloudFront domain as parameter 6 or CLOUDFRONT_DOMAIN env var"
-    CORS_ORIGIN="*"
-else
-    CORS_ORIGIN="https://$CLOUDFRONT_DOMAIN"
-    print_info "CORS Origin: $CORS_ORIGIN"
-fi
+
 
 # Deploy Lambda function from package
 deploy_lambda_function() {
@@ -223,7 +226,6 @@ deploy_lambda_function() {
         
         # Clean up any partial deployment first
         cleanup_partial_deployment "$function_name"
-        
         
         # Create function with comprehensive environment variables
         aws lambda create-function \
@@ -386,339 +388,104 @@ check_vpc_lambda_readiness() {
     fi
 }
 
-# Deploy all Lambda functions from manifest
-print_info "Starting Lambda function deployment..."
+# Main deployment function
+deploy_all_lambda_functions() {
+    # Deploy all Lambda functions from manifest
+    print_info "Starting Lambda function deployment..."
 
-# Check if this is an update deployment (functions already exist from CloudFormation)
-existing_functions=$(aws lambda list-functions \
-    --region "$REGION" \
-    --query "Functions[?starts_with(FunctionName, '${PROJECT_NAME}-${ENVIRONMENT}-')].FunctionName" \
-    --output text 2>/dev/null || echo "")
+    # Check if this is an update deployment (functions already exist from CloudFormation)
+    existing_functions=$(aws lambda list-functions \
+        --region "$REGION" \
+        --query "Functions[?starts_with(FunctionName, '${PROJECT_NAME}-${ENVIRONMENT}-')].FunctionName" \
+        --output text 2>/dev/null || echo "")
 
-if [ -n "$existing_functions" ]; then
-    print_status "Detected existing Lambda functions from CloudFormation"
-    print_info "Running in UPDATE mode - updating existing functions with application code"
-    print_info "This should be much faster since ENIs are already created"
-else
-    print_info "Running in CREATE mode - creating new functions"
-    # Check VPC readiness
-    check_vpc_lambda_readiness
-fi
-
-# Read function list from manifest
-functions=$(jq -r '.functions[]' packages/deployment-manifest.json)
-
-# Deploy functions with error handling
-failed_functions=()
-successful_functions=()
-
-for function_name in $functions; do
-    if deploy_lambda_function "$function_name"; then
-        successful_functions+=("$function_name")
+    if [ -n "$existing_functions" ]; then
+        print_status "Detected existing Lambda functions from CloudFormation"
+        print_info "Running in UPDATE mode - updating existing functions with application code"
+        print_info "This should be much faster since ENIs are already created"
     else
-        failed_functions+=("$function_name")
-        print_error "Failed to deploy $function_name"
+        print_info "Running in CREATE mode - creating new functions"
+        # Check VPC readiness
+        check_vpc_lambda_readiness
     fi
-done
 
-# Report deployment results
-echo ""
-if [ ${#successful_functions[@]} -gt 0 ]; then
-    print_status "Successfully deployed ${#successful_functions[@]} functions:"
-    for func in "${successful_functions[@]}"; do
-        echo "  ✅ $func"
-    done
-fi
+    # Read function list from manifest
+    functions=$(jq -r '.functions[]' packages/deployment-manifest.json)
 
-if [ ${#failed_functions[@]} -gt 0 ]; then
-    print_error "Failed to deploy ${#failed_functions[@]} functions:"
-    for func in "${failed_functions[@]}"; do
-        echo "  ❌ $func"
+    # Deploy functions with error handling
+    failed_functions=()
+    successful_functions=()
+
+    for function_name in $functions; do
+        if deploy_lambda_function "$function_name"; then
+            successful_functions+=("$function_name")
+        else
+            failed_functions+=("$function_name")
+            print_error "Failed to deploy $function_name"
+        fi
     done
+
+    # Report deployment results
     echo ""
-    print_warning "Some functions failed to deploy. Common solutions:"
-    echo "1. Wait 5-10 minutes and re-run the script (VPC ENI creation)"
-    echo "2. Check AWS Console for detailed error messages"
-    echo "3. Verify VPC configuration and security groups"
-    echo "4. Ensure Lambda execution role has proper permissions"
-    echo ""
-    
-    read -p "Do you want to retry failed deployments? (y/N): " -n 1 -r
-    echo ""
-    if [[ $REPLY =~ ^[Yy]$ ]]; then
-        print_info "Retrying failed deployments..."
-        for function_name in "${failed_functions[@]}"; do
-            print_info "Retrying deployment of $function_name..."
-            if deploy_lambda_function "$function_name"; then
-                print_status "Successfully deployed $function_name on retry"
-            else
-                print_error "Failed to deploy $function_name even on retry"
-            fi
+    if [ ${#successful_functions[@]} -gt 0 ]; then
+        print_status "Successfully deployed ${#successful_functions[@]} functions:"
+        for func in "${successful_functions[@]}"; do
+            echo "  ✅ $func"
         done
     fi
-fi
 
-if [ ${#failed_functions[@]} -eq 0 ]; then
-    print_status "All Lambda functions deployed successfully!"
-else
-    print_warning "Deployment completed with some failures"
-    print_info "You can re-run this script to retry failed deployments"
-fi
-
-# Create API Gateway integrations
-print_info "Setting up API Gateway integrations..."
-
-# Function to create API Gateway integration
-create_api_integration() {
-    local resource_path=$1
-    local http_method=$2
-    local function_name=$3
-    
-    print_info "Creating integration for $http_method $resource_path -> $function_name"
-    
-    # Get function ARN
-    local function_arn=$(aws lambda get-function \
-        --function-name "$function_name" \
-        --region "$REGION" \
-        --query 'Configuration.FunctionArn' \
-        --output text)
-    
-    # Create resource if it doesn't exist
-    local parent_id=$(aws apigateway get-resources \
-        --rest-api-id "$API_GATEWAY_ID" \
-        --region "$REGION" \
-        --query 'items[?path==`/`].id' \
-        --output text)
-    
-    # Create resource path
-    local resource_id=$(aws apigateway create-resource \
-        --rest-api-id "$API_GATEWAY_ID" \
-        --parent-id "$parent_id" \
-        --path-part "${resource_path#/}" \
-        --region "$REGION" \
-        --query 'id' \
-        --output text 2>/dev/null || \
-        aws apigateway get-resources \
-        --rest-api-id "$API_GATEWAY_ID" \
-        --region "$REGION" \
-        --query "items[?path=='$resource_path'].id" \
-        --output text)
-    
-    # Create method
-    aws apigateway put-method \
-        --rest-api-id "$API_GATEWAY_ID" \
-        --resource-id "$resource_id" \
-        --http-method "$http_method" \
-        --authorization-type "NONE" \
-        --region "$REGION" > /dev/null 2>&1 || true
-    
-    # Create integration
-    aws apigateway put-integration \
-        --rest-api-id "$API_GATEWAY_ID" \
-        --resource-id "$resource_id" \
-        --http-method "$http_method" \
-        --type "AWS_PROXY" \
-        --integration-http-method "POST" \
-        --uri "arn:aws:apigateway:$REGION:lambda:path/2015-03-31/functions/$function_arn/invocations" \
-        --region "$REGION" > /dev/null 2>&1 || true
-    
-    # Add Lambda permission
-    aws lambda add-permission \
-        --function-name "$function_name" \
-        --statement-id "apigateway-invoke-$(date +%s)" \
-        --action "lambda:InvokeFunction" \
-        --principal "apigateway.amazonaws.com" \
-        --source-arn "arn:aws:execute-api:$REGION:$(aws sts get-caller-identity --query Account --output text):$API_GATEWAY_ID/*/*" \
-        --region "$REGION" > /dev/null 2>&1 || true
-}
-
-# Create API integrations
-create_api_integration "/products" "GET" "${PROJECT_NAME}-${ENVIRONMENT}-product-api"
-create_api_integration "/products" "POST" "${PROJECT_NAME}-${ENVIRONMENT}-product-api"
-create_api_integration "/cart" "GET" "${PROJECT_NAME}-${ENVIRONMENT}-cart-api"
-create_api_integration "/cart" "POST" "${PROJECT_NAME}-${ENVIRONMENT}-cart-api"
-create_api_integration "/orders" "GET" "${PROJECT_NAME}-${ENVIRONMENT}-order-api"
-create_api_integration "/orders" "POST" "${PROJECT_NAME}-${ENVIRONMENT}-order-api"
-create_api_integration "/auth" "POST" "${PROJECT_NAME}-${ENVIRONMENT}-auth-api"
-create_api_integration "/reviews" "GET" "${PROJECT_NAME}-${ENVIRONMENT}-review-api"
-create_api_integration "/reviews" "POST" "${PROJECT_NAME}-${ENVIRONMENT}-review-api"
-create_api_integration "/search" "GET" "${PROJECT_NAME}-${ENVIRONMENT}-search-api"
-create_api_integration "/chat" "POST" "${PROJECT_NAME}-${ENVIRONMENT}-chat-api"
-create_api_integration "/analytics" "GET" "${PROJECT_NAME}-${ENVIRONMENT}-analytics-api"
-
-# Configure CORS for API Gateway
-print_info "Configuring CORS for API Gateway..."
-
-# Function to add CORS to a resource
-add_cors_to_resource() {
-    local resource_path=$1
-    local resource_id=$2
-    
-    print_info "Adding CORS to resource: $resource_path"
-    
-    # Add OPTIONS method
-    aws apigateway put-method \
-        --rest-api-id "$API_GATEWAY_ID" \
-        --resource-id "$resource_id" \
-        --http-method "OPTIONS" \
-        --authorization-type "NONE" \
-        --region "$REGION" > /dev/null 2>&1 || true
-    
-    # Add OPTIONS integration (mock integration for CORS)
-    aws apigateway put-integration \
-        --rest-api-id "$API_GATEWAY_ID" \
-        --resource-id "$resource_id" \
-        --http-method "OPTIONS" \
-        --type "MOCK" \
-        --integration-http-method "OPTIONS" \
-        --request-templates '{"application/json": "{\"statusCode\": 200}"}' \
-        --region "$REGION" > /dev/null 2>&1 || true
-    
-    # Add OPTIONS method response
-    aws apigateway put-method-response \
-        --rest-api-id "$API_GATEWAY_ID" \
-        --resource-id "$resource_id" \
-        --http-method "OPTIONS" \
-        --status-code "200" \
-        --response-parameters '{
-            "method.response.header.Access-Control-Allow-Origin": false,
-            "method.response.header.Access-Control-Allow-Methods": false,
-            "method.response.header.Access-Control-Allow-Headers": false,
-            "method.response.header.Access-Control-Max-Age": false
-        }' \
-        --region "$REGION" > /dev/null 2>&1 || true
-    
-    # Add OPTIONS integration response
-    aws apigateway put-integration-response \
-        --rest-api-id "$API_GATEWAY_ID" \
-        --resource-id "$resource_id" \
-        --http-method "OPTIONS" \
-        --status-code "200" \
-        --response-parameters "{
-            \"method.response.header.Access-Control-Allow-Origin\": \"'$CORS_ORIGIN'\",
-            \"method.response.header.Access-Control-Allow-Methods\": \"'GET,POST,PUT,DELETE,OPTIONS'\",
-            \"method.response.header.Access-Control-Allow-Headers\": \"'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent'\",
-            \"method.response.header.Access-Control-Max-Age\": \"'86400'\"
-        }" \
-        --region "$REGION" > /dev/null 2>&1 || true
-    
-    # Update existing methods to include CORS headers in responses
-    for method in GET POST PUT DELETE; do
-        # Check if method exists
-        if aws apigateway get-method \
-            --rest-api-id "$API_GATEWAY_ID" \
-            --resource-id "$resource_id" \
-            --http-method "$method" \
-            --region "$REGION" > /dev/null 2>&1; then
-            
-            # Add method response with CORS headers
-            aws apigateway put-method-response \
-                --rest-api-id "$API_GATEWAY_ID" \
-                --resource-id "$resource_id" \
-                --http-method "$method" \
-                --status-code "200" \
-                --response-parameters '{
-                    "method.response.header.Access-Control-Allow-Origin": false
-                }' \
-                --region "$REGION" > /dev/null 2>&1 || true
-            
-            # Add integration response with CORS headers
-            aws apigateway put-integration-response \
-                --rest-api-id "$API_GATEWAY_ID" \
-                --resource-id "$resource_id" \
-                --http-method "$method" \
-                --status-code "200" \
-                --response-parameters "{
-                    \"method.response.header.Access-Control-Allow-Origin\": \"'$CORS_ORIGIN'\"
-                }" \
-                --region "$REGION" > /dev/null 2>&1 || true
+    if [ ${#failed_functions[@]} -gt 0 ]; then
+        print_error "Failed to deploy ${#failed_functions[@]} functions:"
+        for func in "${failed_functions[@]}"; do
+            echo "  ❌ $func"
+        done
+        echo ""
+        print_warning "Some functions failed to deploy. Common solutions:"
+        echo "1. Wait 5-10 minutes and re-run the script (VPC ENI creation)"
+        echo "2. Check AWS Console for detailed error messages"
+        echo "3. Verify VPC configuration and security groups"
+        echo "4. Ensure Lambda execution role has proper permissions"
+        echo ""
+        
+        read -p "Do you want to retry failed deployments? (y/N): " -n 1 -r
+        echo ""
+        if [[ $REPLY =~ ^[Yy]$ ]]; then
+            print_info "Retrying failed deployments..."
+            for function_name in "${failed_functions[@]}"; do
+                print_info "Retrying deployment of $function_name..."
+                if deploy_lambda_function "$function_name"; then
+                    print_status "Successfully deployed $function_name on retry"
+                else
+                    print_error "Failed to deploy $function_name even on retry"
+                fi
+            done
         fi
-    done
-}
-
-# Get all resources from API Gateway and add CORS
-resources=$(aws apigateway get-resources \
-    --rest-api-id "$API_GATEWAY_ID" \
-    --region "$REGION" \
-    --query 'items[?path!=`/`].[path,id]' \
-    --output text)
-
-if [ -n "$resources" ]; then
-    # Add CORS to each resource
-    while IFS=$'\t' read -r path id; do
-        if [ -n "$path" ] && [ -n "$id" ]; then
-            add_cors_to_resource "$path" "$id"
-        fi
-    done <<< "$resources"
-    
-    # Also add CORS to root resource for any catch-all routes
-    root_id=$(aws apigateway get-resources \
-        --rest-api-id "$API_GATEWAY_ID" \
-        --region "$REGION" \
-        --query 'items[?path==`/`].id' \
-        --output text)
-    
-    if [ -n "$root_id" ]; then
-        add_cors_to_resource "/" "$root_id"
     fi
-    
-    print_status "CORS configuration completed"
-else
-    print_warning "No resources found for CORS configuration"
-fi
 
-# Deploy API Gateway with CORS changes
-print_info "Deploying API Gateway with CORS configuration..."
-deployment_id=$(aws apigateway create-deployment \
-    --rest-api-id "$API_GATEWAY_ID" \
-    --stage-name "$ENVIRONMENT" \
-    --description "Lambda deployment with CORS configuration $(date)" \
-    --region "$REGION" \
-    --query 'id' \
-    --output text)
+    if [ ${#failed_functions[@]} -eq 0 ]; then
+        print_status "All Lambda functions deployed successfully!"
+    else
+        print_warning "Deployment completed with some failures"
+        print_info "You can re-run this script to retry failed deployments"
+    fi
 
-print_status "API Gateway deployed with deployment ID: $deployment_id"
+    # Display deployment summary
+    echo ""
+    echo -e "${GREEN}🎉 Lambda Functions Deployment Complete!${NC}"
+    echo "=================================================="
+    echo ""
+    echo "Deployed Functions:"
+    for function_name in $functions; do
+        echo "- $function_name"
+    done
+    echo ""
+    echo "Next Steps:"
+    echo "1. Run ./setup-api-gateway.sh to configure API Gateway integrations and CORS"
+    echo "2. Test the API endpoints"
+    echo "3. Deploy the frontend application"
+    echo "4. Seed the databases with sample data"
+    echo ""
+}
 
-# Test CORS configuration
-print_info "Testing CORS configuration..."
-api_endpoint="https://$API_GATEWAY_ID.execute-api.$REGION.amazonaws.com/$ENVIRONMENT"
-
-cors_test=$(curl -s -o /dev/null -w "%{http_code}" \
-    -X OPTIONS \
-    -H "Origin: https://example.com" \
-    -H "Access-Control-Request-Method: GET" \
-    -H "Access-Control-Request-Headers: Content-Type" \
-    "$api_endpoint/products" 2>/dev/null || echo "000")
-
-if [ "$cors_test" = "200" ]; then
-    print_status "CORS preflight test passed"
-else
-    print_warning "CORS preflight test returned status: $cors_test (this might be normal)"
-fi
-
-print_status "API Gateway integrations and CORS configuration completed successfully!"
-
-# Display deployment summary
-echo ""
-echo -e "${GREEN}🎉 Lambda Functions Deployment Complete!${NC}"
-echo "=================================================="
-echo ""
-echo "Deployed Functions:"
-for function_name in $functions; do
-    echo "- $function_name"
-done
-echo ""
-echo "API Gateway Endpoint:"
-echo "https://$API_GATEWAY_ID.execute-api.$REGION.amazonaws.com/$ENVIRONMENT"
-echo ""
-echo "CORS Configuration:"
-echo "- Origin: $CORS_ORIGIN"
-echo "- Methods: GET,POST,PUT,DELETE,OPTIONS"
-echo "- Headers: Content-Type,Authorization,X-Api-Key,etc."
-echo ""
-echo "Next Steps:"
-echo "1. Test your frontend application (CORS should now work)"
-echo "2. Run data seeding: python3 data/generate_all_data.py"
-echo "3. Deploy frontend: ./deploy-frontend.sh"
-echo "4. Run end-to-end tests"
-echo ""
+# Main execution
+deploy_all_lambda_functions
