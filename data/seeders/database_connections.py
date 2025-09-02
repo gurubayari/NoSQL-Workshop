@@ -199,14 +199,36 @@ class DatabaseConnections:
         try:
             print(f"Connecting to ElastiCache at {host}:{port}")
             
-            # Connect to ElastiCache Redis
-            self.elasticache_client = redis.Redis(
-                host=host,
-                port=int(port),
-                decode_responses=True,
-                socket_connect_timeout=10,
-                socket_timeout=10
-            )
+            # Check if TLS/SSL is enabled for Valkey Serverless
+            # ssl_enabled = os.environ.get('ELASTICACHE_SSL', 'false').lower() == 'true'
+            ssl_enabled = True
+            # Base configuration for RedisCluster
+            cluster_config = {
+                'host': host,
+                'port': int(port),
+                'decode_responses': True,
+                'skip_full_coverage_check': True,  # Essential for serverless
+                'socket_connect_timeout': 10,
+                'socket_timeout': 10,
+                'retry_on_timeout': True,
+                'max_connections': 10
+            }
+            
+            # Add TLS/SSL configuration if enabled (for Valkey Serverless)
+            if ssl_enabled:
+                import ssl
+                cluster_config.update({
+                    'ssl': True,
+                    'ssl_cert_reqs': ssl.CERT_NONE,  # Don't verify certificates for managed service
+                    'ssl_check_hostname': False,     # Don't check hostname for managed service
+                    'ssl_ca_certs': None            # Use system CA bundle
+                })
+                print(f"ElastiCache TLS/SSL enabled for Valkey Serverless")
+            else:
+                print(f"ElastiCache TLS/SSL disabled")
+            
+            # Connect to ElastiCache Redis using RedisCluster for serverless compatibility
+            self.elasticache_client = redis.RedisCluster(**cluster_config)
             
             # Test the connection
             self.elasticache_client.ping()

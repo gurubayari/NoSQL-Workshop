@@ -112,7 +112,7 @@ class ProductSeeder:
             return False
     
     def _prepare_for_documentdb(self, product: Dict[str, Any]) -> Dict[str, Any]:
-        """Prepare product for DocumentDB by ensuring proper data types"""
+        """Prepare product for DocumentDB by ensuring proper data types and setting _id"""
         def convert_recursive(obj):
             if isinstance(obj, str):
                 # Try to parse ISO datetime strings back to datetime objects
@@ -130,7 +130,13 @@ class ProductSeeder:
             else:
                 return obj
         
-        return convert_recursive(product)
+        prepared_product = convert_recursive(product)
+        
+        # Set _id field with productId for DocumentDB
+        if 'productId' in prepared_product:
+            prepared_product['_id'] = prepared_product['productId']
+        
+        return prepared_product
     
     def _create_indexes(self):
         """Create indexes for better query performance"""
