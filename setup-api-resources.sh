@@ -34,14 +34,27 @@ create_resource() {
     local path_part=$2
     local resource_name=$3
     
-    echo "Creating resource: $resource_name with path: $path_part"
-    local resource_id=$(aws apigateway create-resource \
-        --rest-api-id $API_GATEWAY_ID \
-        --parent-id $parent_id \
-        --path-part "$path_part" \
-        --query 'id' --output text)
+    echo "Creating or getting resource: $resource_name with path: $path_part"
     
-    echo "Created $resource_name: $resource_id"
+    # Check if resource already exists
+    local existing_resource_id=$(aws apigateway get-resources \
+        --rest-api-id $API_GATEWAY_ID \
+        --query "items[?parentId=='$parent_id' && pathPart=='$path_part'].id" \
+        --output text)
+    
+    if [ ! -z "$existing_resource_id" ] && [ "$existing_resource_id" != "None" ]; then
+        echo "Using existing $resource_name: $existing_resource_id"
+        local resource_id=$existing_resource_id
+    else
+        echo "Creating new resource: $resource_name with path: $path_part"
+        local resource_id=$(aws apigateway create-resource \
+            --rest-api-id $API_GATEWAY_ID \
+            --parent-id $parent_id \
+            --path-part "$path_part" \
+            --query 'id' --output text)
+        echo "Created $resource_name: $resource_id"
+    fi
+    
     eval "${resource_name}=$resource_id"
 }
 
@@ -54,9 +67,9 @@ create_method() {
     local lambda_function_arn=$5
     local method_name=$6
     
-    echo "Creating method: $method_name ($http_method) on resource: $resource_id"
+    echo "Creating or updating method: $method_name ($http_method) on resource: $resource_id"
     
-    # Create method
+    # Create method (this will update if it exists)
     if [ "$authorization_type" = "COGNITO_USER_POOLS" ]; then
         aws apigateway put-method \
             --rest-api-id $API_GATEWAY_ID \
@@ -64,15 +77,23 @@ create_method() {
             --http-method $http_method \
             --authorization-type $authorization_type \
             --authorizer-id $authorizer_id \
-            --no-api-key-required
+            --no-api-key-required 2>/dev/null || echo "Method $http_method already exists on resource $resource_id"
     else
         aws apigateway put-method \
             --rest-api-id $API_GATEWAY_ID \
             --resource-id $resource_id \
             --http-method $http_method \
             --authorization-type $authorization_type \
-            --no-api-key-required
+            --no-api-key-required 2>/dev/null || echo "Method $http_method already exists on resource $resource_id"
     fi
+    
+    # Create method response first
+    aws apigateway put-method-response \
+        --rest-api-id $API_GATEWAY_ID \
+        --resource-id $resource_id \
+        --http-method $http_method \
+        --status-code 200 \
+        --response-parameters method.response.header.Access-Control-Allow-Origin=false 2>/dev/null || echo "Method response already exists"
     
     # Create integration
     aws apigateway put-integration \
@@ -81,7 +102,7 @@ create_method() {
         --http-method $http_method \
         --type AWS_PROXY \
         --integration-http-method POST \
-        --uri "arn:aws:apigateway:$AWS_REGION:lambda:path/2015-03-31/functions/$lambda_function_arn/invocations"
+        --uri "arn:aws:apigateway:$AWS_REGION:lambda:path/2015-03-31/functions/$lambda_function_arn/invocations" 2>/dev/null || echo "Integration already exists"
     
     # Create integration response
     aws apigateway put-integration-response \
@@ -89,17 +110,9 @@ create_method() {
         --resource-id $resource_id \
         --http-method $http_method \
         --status-code 200 \
-        --response-parameters '{"method.response.header.Access-Control-Allow-Origin": "'\''*'\''"}'
+        --response-parameters '{"method.response.header.Access-Control-Allow-Origin": "'\''*'\''"}'  2>/dev/null || echo "Integration response already exists"
     
-    # Create method response
-    aws apigateway put-method-response \
-        --rest-api-id $API_GATEWAY_ID \
-        --resource-id $resource_id \
-        --http-method $http_method \
-        --status-code 200 \
-        --response-parameters method.response.header.Access-Control-Allow-Origin=false
-    
-    echo "Created method: $method_name"
+    echo "Processed method: $method_name"
 }
 
 # Function to create OPTIONS method for CORS
@@ -108,7 +121,7 @@ create_options_method() {
     local resource_name=$2
     local allowed_methods=${3:-"GET,POST,PUT,DELETE,OPTIONS"}
     
-    echo "Creating OPTIONS method for CORS on $resource_name (Methods: $allowed_methods)"
+    echo "Creating or updating OPTIONS method for CORS on $resource_name (Methods: $allowed_methods)"
     
     # Create OPTIONS method
     aws apigateway put-method \
@@ -116,7 +129,15 @@ create_options_method() {
         --resource-id $resource_id \
         --http-method OPTIONS \
         --authorization-type NONE \
-        --no-api-key-required
+        --no-api-key-required 2>/dev/null || echo "OPTIONS method already exists on $resource_name"
+    
+    # Create method response for OPTIONS first
+    aws apigateway put-method-response \
+        --rest-api-id $API_GATEWAY_ID \
+        --resource-id $resource_id \
+        --http-method OPTIONS \
+        --status-code 200 \
+        --response-parameters method.response.header.Access-Control-Allow-Headers=false,method.response.header.Access-Control-Allow-Methods=false,method.response.header.Access-Control-Allow-Origin=false,method.response.header.Access-Control-Allow-Credentials=false,method.response.header.Access-Control-Max-Age=false 2>/dev/null || echo "OPTIONS method response already exists"
     
     # Create MOCK integration for OPTIONS
     aws apigateway put-integration \
@@ -124,7 +145,7 @@ create_options_method() {
         --resource-id $resource_id \
         --http-method OPTIONS \
         --type MOCK \
-        --request-templates '{"application/json": "{\"statusCode\": 200}"}'
+        --request-templates '{"application/json": "{\"statusCode\": 200}"}' 2>/dev/null || echo "OPTIONS integration already exists"
     
     # Create integration response for OPTIONS
     aws apigateway put-integration-response \
@@ -139,17 +160,9 @@ create_options_method() {
             "method.response.header.Access-Control-Allow-Credentials": "'\''true'\''",
             "method.response.header.Access-Control-Max-Age": "'\''86400'\''"
         }' \
-        --response-templates '{"application/json": ""}'
+        --response-templates '{"application/json": ""}' 2>/dev/null || echo "OPTIONS integration response already exists"
     
-    # Create method response for OPTIONS
-    aws apigateway put-method-response \
-        --rest-api-id $API_GATEWAY_ID \
-        --resource-id $resource_id \
-        --http-method OPTIONS \
-        --status-code 200 \
-        --response-parameters method.response.header.Access-Control-Allow-Headers=false,method.response.header.Access-Control-Allow-Methods=false,method.response.header.Access-Control-Allow-Origin=false,method.response.header.Access-Control-Allow-Credentials=false,method.response.header.Access-Control-Max-Age=false
-    
-    echo "Created OPTIONS method for $resource_name"
+    echo "Processed OPTIONS method for $resource_name"
 }
 
 # Get Lambda function ARNs
@@ -169,17 +182,30 @@ ANALYTICS_LAMBDA_ARN=$(get_lambda_arn "AnalyticsApi")
 
 echo "Lambda ARNs retrieved successfully"
 
-# Create Cognito Authorizer
-echo "Creating Cognito Authorizer..."
-COGNITO_AUTHORIZER_ID=$(aws apigateway create-authorizer \
-    --rest-api-id $API_GATEWAY_ID \
-    --name "${ENVIRONMENT}-cognito-authorizer" \
-    --type COGNITO_USER_POOLS \
-    --provider-arns "arn:aws:cognito-idp:$AWS_REGION:$AWS_ACCOUNT_ID:userpool/$USER_POOL_ID" \
-    --identity-source method.request.header.Authorization \
-    --query 'id' --output text)
+# Create or get existing Cognito Authorizer
+echo "Creating or getting Cognito Authorizer..."
+AUTHORIZER_NAME="${ENVIRONMENT}-cognito-authorizer"
 
-echo "Cognito Authorizer ID: $COGNITO_AUTHORIZER_ID"
+# Check if authorizer already exists
+EXISTING_AUTHORIZER_ID=$(aws apigateway get-authorizers \
+    --rest-api-id $API_GATEWAY_ID \
+    --query "items[?name=='$AUTHORIZER_NAME'].id" \
+    --output text)
+
+if [ ! -z "$EXISTING_AUTHORIZER_ID" ] && [ "$EXISTING_AUTHORIZER_ID" != "None" ]; then
+    echo "Using existing Cognito Authorizer ID: $EXISTING_AUTHORIZER_ID"
+    COGNITO_AUTHORIZER_ID=$EXISTING_AUTHORIZER_ID
+else
+    echo "Creating new Cognito Authorizer..."
+    COGNITO_AUTHORIZER_ID=$(aws apigateway create-authorizer \
+        --rest-api-id $API_GATEWAY_ID \
+        --name "$AUTHORIZER_NAME" \
+        --type COGNITO_USER_POOLS \
+        --provider-arns "arn:aws:cognito-idp:$AWS_REGION:$AWS_ACCOUNT_ID:userpool/$USER_POOL_ID" \
+        --identity-source method.request.header.Authorization \
+        --query 'id' --output text)
+    echo "Created new Cognito Authorizer ID: $COGNITO_AUTHORIZER_ID"
+fi
 
 # Create main API resources
 echo "Creating main API resources..."
