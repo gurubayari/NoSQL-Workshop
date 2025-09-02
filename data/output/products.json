@@ -29,13 +29,11 @@
       "electronics"
     ],
     "images": [
-      "https://picsum.photos/600/400?random=941",
-      "https://picsum.photos/600/500?random=523",
-      "https://picsum.photos/500/600?random=517",
-      "https://picsum.photos/500/600?random=328",
-      "https://picsum.photos/400/500?random=335"
+      "images/4ae45c7d-8d70-488e-8443-98ca82b55dd1-img2.jpg",
+      "images/4ae45c7d-8d70-488e-8443-98ca82b55dd1-img3.jpg",
+      "images/4ae45c7d-8d70-488e-8443-98ca82b55dd1-img4.jpg"
     ],
-    "mainImage": "https://picsum.photos/600/400?random=941",
+    "mainImage": "images/4ae45c7d-8d70-488e-8443-98ca82b55dd1-img1.jpg",
     "rating": 3.6,
     "reviewCount": 305,
     "inStock": true,
@@ -1627,14 +1625,11 @@
       "electronics"
     ],
     "images": [
-      "https://picsum.photos/600/400?random=536",
-      "https://picsum.photos/400/400?random=221",
-      "https://picsum.photos/400/500?random=848",
-      "https://picsum.photos/500/400?random=580",
-      "https://picsum.photos/500/500?random=827",
-      "https://picsum.photos/600/500?random=981"
+      "images/957baae4-9c66-46fb-93ec-45ef86b221fc-img2.jpg",
+      "images/957baae4-9c66-46fb-93ec-45ef86b221fc-img3.jpg",
+      "images/957baae4-9c66-46fb-93ec-45ef86b221fc-img4.jpg"
     ],
-    "mainImage": "https://picsum.photos/600/400?random=536",
+    "mainImage": "images/957baae4-9c66-46fb-93ec-45ef86b221fc-img1.jpg",
     "rating": 3.8,
     "reviewCount": 126,
     "inStock": true,
@@ -3225,13 +3220,11 @@
       "electronics"
     ],
     "images": [
-      "https://picsum.photos/400/400?random=835",
-      "https://picsum.photos/600/500?random=258",
-      "https://picsum.photos/400/500?random=356",
-      "https://picsum.photos/400/500?random=907",
-      "https://picsum.photos/400/600?random=737"
+      "images/65eca7ad-f621-4b59-a0ad-375d211148b6-img2.jpg",
+      "images/65eca7ad-f621-4b59-a0ad-375d211148b6-img3.jpg",
+      "images/65eca7ad-f621-4b59-a0ad-375d211148b6-img4.jpg"
     ],
-    "mainImage": "https://picsum.photos/400/400?random=835",
+    "mainImage": "images/65eca7ad-f621-4b59-a0ad-375d211148b6-img1.jpg",
     "rating": 4.3,
     "reviewCount": 177,
     "inStock": true,
@@ -4829,12 +4822,11 @@
       "electronics"
     ],
     "images": [
-      "https://picsum.photos/400/600?random=257",
-      "https://picsum.photos/600/600?random=405",
-      "https://picsum.photos/600/600?random=9",
-      "https://picsum.photos/500/400?random=329"
+      "images/2417950f-4720-428a-adb4-04b111185414-img2.jpg",
+      "images/2417950f-4720-428a-adb4-04b111185414-img3.jpg",
+      "images/2417950f-4720-428a-adb4-04b111185414-img4.jpg"
     ],
-    "mainImage": "https://picsum.photos/400/600?random=257",
+    "mainImage": "images/2417950f-4720-428a-adb4-04b111185414-img1.jpg",
     "rating": 4.1,
     "reviewCount": 402,
     "inStock": true,
@@ -6433,14 +6425,11 @@
       "electronics"
     ],
     "images": [
-      "https://picsum.photos/500/400?random=760",
-      "https://picsum.photos/400/600?random=78",
-      "https://picsum.photos/400/400?random=447",
-      "https://picsum.photos/500/400?random=895",
-      "https://picsum.photos/600/600?random=598",
-      "https://picsum.photos/400/400?random=379"
+      "images/99d14531-6ee6-4cd4-8299-2cbcd768be6a-img2.jpg",
+      "images/99d14531-6ee6-4cd4-8299-2cbcd768be6a-img3.jpg",
+      "images/99d14531-6ee6-4cd4-8299-2cbcd768be6a-img4.jpg"
     ],
-    "mainImage": "https://picsum.photos/500/400?random=760",
+    "mainImage": "images/99d14531-6ee6-4cd4-8299-2cbcd768be6a-img1.jpg",
     "rating": 4.9,
     "reviewCount": 64,
     "inStock": true,
@@ -8030,12 +8019,11 @@
       "electronics"
     ],
     "images": [
-      "https://picsum.photos/400/400?random=307",
-      "https://picsum.photos/500/500?random=83",
-      "https://picsum.photos/500/400?random=144",
-      "https://picsum.photos/500/500?random=749"
+      "images/47d36ffe-fa3d-4b72-8237-dc2a87cd13f5-img2.jpg",
+      "images/47d36ffe-fa3d-4b72-8237-dc2a87cd13f5-img3.jpg",
+      "images/47d36ffe-fa3d-4b72-8237-dc2a87cd13f5-img4.jpg"
     ],
-    "mainImage": "https://picsum.photos/400/400?random=307",
+    "mainImage": "images/47d36ffe-fa3d-4b72-8237-dc2a87cd13f5-img1.jpg",
     "rating": 4.3,
     "reviewCount": 415,
     "inStock": true,
@@ -9626,12 +9614,11 @@
       "electronics"
     ],
     "images": [
-      "https://picsum.photos/500/500?random=829",
-      "https://picsum.photos/500/500?random=468",
-      "https://picsum.photos/400/400?random=784",
-      "https://picsum.photos/500/400?random=467"
+      "images/2dc40a5e-15a2-4f0a-b121-2230874043f3-img2.jpg",
+      "images/2dc40a5e-15a2-4f0a-b121-2230874043f3-img3.jpg",
+      "images/2dc40a5e-15a2-4f0a-b121-2230874043f3-img4.jpg"
     ],
-    "mainImage": "https://picsum.photos/500/500?random=829",
+    "mainImage": "images/2dc40a5e-15a2-4f0a-b121-2230874043f3-img1.jpg",
     "rating": 4.3,
     "reviewCount": 120,
     "inStock": true,
@@ -11223,11 +11210,11 @@
       "electronics"
     ],
     "images": [
-      "https://picsum.photos/600/400?random=80",
-      "https://picsum.photos/600/500?random=880",
-      "https://picsum.photos/400/600?random=802"
+      "images/23e3f013-dafa-4495-a050-a89632b4c1d6-img2.jpg",
+      "images/23e3f013-dafa-4495-a050-a89632b4c1d6-img3.jpg",
+      "images/23e3f013-dafa-4495-a050-a89632b4c1d6-img4.jpg"
     ],
-    "mainImage": "https://picsum.photos/600/400?random=80",
+    "mainImage": "images/23e3f013-dafa-4495-a050-a89632b4c1d6-img1.jpg",
     "rating": 3.6,
     "reviewCount": 133,
     "inStock": true,
@@ -12824,13 +12811,11 @@
       "electronics"
     ],
     "images": [
-      "https://picsum.photos/600/400?random=243",
-      "https://picsum.photos/600/400?random=413",
-      "https://picsum.photos/600/500?random=91",
-      "https://picsum.photos/600/600?random=506",
-      "https://picsum.photos/500/500?random=961"
+      "images/443dd0aa-143e-4376-84f8-c7219e42ab1b-img2.jpg",
+      "images/443dd0aa-143e-4376-84f8-c7219e42ab1b-img3.jpg",
+      "images/443dd0aa-143e-4376-84f8-c7219e42ab1b-img4.jpg"
     ],
-    "mainImage": "https://picsum.photos/600/400?random=243",
+    "mainImage": "images/443dd0aa-143e-4376-84f8-c7219e42ab1b-img1.jpg",
     "rating": 4.9,
     "reviewCount": 26,
     "inStock": true,
@@ -14427,13 +14412,11 @@
       "electronics"
     ],
     "images": [
-      "https://picsum.photos/500/600?random=491",
-      "https://picsum.photos/600/600?random=685",
-      "https://picsum.photos/600/600?random=9",
-      "https://picsum.photos/500/500?random=582",
-      "https://picsum.photos/600/500?random=672"
+      "images/72e3bec8-db6e-484f-8d9a-7dc2fd0ef45c-img2.jpg",
+      "images/72e3bec8-db6e-484f-8d9a-7dc2fd0ef45c-img3.jpg",
+      "images/72e3bec8-db6e-484f-8d9a-7dc2fd0ef45c-img4.jpg"
     ],
-    "mainImage": "https://picsum.photos/500/600?random=491",
+    "mainImage": "images/72e3bec8-db6e-484f-8d9a-7dc2fd0ef45c-img1.jpg",
     "rating": 3.5,
     "reviewCount": 65,
     "inStock": true,
@@ -16044,12 +16027,11 @@
       "style"
     ],
     "images": [
-      "https://picsum.photos/400/600?random=804",
-      "https://picsum.photos/500/500?random=444",
-      "https://picsum.photos/600/400?random=310",
-      "https://picsum.photos/500/600?random=905"
+      "images/2d280b87-a314-48ce-bdff-65eb9ed50ea4-img2.jpg",
+      "images/2d280b87-a314-48ce-bdff-65eb9ed50ea4-img3.jpg",
+      "images/2d280b87-a314-48ce-bdff-65eb9ed50ea4-img4.jpg"
     ],
-    "mainImage": "https://picsum.photos/400/600?random=804",
+    "mainImage": "images/2d280b87-a314-48ce-bdff-65eb9ed50ea4-img1.jpg",
     "rating": 4.7,
     "reviewCount": 60,
     "inStock": true,
@@ -17659,14 +17641,11 @@
       "clothing"
     ],
     "images": [
-      "https://picsum.photos/500/500?random=170",
-      "https://picsum.photos/500/400?random=914",
-      "https://picsum.photos/600/600?random=87",
-      "https://picsum.photos/600/500?random=318",
-      "https://picsum.photos/600/600?random=511",
-      "https://picsum.photos/600/400?random=289"
+      "images/46a1152e-b205-464c-aa8c-756d18bbf747-img2.jpg",
+      "images/46a1152e-b205-464c-aa8c-756d18bbf747-img3.jpg",
+      "images/46a1152e-b205-464c-aa8c-756d18bbf747-img4.jpg"
     ],
-    "mainImage": "https://picsum.photos/500/500?random=170",
+    "mainImage": "images/46a1152e-b205-464c-aa8c-756d18bbf747-img1.jpg",
     "rating": 4.9,
     "reviewCount": 110,
     "inStock": true,
@@ -19276,11 +19255,11 @@
       "clothing"
     ],
     "images": [
-      "https://picsum.photos/600/600?random=385",
-      "https://picsum.photos/400/500?random=230",
-      "https://picsum.photos/400/600?random=994"
+      "images/13955f4d-f0dd-4545-a959-44676e0ee6c8-img2.jpg",
+      "images/13955f4d-f0dd-4545-a959-44676e0ee6c8-img3.jpg",
+      "images/13955f4d-f0dd-4545-a959-44676e0ee6c8-img4.jpg"
     ],
-    "mainImage": "https://picsum.photos/600/600?random=385",
+    "mainImage": "images/13955f4d-f0dd-4545-a959-44676e0ee6c8-img1.jpg",
     "rating": 4.9,
     "reviewCount": 460,
     "inStock": true,
@@ -20889,12 +20868,11 @@
       "clothing"
     ],
     "images": [
-      "https://picsum.photos/400/600?random=866",
-      "https://picsum.photos/600/400?random=738",
-      "https://picsum.photos/400/400?random=320",
-      "https://picsum.photos/600/600?random=349"
+      "images/9fdcaf99-4516-402d-9dbb-a96c7037a13e-img2.jpg",
+      "images/9fdcaf99-4516-402d-9dbb-a96c7037a13e-img3.jpg",
+      "images/9fdcaf99-4516-402d-9dbb-a96c7037a13e-img4.jpg"
     ],
-    "mainImage": "https://picsum.photos/400/600?random=866",
+    "mainImage": "images/9fdcaf99-4516-402d-9dbb-a96c7037a13e-img1.jpg",
     "rating": 5.0,
     "reviewCount": 471,
     "inStock": true,
@@ -22503,12 +22481,11 @@
       "style"
     ],
     "images": [
-      "https://picsum.photos/400/600?random=763",
-      "https://picsum.photos/500/400?random=443",
-      "https://picsum.photos/400/500?random=250",
-      "https://picsum.photos/600/500?random=293"
+      "images/1c7b03f9-d686-4967-8aaf-faf8bed47691-img2.jpg",
+      "images/1c7b03f9-d686-4967-8aaf-faf8bed47691-img3.jpg",
+      "images/1c7b03f9-d686-4967-8aaf-faf8bed47691-img4.jpg"
     ],
-    "mainImage": "https://picsum.photos/400/600?random=763",
+    "mainImage": "images/1c7b03f9-d686-4967-8aaf-faf8bed47691-img1.jpg",
     "rating": 4.0,
     "reviewCount": 136,
     "inStock": true,
@@ -24114,14 +24091,11 @@
       "wear"
     ],
     "images": [
-      "https://picsum.photos/400/600?random=527",
-      "https://picsum.photos/500/400?random=772",
-      "https://picsum.photos/600/600?random=592",
-      "https://picsum.photos/400/500?random=607",
-      "https://picsum.photos/500/500?random=354",
-      "https://picsum.photos/400/600?random=330"
+      "images/f5bfe1b5-e6ef-4a08-aab3-e98a06fa3970-img2.jpg",
+      "images/f5bfe1b5-e6ef-4a08-aab3-e98a06fa3970-img3.jpg",
+      "images/f5bfe1b5-e6ef-4a08-aab3-e98a06fa3970-img4.jpg"
     ],
-    "mainImage": "https://picsum.photos/400/600?random=527",
+    "mainImage": "images/f5bfe1b5-e6ef-4a08-aab3-e98a06fa3970-img1.jpg",
     "rating": 3.7,
     "reviewCount": 51,
     "inStock": true,
@@ -25726,12 +25700,11 @@
       "wear"
     ],
     "images": [
-      "https://picsum.photos/600/400?random=856",
-      "https://picsum.photos/500/500?random=169",
-      "https://picsum.photos/500/400?random=798",
-      "https://picsum.photos/500/600?random=912"
+      "images/5c73032a-4953-4ac8-a504-1aedfc16f4be-img2.jpg",
+      "images/5c73032a-4953-4ac8-a504-1aedfc16f4be-img3.jpg",
+      "images/5c73032a-4953-4ac8-a504-1aedfc16f4be-img4.jpg"
     ],
-    "mainImage": "https://picsum.photos/600/400?random=856",
+    "mainImage": "images/5c73032a-4953-4ac8-a504-1aedfc16f4be-img1.jpg",
     "rating": 4.9,
     "reviewCount": 488,
     "inStock": true,
@@ -27341,14 +27314,11 @@
       "style"
     ],
     "images": [
-      "https://picsum.photos/400/400?random=19",
-      "https://picsum.photos/600/600?random=375",
-      "https://picsum.photos/400/500?random=358",
-      "https://picsum.photos/600/600?random=689",
-      "https://picsum.photos/400/400?random=757",
-      "https://picsum.photos/500/400?random=191"
+      "images/1279dd1e-9c9b-4c66-9731-4d46c1385312-img2.jpg",
+      "images/1279dd1e-9c9b-4c66-9731-4d46c1385312-img3.jpg",
+      "images/1279dd1e-9c9b-4c66-9731-4d46c1385312-img4.jpg"
     ],
-    "mainImage": "https://picsum.photos/400/400?random=19",
+    "mainImage": "images/1279dd1e-9c9b-4c66-9731-4d46c1385312-img1.jpg",
     "rating": 4.4,
     "reviewCount": 30,
     "inStock": true,
@@ -28958,11 +28928,11 @@
       "style"
     ],
     "images": [
-      "https://picsum.photos/600/400?random=698",
-      "https://picsum.photos/400/400?random=500",
-      "https://picsum.photos/400/600?random=840"
+      "images/08799319-5ed9-4db2-a1b0-c71812813024-img2.jpg",
+      "images/08799319-5ed9-4db2-a1b0-c71812813024-img3.jpg",
+      "images/08799319-5ed9-4db2-a1b0-c71812813024-img4.jpg"
     ],
-    "mainImage": "https://picsum.photos/600/400?random=698",
+    "mainImage": "images/08799319-5ed9-4db2-a1b0-c71812813024-img1.jpg",
     "rating": 4.8,
     "reviewCount": 309,
     "inStock": true,
@@ -30569,14 +30539,11 @@
       "style"
     ],
     "images": [
-      "https://picsum.photos/400/400?random=959",
-      "https://picsum.photos/500/500?random=759",
-      "https://picsum.photos/500/600?random=533",
-      "https://picsum.photos/500/500?random=92",
-      "https://picsum.photos/600/500?random=905",
-      "https://picsum.photos/600/600?random=186"
+      "images/e580f902-c917-40f6-9c2b-7fcdd7a42c1d-img2.jpg",
+      "images/e580f902-c917-40f6-9c2b-7fcdd7a42c1d-img3.jpg",
+      "images/e580f902-c917-40f6-9c2b-7fcdd7a42c1d-img4.jpg"
     ],
-    "mainImage": "https://picsum.photos/400/400?random=959",
+    "mainImage": "images/e580f902-c917-40f6-9c2b-7fcdd7a42c1d-img1.jpg",
     "rating": 4.9,
     "reviewCount": 374,
     "inStock": true,
@@ -32171,12 +32138,11 @@
       "ikea"
     ],
     "images": [
-      "https://picsum.photos/400/400?random=930",
-      "https://picsum.photos/400/600?random=424",
-      "https://picsum.photos/500/500?random=177",
-      "https://picsum.photos/400/400?random=827"
+      "images/db549925-3e84-4db7-b2ba-c2cc700f0f86-img2.jpg",
+      "images/db549925-3e84-4db7-b2ba-c2cc700f0f86-img3.jpg",
+      "images/db549925-3e84-4db7-b2ba-c2cc700f0f86-img4.jpg"
     ],
-    "mainImage": "https://picsum.photos/400/400?random=930",
+    "mainImage": "images/db549925-3e84-4db7-b2ba-c2cc700f0f86-img1.jpg",
     "rating": 4.3,
     "reviewCount": 160,
     "inStock": true,
@@ -33771,12 +33737,11 @@
       "ikea"
     ],
     "images": [
-      "https://picsum.photos/600/400?random=161",
-      "https://picsum.photos/500/600?random=0",
-      "https://picsum.photos/400/500?random=709",
-      "https://picsum.photos/500/500?random=441"
+      "images/574a83c9-485c-4610-80a5-8ab3117ca416-img2.jpg",
+      "images/574a83c9-485c-4610-80a5-8ab3117ca416-img3.jpg",
+      "images/574a83c9-485c-4610-80a5-8ab3117ca416-img4.jpg"
     ],
-    "mainImage": "https://picsum.photos/600/400?random=161",
+    "mainImage": "images/574a83c9-485c-4610-80a5-8ab3117ca416-img1.jpg",
     "rating": 4.6,
     "reviewCount": 460,
     "inStock": true,
@@ -35371,12 +35336,11 @@
       "dyson"
     ],
     "images": [
-      "https://picsum.photos/500/500?random=242",
-      "https://picsum.photos/600/500?random=155",
-      "https://picsum.photos/600/600?random=185",
-      "https://picsum.photos/600/600?random=55"
+      "images/91a1456a-fb72-4acf-8245-971f6c551c92-img2.jpg",
+      "images/91a1456a-fb72-4acf-8245-971f6c551c92-img3.jpg",
+      "images/91a1456a-fb72-4acf-8245-971f6c551c92-img4.jpg"
     ],
-    "mainImage": "https://picsum.photos/500/500?random=242",
+    "mainImage": "images/91a1456a-fb72-4acf-8245-971f6c551c92-img1.jpg",
     "rating": 3.7,
     "reviewCount": 455,
     "inStock": true,
@@ -36972,14 +36936,11 @@
       "home & garden"
     ],
     "images": [
-      "https://picsum.photos/600/400?random=516",
-      "https://picsum.photos/600/400?random=729",
-      "https://picsum.photos/400/400?random=344",
-      "https://picsum.photos/500/500?random=700",
-      "https://picsum.photos/600/500?random=248",
-      "https://picsum.photos/500/500?random=246"
+      "images/7fd58430-7881-4c46-a321-9db0d19cefa9-img2.jpg",
+      "images/7fd58430-7881-4c46-a321-9db0d19cefa9-img3.jpg",
+      "images/7fd58430-7881-4c46-a321-9db0d19cefa9-img4.jpg"
     ],
-    "mainImage": "https://picsum.photos/600/400?random=516",
+    "mainImage": "images/7fd58430-7881-4c46-a321-9db0d19cefa9-img1.jpg",
     "rating": 4.3,
     "reviewCount": 327,
     "inStock": true,
@@ -38575,14 +38536,11 @@
       "home & garden"
     ],
     "images": [
-      "https://picsum.photos/500/400?random=661",
-      "https://picsum.photos/400/500?random=258",
-      "https://picsum.photos/600/400?random=603",
-      "https://picsum.photos/600/600?random=900",
-      "https://picsum.photos/400/400?random=976",
-      "https://picsum.photos/400/400?random=609"
+      "images/9f32330c-994e-48f1-8115-87a4b90716b1-img2.jpg",
+      "images/9f32330c-994e-48f1-8115-87a4b90716b1-img3.jpg",
+      "images/9f32330c-994e-48f1-8115-87a4b90716b1-img4.jpg"
     ],
-    "mainImage": "https://picsum.photos/500/400?random=661",
+    "mainImage": "images/9f32330c-994e-48f1-8115-87a4b90716b1-img1.jpg",
     "rating": 4.2,
     "reviewCount": 93,
     "inStock": true,
@@ -40178,11 +40136,11 @@
       "ikea"
     ],
     "images": [
-      "https://picsum.photos/400/600?random=81",
-      "https://picsum.photos/600/400?random=332",
-      "https://picsum.photos/600/600?random=23"
+      "images/6d08a1cc-d6b5-4402-ade1-ff053557d33a-img2.jpg",
+      "images/6d08a1cc-d6b5-4402-ade1-ff053557d33a-img3.jpg",
+      "images/6d08a1cc-d6b5-4402-ade1-ff053557d33a-img4.jpg"
     ],
-    "mainImage": "https://picsum.photos/400/600?random=81",
+    "mainImage": "images/6d08a1cc-d6b5-4402-ade1-ff053557d33a-img1.jpg",
     "rating": 3.8,
     "reviewCount": 108,
     "inStock": true,
@@ -41777,14 +41735,11 @@
       "home & garden"
     ],
     "images": [
-      "https://picsum.photos/400/400?random=825",
-      "https://picsum.photos/600/400?random=875",
-      "https://picsum.photos/400/600?random=696",
-      "https://picsum.photos/500/400?random=864",
-      "https://picsum.photos/500/500?random=489",
-      "https://picsum.photos/400/500?random=552"
+      "images/8de5a0f8-957c-4a76-be8a-bbb3f71976d7-img2.jpg",
+      "images/8de5a0f8-957c-4a76-be8a-bbb3f71976d7-img3.jpg",
+      "images/8de5a0f8-957c-4a76-be8a-bbb3f71976d7-img4.jpg"
     ],
-    "mainImage": "https://picsum.photos/400/400?random=825",
+    "mainImage": "images/8de5a0f8-957c-4a76-be8a-bbb3f71976d7-img1.jpg",
     "rating": 3.9,
     "reviewCount": 481,
     "inStock": true,
@@ -43380,11 +43335,11 @@
       "home & garden"
     ],
     "images": [
-      "https://picsum.photos/600/600?random=146",
-      "https://picsum.photos/600/400?random=632",
-      "https://picsum.photos/600/600?random=379"
+      "images/4af151a7-214d-4df3-bfed-5e6bdf7fe8bc-img2.jpg",
+      "images/4af151a7-214d-4df3-bfed-5e6bdf7fe8bc-img3.jpg",
+      "images/4af151a7-214d-4df3-bfed-5e6bdf7fe8bc-img4.jpg"
     ],
-    "mainImage": "https://picsum.photos/600/600?random=146",
+    "mainImage": "images/4af151a7-214d-4df3-bfed-5e6bdf7fe8bc-img1.jpg",
     "rating": 4.6,
     "reviewCount": 406,
     "inStock": true,
@@ -44982,14 +44937,11 @@
       "home & garden"
     ],
     "images": [
-      "https://picsum.photos/400/600?random=644",
-      "https://picsum.photos/500/500?random=751",
-      "https://picsum.photos/400/400?random=166",
-      "https://picsum.photos/500/600?random=498",
-      "https://picsum.photos/600/400?random=727",
-      "https://picsum.photos/500/500?random=416"
+      "images/8693c6e0-8edd-475b-829a-d0eee670d3cc-img2.jpg",
+      "images/8693c6e0-8edd-475b-829a-d0eee670d3cc-img3.jpg",
+      "images/8693c6e0-8edd-475b-829a-d0eee670d3cc-img4.jpg"
     ],
-    "mainImage": "https://picsum.photos/400/600?random=644",
+    "mainImage": "images/8693c6e0-8edd-475b-829a-d0eee670d3cc-img1.jpg",
     "rating": 4.7,
     "reviewCount": 469,
     "inStock": true,
@@ -46585,12 +46537,11 @@
       "dyson"
     ],
     "images": [
-      "https://picsum.photos/400/600?random=900",
-      "https://picsum.photos/600/600?random=782",
-      "https://picsum.photos/400/600?random=610",
-      "https://picsum.photos/600/400?random=382"
+      "images/348c2383-272a-401f-8526-ce8012e61afd-img2.jpg",
+      "images/348c2383-272a-401f-8526-ce8012e61afd-img3.jpg",
+      "images/348c2383-272a-401f-8526-ce8012e61afd-img4.jpg"
     ],
-    "mainImage": "https://picsum.photos/400/600?random=900",
+    "mainImage": "images/348c2383-272a-401f-8526-ce8012e61afd-img1.jpg",
     "rating": 4.9,
     "reviewCount": 316,
     "inStock": true,
@@ -48180,13 +48131,11 @@
       "fitness"
     ],
     "images": [
-      "https://picsum.photos/600/500?random=482",
-      "https://picsum.photos/500/400?random=238",
-      "https://picsum.photos/400/600?random=790",
-      "https://picsum.photos/400/400?random=281",
-      "https://picsum.photos/600/400?random=664"
+      "images/77a9adee-23a2-4e8a-b6d4-0ea12bfc3ad8-img2.jpg",
+      "images/77a9adee-23a2-4e8a-b6d4-0ea12bfc3ad8-img3.jpg",
+      "images/77a9adee-23a2-4e8a-b6d4-0ea12bfc3ad8-img4.jpg"
     ],
-    "mainImage": "https://picsum.photos/600/500?random=482",
+    "mainImage": "images/77a9adee-23a2-4e8a-b6d4-0ea12bfc3ad8-img1.jpg",
     "rating": 4.3,
     "reviewCount": 248,
     "inStock": true,
@@ -49774,11 +49723,11 @@
       "sportswear"
     ],
     "images": [
-      "https://picsum.photos/600/400?random=731",
-      "https://picsum.photos/400/600?random=703",
-      "https://picsum.photos/600/500?random=735"
+      "images/60a1240c-2381-4521-bfa1-cf2acd578c49-img2.jpg",
+      "images/60a1240c-2381-4521-bfa1-cf2acd578c49-img3.jpg",
+      "images/60a1240c-2381-4521-bfa1-cf2acd578c49-img4.jpg"
     ],
-    "mainImage": "https://picsum.photos/600/400?random=731",
+    "mainImage": "images/60a1240c-2381-4521-bfa1-cf2acd578c49-img1.jpg",
     "rating": 4.1,
     "reviewCount": 421,
     "inStock": true,
@@ -51364,11 +51313,11 @@
       "supplements"
     ],
     "images": [
-      "https://picsum.photos/500/600?random=794",
-      "https://picsum.photos/400/500?random=283",
-      "https://picsum.photos/500/600?random=823"
+      "images/7ca206fa-1b0d-4f6a-9e54-b7e0ad5c973b-img2.jpg",
+      "images/7ca206fa-1b0d-4f6a-9e54-b7e0ad5c973b-img3.jpg",
+      "images/7ca206fa-1b0d-4f6a-9e54-b7e0ad5c973b-img4.jpg"
     ],
-    "mainImage": "https://picsum.photos/500/600?random=794",
+    "mainImage": "images/7ca206fa-1b0d-4f6a-9e54-b7e0ad5c973b-img1.jpg",
     "rating": 4.4,
     "reviewCount": 329,
     "inStock": true,
@@ -52957,12 +52906,11 @@
       "recommended"
     ],
     "images": [
-      "https://picsum.photos/400/400?random=499",
-      "https://picsum.photos/600/500?random=167",
-      "https://picsum.photos/500/600?random=663",
-      "https://picsum.photos/500/600?random=217"
+      "images/f4b9d029-b6ea-447a-bbdb-c01fbae4777c-img2.jpg",
+      "images/f4b9d029-b6ea-447a-bbdb-c01fbae4777c-img3.jpg",
+      "images/f4b9d029-b6ea-447a-bbdb-c01fbae4777c-img4.jpg"
     ],
-    "mainImage": "https://picsum.photos/400/400?random=499",
+    "mainImage": "images/f4b9d029-b6ea-447a-bbdb-c01fbae4777c-img1.jpg",
     "rating": 4.5,
     "reviewCount": 80,
     "inStock": true,
@@ -54551,14 +54499,11 @@
       "recommended"
     ],
     "images": [
-      "https://picsum.photos/400/400?random=769",
-      "https://picsum.photos/600/400?random=304",
-      "https://picsum.photos/400/500?random=949",
-      "https://picsum.photos/500/500?random=150",
-      "https://picsum.photos/600/500?random=818",
-      "https://picsum.photos/600/600?random=303"
+      "images/3e196480-984f-4194-8931-ff2430391d99-img2.jpg",
+      "images/3e196480-984f-4194-8931-ff2430391d99-img3.jpg",
+      "images/3e196480-984f-4194-8931-ff2430391d99-img4.jpg"
     ],
-    "mainImage": "https://picsum.photos/400/400?random=769",
+    "mainImage": "images/3e196480-984f-4194-8931-ff2430391d99-img1.jpg",
     "rating": 4.6,
     "reviewCount": 87,
     "inStock": true,
@@ -56146,11 +56091,11 @@
       "supplements"
     ],
     "images": [
-      "https://picsum.photos/400/500?random=689",
-      "https://picsum.photos/600/400?random=770",
-      "https://picsum.photos/400/500?random=999"
+      "images/9f06f5a7-53be-4caa-a067-2d4f0596d2bd-img2.jpg",
+      "images/9f06f5a7-53be-4caa-a067-2d4f0596d2bd-img3.jpg",
+      "images/9f06f5a7-53be-4caa-a067-2d4f0596d2bd-img4.jpg"
     ],
-    "mainImage": "https://picsum.photos/400/500?random=689",
+    "mainImage": "images/9f06f5a7-53be-4caa-a067-2d4f0596d2bd-img1.jpg",
     "rating": 4.6,
     "reviewCount": 295,
     "inStock": true,
@@ -57741,11 +57686,11 @@
       "reebok"
     ],
     "images": [
-      "https://picsum.photos/400/500?random=185",
-      "https://picsum.photos/600/500?random=907",
-      "https://picsum.photos/500/600?random=331"
+      "images/ad14078a-24bd-4937-83a2-2e2aaacfe8bf-img2.jpg",
+      "images/ad14078a-24bd-4937-83a2-2e2aaacfe8bf-img3.jpg",
+      "images/ad14078a-24bd-4937-83a2-2e2aaacfe8bf-img4.jpg"
     ],
-    "mainImage": "https://picsum.photos/400/500?random=185",
+    "mainImage": "images/ad14078a-24bd-4937-83a2-2e2aaacfe8bf-img1.jpg",
     "rating": 4.6,
     "reviewCount": 362,
     "inStock": true,
@@ -59334,11 +59279,11 @@
       "reebok"
     ],
     "images": [
-      "https://picsum.photos/600/400?random=495",
-      "https://picsum.photos/500/500?random=877",
-      "https://picsum.photos/500/400?random=208"
+      "images/68a0db4e-b1f4-43f9-84de-7b423c31c8dd-img2.jpg",
+      "images/68a0db4e-b1f4-43f9-84de-7b423c31c8dd-img3.jpg",
+      "images/68a0db4e-b1f4-43f9-84de-7b423c31c8dd-img4.jpg"
     ],
-    "mainImage": "https://picsum.photos/600/400?random=495",
+    "mainImage": "images/68a0db4e-b1f4-43f9-84de-7b423c31c8dd-img1.jpg",
     "rating": 4.0,
     "reviewCount": 110,
     "inStock": true,
@@ -60927,11 +60872,11 @@
       "fitness"
     ],
     "images": [
-      "https://picsum.photos/600/500?random=603",
-      "https://picsum.photos/500/600?random=906",
-      "https://picsum.photos/500/500?random=201"
+      "images/52365530-7c85-4cd4-b1bf-7f860a06b33f-img2.jpg",
+      "images/52365530-7c85-4cd4-b1bf-7f860a06b33f-img3.jpg",
+      "images/52365530-7c85-4cd4-b1bf-7f860a06b33f-img4.jpg"
     ],
-    "mainImage": "https://picsum.photos/600/500?random=603",
+    "mainImage": "images/52365530-7c85-4cd4-b1bf-7f860a06b33f-img1.jpg",
     "rating": 4.6,
     "reviewCount": 315,
     "inStock": true,
@@ -62523,12 +62468,11 @@
       "reebok"
     ],
     "images": [
-      "https://picsum.photos/400/400?random=878",
-      "https://picsum.photos/400/500?random=646",
-      "https://picsum.photos/400/600?random=37",
-      "https://picsum.photos/400/500?random=226"
+      "images/1da6a18d-b633-439d-b934-de5ceeed371b-img2.jpg",
+      "images/1da6a18d-b633-439d-b934-de5ceeed371b-img3.jpg",
+      "images/1da6a18d-b633-439d-b934-de5ceeed371b-img4.jpg"
     ],
-    "mainImage": "https://picsum.photos/400/400?random=878",
+    "mainImage": "images/1da6a18d-b633-439d-b934-de5ceeed371b-img1.jpg",
     "rating": 3.7,
     "reviewCount": 435,
     "inStock": true,
@@ -64115,14 +64059,11 @@
       "non-fiction"
     ],
     "images": [
-      "https://picsum.photos/400/500?random=199",
-      "https://picsum.photos/400/500?random=45",
-      "https://picsum.photos/400/400?random=272",
-      "https://picsum.photos/400/400?random=706",
-      "https://picsum.photos/500/600?random=696",
-      "https://picsum.photos/400/600?random=150"
+      "images/0a010795-defd-4ece-9ddf-4180a9dda248-img2.jpg",
+      "images/0a010795-defd-4ece-9ddf-4180a9dda248-img3.jpg",
+      "images/0a010795-defd-4ece-9ddf-4180a9dda248-img4.jpg"
     ],
-    "mainImage": "https://picsum.photos/400/500?random=199",
+    "mainImage": "images/0a010795-defd-4ece-9ddf-4180a9dda248-img1.jpg",
     "rating": 3.9,
     "reviewCount": 121,
     "inStock": true,
@@ -65706,12 +65647,11 @@
       "books & media"
     ],
     "images": [
-      "https://picsum.photos/500/600?random=536",
-      "https://picsum.photos/500/600?random=437",
-      "https://picsum.photos/400/600?random=475",
-      "https://picsum.photos/600/400?random=326"
+      "images/8dd17f61-4f5e-4c24-9bfa-d11e0a4a8982-img2.jpg",
+      "images/8dd17f61-4f5e-4c24-9bfa-d11e0a4a8982-img3.jpg",
+      "images/8dd17f61-4f5e-4c24-9bfa-d11e0a4a8982-img4.jpg"
     ],
-    "mainImage": "https://picsum.photos/500/600?random=536",
+    "mainImage": "images/8dd17f61-4f5e-4c24-9bfa-d11e0a4a8982-img1.jpg",
     "rating": 3.9,
     "reviewCount": 452,
     "inStock": true,
@@ -67295,11 +67235,11 @@
       "harpercollins"
     ],
     "images": [
-      "https://picsum.photos/400/400?random=79",
-      "https://picsum.photos/400/400?random=332",
-      "https://picsum.photos/600/500?random=145"
+      "images/3ac28b75-f3b4-4ddc-b500-32fd97c9021e-img2.jpg",
+      "images/3ac28b75-f3b4-4ddc-b500-32fd97c9021e-img3.jpg",
+      "images/3ac28b75-f3b4-4ddc-b500-32fd97c9021e-img4.jpg"
     ],
-    "mainImage": "https://picsum.photos/400/400?random=79",
+    "mainImage": "images/3ac28b75-f3b4-4ddc-b500-32fd97c9021e-img1.jpg",
     "rating": 3.9,
     "reviewCount": 126,
     "inStock": true,
@@ -68881,13 +68821,11 @@
       "bestseller"
     ],
     "images": [
-      "https://picsum.photos/400/600?random=316",
-      "https://picsum.photos/600/500?random=958",
-      "https://picsum.photos/600/500?random=86",
-      "https://picsum.photos/600/600?random=308",
-      "https://picsum.photos/600/600?random=870"
+      "images/f9fc729b-7ae4-4fb4-8226-7ee0b229f0b4-img2.jpg",
+      "images/f9fc729b-7ae4-4fb4-8226-7ee0b229f0b4-img3.jpg",
+      "images/f9fc729b-7ae4-4fb4-8226-7ee0b229f0b4-img4.jpg"
     ],
-    "mainImage": "https://picsum.photos/400/600?random=316",
+    "mainImage": "images/f9fc729b-7ae4-4fb4-8226-7ee0b229f0b4-img1.jpg",
     "rating": 4.0,
     "reviewCount": 153,
     "inStock": true,
@@ -70469,12 +70407,11 @@
       "premium"
     ],
     "images": [
-      "https://picsum.photos/600/400?random=861",
-      "https://picsum.photos/600/500?random=363",
-      "https://picsum.photos/500/600?random=769",
-      "https://picsum.photos/500/500?random=521"
+      "images/12bca71f-e848-4677-bfcd-bfcd82124829-img2.jpg",
+      "images/12bca71f-e848-4677-bfcd-bfcd82124829-img3.jpg",
+      "images/12bca71f-e848-4677-bfcd-bfcd82124829-img4.jpg"
     ],
-    "mainImage": "https://picsum.photos/600/400?random=861",
+    "mainImage": "images/12bca71f-e848-4677-bfcd-bfcd82124829-img1.jpg",
     "rating": 3.7,
     "reviewCount": 279,
     "inStock": true,
@@ -72057,13 +71994,11 @@
       "textbooks"
     ],
     "images": [
-      "https://picsum.photos/400/500?random=862",
-      "https://picsum.photos/400/400?random=639",
-      "https://picsum.photos/600/600?random=586",
-      "https://picsum.photos/500/500?random=338",
-      "https://picsum.photos/600/400?random=923"
+      "images/5b248922-d896-4adc-a7f6-6afe7da9a58f-img2.jpg",
+      "images/5b248922-d896-4adc-a7f6-6afe7da9a58f-img3.jpg",
+      "images/5b248922-d896-4adc-a7f6-6afe7da9a58f-img4.jpg"
     ],
-    "mainImage": "https://picsum.photos/400/500?random=862",
+    "mainImage": "images/5b248922-d896-4adc-a7f6-6afe7da9a58f-img1.jpg",
     "rating": 4.7,
     "reviewCount": 126,
     "inStock": true,
@@ -73647,14 +73582,11 @@
       "books & media"
     ],
     "images": [
-      "https://picsum.photos/500/400?random=947",
-      "https://picsum.photos/500/600?random=216",
-      "https://picsum.photos/500/400?random=217",
-      "https://picsum.photos/500/500?random=270",
-      "https://picsum.photos/500/600?random=246",
-      "https://picsum.photos/600/600?random=603"
+      "images/dd8314e3-50d1-4e04-bc1a-3795a3ebf4a6-img2.jpg",
+      "images/dd8314e3-50d1-4e04-bc1a-3795a3ebf4a6-img3.jpg",
+      "images/dd8314e3-50d1-4e04-bc1a-3795a3ebf4a6-img4.jpg"
     ],
-    "mainImage": "https://picsum.photos/500/400?random=947",
+    "mainImage": "images/dd8314e3-50d1-4e04-bc1a-3795a3ebf4a6-img1.jpg",
     "rating": 3.7,
     "reviewCount": 153,
     "inStock": true,
@@ -75239,11 +75171,11 @@
       "books & media"
     ],
     "images": [
-      "https://picsum.photos/500/600?random=381",
-      "https://picsum.photos/400/500?random=980",
-      "https://picsum.photos/500/500?random=289"
+      "images/9b3cee68-fdc0-4773-b957-5fddfad9fe1d-img2.jpg",
+      "images/9b3cee68-fdc0-4773-b957-5fddfad9fe1d-img3.jpg",
+      "images/9b3cee68-fdc0-4773-b957-5fddfad9fe1d-img4.jpg"
     ],
-    "mainImage": "https://picsum.photos/500/600?random=381",
+    "mainImage": "images/9b3cee68-fdc0-4773-b957-5fddfad9fe1d-img1.jpg",
     "rating": 3.9,
     "reviewCount": 79,
     "inStock": true,
@@ -76827,11 +76759,11 @@
       "textbooks"
     ],
     "images": [
-      "https://picsum.photos/500/600?random=483",
-      "https://picsum.photos/400/600?random=446",
-      "https://picsum.photos/500/400?random=702"
+      "images/13f6de51-f8a1-4fb7-9410-baf9e5ebeded-img2.jpg",
+      "images/13f6de51-f8a1-4fb7-9410-baf9e5ebeded-img3.jpg",
+      "images/13f6de51-f8a1-4fb7-9410-baf9e5ebeded-img4.jpg"
     ],
-    "mainImage": "https://picsum.photos/500/600?random=483",
+    "mainImage": "images/13f6de51-f8a1-4fb7-9410-baf9e5ebeded-img1.jpg",
     "rating": 4.1,
     "reviewCount": 300,
     "inStock": true,
@@ -78414,13 +78346,11 @@
       "textbooks"
     ],
     "images": [
-      "https://picsum.photos/500/400?random=863",
-      "https://picsum.photos/600/400?random=359",
-      "https://picsum.photos/500/500?random=448",
-      "https://picsum.photos/600/500?random=400",
-      "https://picsum.photos/400/400?random=8"
+      "images/7acf1bc7-1c73-4fe2-8ae3-c1f35226bd48-img2.jpg",
+      "images/7acf1bc7-1c73-4fe2-8ae3-c1f35226bd48-img3.jpg",
+      "images/7acf1bc7-1c73-4fe2-8ae3-c1f35226bd48-img4.jpg"
     ],
-    "mainImage": "https://picsum.photos/500/400?random=863",
+    "mainImage": "images/7acf1bc7-1c73-4fe2-8ae3-c1f35226bd48-img1.jpg",
     "rating": 4.3,
     "reviewCount": 253,
     "inStock": true,
@@ -80008,13 +79938,11 @@
       "skincare"
     ],
     "images": [
-      "https://picsum.photos/500/500?random=972",
-      "https://picsum.photos/600/400?random=176",
-      "https://picsum.photos/400/500?random=113",
-      "https://picsum.photos/400/400?random=516",
-      "https://picsum.photos/600/400?random=867"
+      "images/b3a5b3e8-c518-4a52-9857-304e5805158e-img2.jpg",
+      "images/b3a5b3e8-c518-4a52-9857-304e5805158e-img3.jpg",
+      "images/b3a5b3e8-c518-4a52-9857-304e5805158e-img4.jpg"
     ],
-    "mainImage": "https://picsum.photos/500/500?random=972",
+    "mainImage": "images/b3a5b3e8-c518-4a52-9857-304e5805158e-img1.jpg",
     "rating": 4.9,
     "reviewCount": 96,
     "inStock": true,
@@ -81603,14 +81531,11 @@
       "skincare"
     ],
     "images": [
-      "https://picsum.photos/400/600?random=126",
-      "https://picsum.photos/400/500?random=494",
-      "https://picsum.photos/400/400?random=627",
-      "https://picsum.photos/600/500?random=954",
-      "https://picsum.photos/600/500?random=141",
-      "https://picsum.photos/500/500?random=138"
+      "images/521b9747-8553-48a3-aa17-372ae5227075-img2.jpg",
+      "images/521b9747-8553-48a3-aa17-372ae5227075-img3.jpg",
+      "images/521b9747-8553-48a3-aa17-372ae5227075-img4.jpg"
     ],
-    "mainImage": "https://picsum.photos/400/600?random=126",
+    "mainImage": "images/521b9747-8553-48a3-aa17-372ae5227075-img1.jpg",
     "rating": 4.2,
     "reviewCount": 93,
     "inStock": true,
@@ -83197,14 +83122,11 @@
       "care"
     ],
     "images": [
-      "https://picsum.photos/400/600?random=581",
-      "https://picsum.photos/500/600?random=440",
-      "https://picsum.photos/400/600?random=285",
-      "https://picsum.photos/600/600?random=430",
-      "https://picsum.photos/600/400?random=490",
-      "https://picsum.photos/500/400?random=667"
+      "images/01ddaf57-3ee8-48fa-a550-6192c791f7a3-img2.jpg",
+      "images/01ddaf57-3ee8-48fa-a550-6192c791f7a3-img3.jpg",
+      "images/01ddaf57-3ee8-48fa-a550-6192c791f7a3-img4.jpg"
     ],
-    "mainImage": "https://picsum.photos/400/600?random=581",
+    "mainImage": "images/01ddaf57-3ee8-48fa-a550-6192c791f7a3-img1.jpg",
     "rating": 4.7,
     "reviewCount": 427,
     "inStock": true,
@@ -84791,11 +84713,11 @@
       "skincare"
     ],
     "images": [
-      "https://picsum.photos/600/400?random=686",
-      "https://picsum.photos/600/600?random=549",
-      "https://picsum.photos/600/400?random=398"
+      "images/f860e30e-be3c-49be-968b-ac6ad771e693-img2.jpg",
+      "images/f860e30e-be3c-49be-968b-ac6ad771e693-img3.jpg",
+      "images/f860e30e-be3c-49be-968b-ac6ad771e693-img4.jpg"
     ],
-    "mainImage": "https://picsum.photos/600/400?random=686",
+    "mainImage": "images/f860e30e-be3c-49be-968b-ac6ad771e693-img1.jpg",
     "rating": 4.8,
     "reviewCount": 104,
     "inStock": true,
@@ -86385,14 +86307,11 @@
       "skincare"
     ],
     "images": [
-      "https://picsum.photos/400/600?random=770",
-      "https://picsum.photos/600/400?random=548",
-      "https://picsum.photos/500/600?random=47",
-      "https://picsum.photos/600/400?random=769",
-      "https://picsum.photos/400/600?random=727",
-      "https://picsum.photos/400/600?random=115"
+      "images/996875f7-fa4e-407f-a386-82aea0c3956d-img2.jpg",
+      "images/996875f7-fa4e-407f-a386-82aea0c3956d-img3.jpg",
+      "images/996875f7-fa4e-407f-a386-82aea0c3956d-img4.jpg"
     ],
-    "mainImage": "https://picsum.photos/400/600?random=770",
+    "mainImage": "images/996875f7-fa4e-407f-a386-82aea0c3956d-img1.jpg",
     "rating": 4.6,
     "reviewCount": 100,
     "inStock": true,
@@ -87984,14 +87903,11 @@
       "oral care"
     ],
     "images": [
-      "https://picsum.photos/600/500?random=318",
-      "https://picsum.photos/500/400?random=649",
-      "https://picsum.photos/400/400?random=10",
-      "https://picsum.photos/600/400?random=818",
-      "https://picsum.photos/600/600?random=104",
-      "https://picsum.photos/600/600?random=195"
+      "images/4dc1eb0e-8814-4dfe-929b-d84c92c30e29-img2.jpg",
+      "images/4dc1eb0e-8814-4dfe-929b-d84c92c30e29-img3.jpg",
+      "images/4dc1eb0e-8814-4dfe-929b-d84c92c30e29-img4.jpg"
     ],
-    "mainImage": "https://picsum.photos/600/500?random=318",
+    "mainImage": "images/4dc1eb0e-8814-4dfe-929b-d84c92c30e29-img1.jpg",
     "rating": 3.9,
     "reviewCount": 107,
     "inStock": true,
@@ -89582,13 +89498,11 @@
       "skincare"
     ],
     "images": [
-      "https://picsum.photos/400/400?random=568",
-      "https://picsum.photos/600/600?random=856",
-      "https://picsum.photos/400/400?random=52",
-      "https://picsum.photos/400/500?random=194",
-      "https://picsum.photos/400/600?random=726"
+      "images/d46cb614-d861-4162-b43a-f027ec2e1b8e-img2.jpg",
+      "images/d46cb614-d861-4162-b43a-f027ec2e1b8e-img3.jpg",
+      "images/d46cb614-d861-4162-b43a-f027ec2e1b8e-img4.jpg"
     ],
-    "mainImage": "https://picsum.photos/400/400?random=568",
+    "mainImage": "images/d46cb614-d861-4162-b43a-f027ec2e1b8e-img1.jpg",
     "rating": 4.1,
     "reviewCount": 397,
     "inStock": true,
@@ -91179,14 +91093,11 @@
       "skincare"
     ],
     "images": [
-      "https://picsum.photos/400/400?random=489",
-      "https://picsum.photos/400/600?random=104",
-      "https://picsum.photos/400/400?random=391",
-      "https://picsum.photos/400/600?random=259",
-      "https://picsum.photos/600/500?random=395",
-      "https://picsum.photos/400/400?random=481"
+      "images/ca554696-82df-48a2-876a-7390a55840c0-img2.jpg",
+      "images/ca554696-82df-48a2-876a-7390a55840c0-img3.jpg",
+      "images/ca554696-82df-48a2-876a-7390a55840c0-img4.jpg"
     ],
-    "mainImage": "https://picsum.photos/400/400?random=489",
+    "mainImage": "images/ca554696-82df-48a2-876a-7390a55840c0-img1.jpg",
     "rating": 4.3,
     "reviewCount": 133,
     "inStock": true,
@@ -92776,11 +92687,11 @@
       "skincare"
     ],
     "images": [
-      "https://picsum.photos/600/400?random=996",
-      "https://picsum.photos/500/500?random=320",
-      "https://picsum.photos/500/400?random=26"
+      "images/56c4d035-b7da-4dd4-9938-206da6c21d57-img2.jpg",
+      "images/56c4d035-b7da-4dd4-9938-206da6c21d57-img3.jpg",
+      "images/56c4d035-b7da-4dd4-9938-206da6c21d57-img4.jpg"
     ],
-    "mainImage": "https://picsum.photos/600/400?random=996",
+    "mainImage": "images/56c4d035-b7da-4dd4-9938-206da6c21d57-img1.jpg",
     "rating": 3.6,
     "reviewCount": 74,
     "inStock": true,
@@ -94370,13 +94281,11 @@
       "skincare"
     ],
     "images": [
-      "https://picsum.photos/600/400?random=563",
-      "https://picsum.photos/500/400?random=701",
-      "https://picsum.photos/600/600?random=751",
-      "https://picsum.photos/500/600?random=438",
-      "https://picsum.photos/600/500?random=24"
+      "images/cf976122-8294-460e-a9d5-7dc224465c12-img2.jpg",
+      "images/cf976122-8294-460e-a9d5-7dc224465c12-img3.jpg",
+      "images/cf976122-8294-460e-a9d5-7dc224465c12-img4.jpg"
     ],
-    "mainImage": "https://picsum.photos/600/400?random=563",
+    "mainImage": "images/cf976122-8294-460e-a9d5-7dc224465c12-img1.jpg",
     "rating": 4.0,
     "reviewCount": 17,
     "inStock": true,
@@ -95963,13 +95872,11 @@
       "recommended"
     ],
     "images": [
-      "https://picsum.photos/500/500?random=382",
-      "https://picsum.photos/600/500?random=789",
-      "https://picsum.photos/500/400?random=668",
-      "https://picsum.photos/600/600?random=196",
-      "https://picsum.photos/500/600?random=119"
+      "images/89153dc5-9233-45a2-aaad-710f8c7c9638-img2.jpg",
+      "images/89153dc5-9233-45a2-aaad-710f8c7c9638-img3.jpg",
+      "images/89153dc5-9233-45a2-aaad-710f8c7c9638-img4.jpg"
     ],
-    "mainImage": "https://picsum.photos/500/500?random=382",
+    "mainImage": "images/89153dc5-9233-45a2-aaad-710f8c7c9638-img1.jpg",
     "rating": 3.8,
     "reviewCount": 58,
     "inStock": true,
@@ -97554,11 +97461,11 @@
       "recommended"
     ],
     "images": [
-      "https://picsum.photos/600/400?random=535",
-      "https://picsum.photos/400/400?random=800",
-      "https://picsum.photos/500/400?random=261"
+      "images/18c22714-31d9-4703-96cd-b8ef1ce644b1-img2.jpg",
+      "images/18c22714-31d9-4703-96cd-b8ef1ce644b1-img3.jpg",
+      "images/18c22714-31d9-4703-96cd-b8ef1ce644b1-img4.jpg"
     ],
-    "mainImage": "https://picsum.photos/600/400?random=535",
+    "mainImage": "images/18c22714-31d9-4703-96cd-b8ef1ce644b1-img1.jpg",
     "rating": 4.3,
     "reviewCount": 105,
     "inStock": true,
@@ -99143,14 +99050,11 @@
       "michelin"
     ],
     "images": [
-      "https://picsum.photos/400/500?random=691",
-      "https://picsum.photos/400/600?random=886",
-      "https://picsum.photos/600/400?random=510",
-      "https://picsum.photos/600/400?random=180",
-      "https://picsum.photos/600/500?random=896",
-      "https://picsum.photos/600/500?random=911"
+      "images/cc42651d-d83e-4da1-84da-467049f956b4-img2.jpg",
+      "images/cc42651d-d83e-4da1-84da-467049f956b4-img3.jpg",
+      "images/cc42651d-d83e-4da1-84da-467049f956b4-img4.jpg"
     ],
-    "mainImage": "https://picsum.photos/400/500?random=691",
+    "mainImage": "images/cc42651d-d83e-4da1-84da-467049f956b4-img1.jpg",
     "rating": 4.6,
     "reviewCount": 395,
     "inStock": true,
@@ -100735,12 +100639,11 @@
       "electronics"
     ],
     "images": [
-      "https://picsum.photos/400/600?random=435",
-      "https://picsum.photos/500/400?random=917",
-      "https://picsum.photos/500/500?random=332",
-      "https://picsum.photos/600/400?random=610"
+      "images/3d3150c0-2f4b-476f-b445-bb90a6e1b2e0-img2.jpg",
+      "images/3d3150c0-2f4b-476f-b445-bb90a6e1b2e0-img3.jpg",
+      "images/3d3150c0-2f4b-476f-b445-bb90a6e1b2e0-img4.jpg"
     ],
-    "mainImage": "https://picsum.photos/400/600?random=435",
+    "mainImage": "images/3d3150c0-2f4b-476f-b445-bb90a6e1b2e0-img1.jpg",
     "rating": 3.9,
     "reviewCount": 401,
     "inStock": true,
@@ -102325,14 +102228,11 @@
       "michelin"
     ],
     "images": [
-      "https://picsum.photos/600/500?random=679",
-      "https://picsum.photos/400/600?random=575",
-      "https://picsum.photos/400/500?random=350",
-      "https://picsum.photos/600/600?random=582",
-      "https://picsum.photos/400/600?random=419",
-      "https://picsum.photos/400/400?random=950"
+      "images/499c65ed-a352-4018-b71b-8106b1b54afa-img2.jpg",
+      "images/499c65ed-a352-4018-b71b-8106b1b54afa-img3.jpg",
+      "images/499c65ed-a352-4018-b71b-8106b1b54afa-img4.jpg"
     ],
-    "mainImage": "https://picsum.photos/600/500?random=679",
+    "mainImage": "images/499c65ed-a352-4018-b71b-8106b1b54afa-img1.jpg",
     "rating": 3.6,
     "reviewCount": 120,
     "inStock": true,
@@ -103917,11 +103817,11 @@
       "castrol"
     ],
     "images": [
-      "https://picsum.photos/400/600?random=920",
-      "https://picsum.photos/600/400?random=251",
-      "https://picsum.photos/600/500?random=689"
+      "images/af5339e2-3dc4-4b64-8a44-e04f0f665862-img2.jpg",
+      "images/af5339e2-3dc4-4b64-8a44-e04f0f665862-img3.jpg",
+      "images/af5339e2-3dc4-4b64-8a44-e04f0f665862-img4.jpg"
     ],
-    "mainImage": "https://picsum.photos/400/600?random=920",
+    "mainImage": "images/af5339e2-3dc4-4b64-8a44-e04f0f665862-img1.jpg",
     "rating": 4.6,
     "reviewCount": 61,
     "inStock": true,
@@ -105505,11 +105405,11 @@
       "popular"
     ],
     "images": [
-      "https://picsum.photos/400/400?random=342",
-      "https://picsum.photos/500/500?random=531",
-      "https://picsum.photos/400/400?random=877"
+      "images/49df343e-44c2-416e-ac7b-4b1bac2959a6-img2.jpg",
+      "images/49df343e-44c2-416e-ac7b-4b1bac2959a6-img3.jpg",
+      "images/49df343e-44c2-416e-ac7b-4b1bac2959a6-img4.jpg"
     ],
-    "mainImage": "https://picsum.photos/400/400?random=342",
+    "mainImage": "images/49df343e-44c2-416e-ac7b-4b1bac2959a6-img1.jpg",
     "rating": 4.2,
     "reviewCount": 160,
     "inStock": true,
@@ -107091,13 +106991,11 @@
       "electronics"
     ],
     "images": [
-      "https://picsum.photos/400/400?random=723",
-      "https://picsum.photos/600/600?random=247",
-      "https://picsum.photos/400/600?random=886",
-      "https://picsum.photos/600/600?random=913",
-      "https://picsum.photos/400/600?random=547"
+      "images/83aef140-0d17-444b-ae9c-ce24d13743e6-img2.jpg",
+      "images/83aef140-0d17-444b-ae9c-ce24d13743e6-img3.jpg",
+      "images/83aef140-0d17-444b-ae9c-ce24d13743e6-img4.jpg"
     ],
-    "mainImage": "https://picsum.photos/400/400?random=723",
+    "mainImage": "images/83aef140-0d17-444b-ae9c-ce24d13743e6-img1.jpg",
     "rating": 4.8,
     "reviewCount": 451,
     "inStock": true,
@@ -108681,11 +108579,11 @@
       "electronics"
     ],
     "images": [
-      "https://picsum.photos/500/500?random=555",
-      "https://picsum.photos/500/400?random=800",
-      "https://picsum.photos/400/600?random=468"
+      "images/7ff4386b-e2d1-4c75-8cac-7bb55a298199-img2.jpg",
+      "images/7ff4386b-e2d1-4c75-8cac-7bb55a298199-img3.jpg",
+      "images/7ff4386b-e2d1-4c75-8cac-7bb55a298199-img4.jpg"
     ],
-    "mainImage": "https://picsum.photos/500/500?random=555",
+    "mainImage": "images/7ff4386b-e2d1-4c75-8cac-7bb55a298199-img1.jpg",
     "rating": 4.8,
     "reviewCount": 165,
     "inStock": true,
@@ -110271,12 +110169,11 @@
       "electronics"
     ],
     "images": [
-      "https://picsum.photos/500/500?random=996",
-      "https://picsum.photos/400/500?random=491",
-      "https://picsum.photos/500/500?random=636",
-      "https://picsum.photos/500/600?random=127"
+      "images/e5a74fc0-b447-4e8a-8bd2-a5b0307a105e-img2.jpg",
+      "images/e5a74fc0-b447-4e8a-8bd2-a5b0307a105e-img3.jpg",
+      "images/e5a74fc0-b447-4e8a-8bd2-a5b0307a105e-img4.jpg"
     ],
-    "mainImage": "https://picsum.photos/500/500?random=996",
+    "mainImage": "images/e5a74fc0-b447-4e8a-8bd2-a5b0307a105e-img1.jpg",
     "rating": 3.8,
     "reviewCount": 427,
     "inStock": true,
@@ -111861,14 +111758,11 @@
       "lego"
     ],
     "images": [
-      "https://picsum.photos/400/600?random=7",
-      "https://picsum.photos/400/400?random=123",
-      "https://picsum.photos/600/400?random=917",
-      "https://picsum.photos/500/600?random=508",
-      "https://picsum.photos/600/400?random=336",
-      "https://picsum.photos/600/400?random=786"
+      "images/d4a58799-7fa1-4591-b55c-68e78088e922-img2.jpg",
+      "images/d4a58799-7fa1-4591-b55c-68e78088e922-img3.jpg",
+      "images/d4a58799-7fa1-4591-b55c-68e78088e922-img4.jpg"
     ],
-    "mainImage": "https://picsum.photos/400/600?random=7",
+    "mainImage": "images/d4a58799-7fa1-4591-b55c-68e78088e922-img1.jpg",
     "rating": 4.3,
     "reviewCount": 273,
     "inStock": true,
@@ -113453,11 +113347,11 @@
       "fisher-price"
     ],
     "images": [
-      "https://picsum.photos/400/400?random=784",
-      "https://picsum.photos/600/600?random=218",
-      "https://picsum.photos/400/500?random=17"
+      "images/c5a0fbc9-ceeb-467d-8810-0aff22700eba-img2.jpg",
+      "images/c5a0fbc9-ceeb-467d-8810-0aff22700eba-img3.jpg",
+      "images/c5a0fbc9-ceeb-467d-8810-0aff22700eba-img4.jpg"
     ],
-    "mainImage": "https://picsum.photos/400/400?random=784",
+    "mainImage": "images/c5a0fbc9-ceeb-467d-8810-0aff22700eba-img1.jpg",
     "rating": 4.0,
     "reviewCount": 44,
     "inStock": true,
@@ -115043,13 +114937,11 @@
       "quality"
     ],
     "images": [
-      "https://picsum.photos/500/500?random=587",
-      "https://picsum.photos/500/500?random=775",
-      "https://picsum.photos/500/600?random=470",
-      "https://picsum.photos/400/600?random=83",
-      "https://picsum.photos/500/600?random=113"
+      "images/06663c52-c6bd-4ad3-9bfa-49a697f23081-img2.jpg",
+      "images/06663c52-c6bd-4ad3-9bfa-49a697f23081-img3.jpg",
+      "images/06663c52-c6bd-4ad3-9bfa-49a697f23081-img4.jpg"
     ],
-    "mainImage": "https://picsum.photos/500/500?random=587",
+    "mainImage": "images/06663c52-c6bd-4ad3-9bfa-49a697f23081-img1.jpg",
     "rating": 3.8,
     "reviewCount": 419,
     "inStock": true,
@@ -116634,13 +116526,11 @@
       "lego"
     ],
     "images": [
-      "https://picsum.photos/500/500?random=852",
-      "https://picsum.photos/500/600?random=388",
-      "https://picsum.photos/400/500?random=398",
-      "https://picsum.photos/500/600?random=548",
-      "https://picsum.photos/500/600?random=588"
+      "images/9a61d67f-fa6d-4d19-9939-de3c833f24fc-img2.jpg",
+      "images/9a61d67f-fa6d-4d19-9939-de3c833f24fc-img3.jpg",
+      "images/9a61d67f-fa6d-4d19-9939-de3c833f24fc-img4.jpg"
     ],
-    "mainImage": "https://picsum.photos/500/500?random=852",
+    "mainImage": "images/9a61d67f-fa6d-4d19-9939-de3c833f24fc-img1.jpg",
     "rating": 4.1,
     "reviewCount": 41,
     "inStock": true,
@@ -118224,13 +118114,11 @@
       "recommended"
     ],
     "images": [
-      "https://picsum.photos/500/400?random=183",
-      "https://picsum.photos/400/400?random=680",
-      "https://picsum.photos/500/500?random=414",
-      "https://picsum.photos/600/600?random=805",
-      "https://picsum.photos/500/500?random=884"
+      "images/54ee737e-e485-44b8-8481-b58bc60be3d6-img2.jpg",
+      "images/54ee737e-e485-44b8-8481-b58bc60be3d6-img3.jpg",
+      "images/54ee737e-e485-44b8-8481-b58bc60be3d6-img4.jpg"
     ],
-    "mainImage": "https://picsum.photos/500/400?random=183",
+    "mainImage": "images/54ee737e-e485-44b8-8481-b58bc60be3d6-img1.jpg",
     "rating": 4.3,
     "reviewCount": 22,
     "inStock": true,
@@ -119814,14 +119702,11 @@
       "lego"
     ],
     "images": [
-      "https://picsum.photos/600/500?random=225",
-      "https://picsum.photos/600/500?random=643",
-      "https://picsum.photos/600/600?random=110",
-      "https://picsum.photos/500/600?random=750",
-      "https://picsum.photos/600/600?random=166",
-      "https://picsum.photos/600/400?random=341"
+      "images/b453c2e0-ff10-4011-8f71-38df491e9ff6-img2.jpg",
+      "images/b453c2e0-ff10-4011-8f71-38df491e9ff6-img3.jpg",
+      "images/b453c2e0-ff10-4011-8f71-38df491e9ff6-img4.jpg"
     ],
-    "mainImage": "https://picsum.photos/600/500?random=225",
+    "mainImage": "images/b453c2e0-ff10-4011-8f71-38df491e9ff6-img1.jpg",
     "rating": 4.8,
     "reviewCount": 313,
     "inStock": true,
@@ -121405,12 +121290,11 @@
       "quality"
     ],
     "images": [
-      "https://picsum.photos/500/400?random=20",
-      "https://picsum.photos/600/500?random=207",
-      "https://picsum.photos/500/600?random=89",
-      "https://picsum.photos/600/400?random=828"
+      "images/566b997c-2f99-4b71-ad73-c562ae777f61-img2.jpg",
+      "images/566b997c-2f99-4b71-ad73-c562ae777f61-img3.jpg",
+      "images/566b997c-2f99-4b71-ad73-c562ae777f61-img4.jpg"
     ],
-    "mainImage": "https://picsum.photos/500/400?random=20",
+    "mainImage": "images/566b997c-2f99-4b71-ad73-c562ae777f61-img1.jpg",
     "rating": 4.7,
     "reviewCount": 60,
     "inStock": true,
@@ -122993,14 +122877,11 @@
       "electronic toys"
     ],
     "images": [
-      "https://picsum.photos/500/400?random=571",
-      "https://picsum.photos/600/400?random=617",
-      "https://picsum.photos/400/400?random=825",
-      "https://picsum.photos/500/600?random=50",
-      "https://picsum.photos/500/600?random=837",
-      "https://picsum.photos/500/400?random=498"
+      "images/4267fed8-1746-4bc7-ab18-1d57b76d8283-img2.jpg",
+      "images/4267fed8-1746-4bc7-ab18-1d57b76d8283-img3.jpg",
+      "images/4267fed8-1746-4bc7-ab18-1d57b76d8283-img4.jpg"
     ],
-    "mainImage": "https://picsum.photos/500/400?random=571",
+    "mainImage": "images/4267fed8-1746-4bc7-ab18-1d57b76d8283-img1.jpg",
     "rating": 3.5,
     "reviewCount": 308,
     "inStock": true,
@@ -124582,14 +124463,11 @@
       "toys & games"
     ],
     "images": [
-      "https://picsum.photos/500/400?random=411",
-      "https://picsum.photos/400/600?random=318",
-      "https://picsum.photos/600/400?random=62",
-      "https://picsum.photos/400/500?random=144",
-      "https://picsum.photos/600/400?random=940",
-      "https://picsum.photos/500/400?random=86"
+      "images/706834ca-6454-4c56-a136-bd32a50d9bda-img2.jpg",
+      "images/706834ca-6454-4c56-a136-bd32a50d9bda-img3.jpg",
+      "images/706834ca-6454-4c56-a136-bd32a50d9bda-img4.jpg"
     ],
-    "mainImage": "https://picsum.photos/500/400?random=411",
+    "mainImage": "images/706834ca-6454-4c56-a136-bd32a50d9bda-img1.jpg",
     "rating": 3.8,
     "reviewCount": 67,
     "inStock": true,
@@ -126173,14 +126051,11 @@
       "recommended"
     ],
     "images": [
-      "https://picsum.photos/400/600?random=775",
-      "https://picsum.photos/500/400?random=987",
-      "https://picsum.photos/500/400?random=792",
-      "https://picsum.photos/500/600?random=521",
-      "https://picsum.photos/400/500?random=11",
-      "https://picsum.photos/500/400?random=655"
+      "images/47382bd1-4118-475a-8499-6a3931d6d384-img2.jpg",
+      "images/47382bd1-4118-475a-8499-6a3931d6d384-img3.jpg",
+      "images/47382bd1-4118-475a-8499-6a3931d6d384-img4.jpg"
     ],
-    "mainImage": "https://picsum.photos/400/600?random=775",
+    "mainImage": "images/47382bd1-4118-475a-8499-6a3931d6d384-img1.jpg",
     "rating": 4.0,
     "reviewCount": 398,
     "inStock": true,
@@ -127765,12 +127640,11 @@
       "pet supplies"
     ],
     "images": [
-      "https://picsum.photos/400/500?random=863",
-      "https://picsum.photos/600/600?random=814",
-      "https://picsum.photos/500/600?random=773",
-      "https://picsum.photos/500/500?random=319"
+      "images/d32de0ed-8059-41f5-b0ec-55ef42450db9-img2.jpg",
+      "images/d32de0ed-8059-41f5-b0ec-55ef42450db9-img3.jpg",
+      "images/d32de0ed-8059-41f5-b0ec-55ef42450db9-img4.jpg"
     ],
-    "mainImage": "https://picsum.photos/400/500?random=863",
+    "mainImage": "images/d32de0ed-8059-41f5-b0ec-55ef42450db9-img1.jpg",
     "rating": 3.5,
     "reviewCount": 256,
     "inStock": true,
@@ -129354,11 +129228,11 @@
       "pet supplies"
     ],
     "images": [
-      "https://picsum.photos/600/400?random=20",
-      "https://picsum.photos/600/400?random=197",
-      "https://picsum.photos/500/400?random=930"
+      "images/461afc99-d620-4e3f-beab-90a90e5a683f-img2.jpg",
+      "images/461afc99-d620-4e3f-beab-90a90e5a683f-img3.jpg",
+      "images/461afc99-d620-4e3f-beab-90a90e5a683f-img4.jpg"
     ],
-    "mainImage": "https://picsum.photos/600/400?random=20",
+    "mainImage": "images/461afc99-d620-4e3f-beab-90a90e5a683f-img1.jpg",
     "rating": 3.9,
     "reviewCount": 437,
     "inStock": true,
@@ -130942,13 +130816,11 @@
       "pet supplies"
     ],
     "images": [
-      "https://picsum.photos/600/500?random=788",
-      "https://picsum.photos/400/600?random=284",
-      "https://picsum.photos/500/400?random=586",
-      "https://picsum.photos/400/500?random=937",
-      "https://picsum.photos/400/500?random=517"
+      "images/2082dd39-b509-4d0a-9d64-6fdb9470410b-img2.jpg",
+      "images/2082dd39-b509-4d0a-9d64-6fdb9470410b-img3.jpg",
+      "images/2082dd39-b509-4d0a-9d64-6fdb9470410b-img4.jpg"
     ],
-    "mainImage": "https://picsum.photos/600/500?random=788",
+    "mainImage": "images/2082dd39-b509-4d0a-9d64-6fdb9470410b-img1.jpg",
     "rating": 3.6,
     "reviewCount": 243,
     "inStock": true,
@@ -132533,14 +132405,11 @@
       "purina"
     ],
     "images": [
-      "https://picsum.photos/500/500?random=80",
-      "https://picsum.photos/400/600?random=889",
-      "https://picsum.photos/400/500?random=21",
-      "https://picsum.photos/500/600?random=28",
-      "https://picsum.photos/500/600?random=167",
-      "https://picsum.photos/600/400?random=524"
+      "images/f4a21263-a4c7-46c7-a4aa-7d038248f764-img2.jpg",
+      "images/f4a21263-a4c7-46c7-a4aa-7d038248f764-img3.jpg",
+      "images/f4a21263-a4c7-46c7-a4aa-7d038248f764-img4.jpg"
     ],
-    "mainImage": "https://picsum.photos/500/500?random=80",
+    "mainImage": "images/f4a21263-a4c7-46c7-a4aa-7d038248f764-img1.jpg",
     "rating": 3.5,
     "reviewCount": 99,
     "inStock": true,
@@ -134124,12 +133993,11 @@
       "popular"
     ],
     "images": [
-      "https://picsum.photos/600/600?random=528",
-      "https://picsum.photos/500/500?random=382",
-      "https://picsum.photos/400/500?random=698",
-      "https://picsum.photos/400/400?random=91"
+      "images/bc19eb03-7dab-4f93-b31f-ac0c6bbd7ee9-img2.jpg",
+      "images/bc19eb03-7dab-4f93-b31f-ac0c6bbd7ee9-img3.jpg",
+      "images/bc19eb03-7dab-4f93-b31f-ac0c6bbd7ee9-img4.jpg"
     ],
-    "mainImage": "https://picsum.photos/600/600?random=528",
+    "mainImage": "images/bc19eb03-7dab-4f93-b31f-ac0c6bbd7ee9-img1.jpg",
     "rating": 3.9,
     "reviewCount": 15,
     "inStock": true,
@@ -135712,11 +135580,11 @@
       "cat supplies"
     ],
     "images": [
-      "https://picsum.photos/500/600?random=725",
-      "https://picsum.photos/400/500?random=220",
-      "https://picsum.photos/500/600?random=507"
+      "images/9d9ae24f-2f79-41c7-81a3-4f348b4f4e35-img2.jpg",
+      "images/9d9ae24f-2f79-41c7-81a3-4f348b4f4e35-img3.jpg",
+      "images/9d9ae24f-2f79-41c7-81a3-4f348b4f4e35-img4.jpg"
     ],
-    "mainImage": "https://picsum.photos/500/600?random=725",
+    "mainImage": "images/9d9ae24f-2f79-41c7-81a3-4f348b4f4e35-img1.jpg",
     "rating": 4.9,
     "reviewCount": 189,
     "inStock": true,
@@ -137301,14 +137169,11 @@
       "pet supplies"
     ],
     "images": [
-      "https://picsum.photos/600/500?random=882",
-      "https://picsum.photos/500/500?random=681",
-      "https://picsum.photos/500/500?random=651",
-      "https://picsum.photos/500/400?random=392",
-      "https://picsum.photos/400/400?random=228",
-      "https://picsum.photos/500/500?random=733"
+      "images/d2513657-9e19-46ec-b994-7886735a1f21-img2.jpg",
+      "images/d2513657-9e19-46ec-b994-7886735a1f21-img3.jpg",
+      "images/d2513657-9e19-46ec-b994-7886735a1f21-img4.jpg"
     ],
-    "mainImage": "https://picsum.photos/600/500?random=882",
+    "mainImage": "images/d2513657-9e19-46ec-b994-7886735a1f21-img1.jpg",
     "rating": 3.8,
     "reviewCount": 149,
     "inStock": true,
@@ -138892,13 +138757,11 @@
       "premium"
     ],
     "images": [
-      "https://picsum.photos/500/500?random=763",
-      "https://picsum.photos/500/500?random=825",
-      "https://picsum.photos/500/600?random=836",
-      "https://picsum.photos/400/400?random=35",
-      "https://picsum.photos/500/400?random=325"
+      "images/dd97ccb8-6019-453f-ba10-135a698d203b-img2.jpg",
+      "images/dd97ccb8-6019-453f-ba10-135a698d203b-img3.jpg",
+      "images/dd97ccb8-6019-453f-ba10-135a698d203b-img4.jpg"
     ],
-    "mainImage": "https://picsum.photos/500/500?random=763",
+    "mainImage": "images/dd97ccb8-6019-453f-ba10-135a698d203b-img1.jpg",
     "rating": 3.9,
     "reviewCount": 278,
     "inStock": true,
@@ -140481,12 +140344,11 @@
       "pet supplies"
     ],
     "images": [
-      "https://picsum.photos/500/400?random=40",
-      "https://picsum.photos/500/500?random=281",
-      "https://picsum.photos/500/600?random=260",
-      "https://picsum.photos/600/400?random=361"
+      "images/a0d8968b-b728-434f-9cba-40f53c5243a0-img2.jpg",
+      "images/a0d8968b-b728-434f-9cba-40f53c5243a0-img3.jpg",
+      "images/a0d8968b-b728-434f-9cba-40f53c5243a0-img4.jpg"
     ],
-    "mainImage": "https://picsum.photos/500/400?random=40",
+    "mainImage": "images/a0d8968b-b728-434f-9cba-40f53c5243a0-img1.jpg",
     "rating": 4.5,
     "reviewCount": 155,
     "inStock": true,
@@ -142071,11 +141933,11 @@
       "pet supplies"
     ],
     "images": [
-      "https://picsum.photos/600/600?random=876",
-      "https://picsum.photos/600/400?random=843",
-      "https://picsum.photos/500/500?random=794"
+      "images/281984ea-7fc5-40e2-9437-a31417f0ae0c-img2.jpg",
+      "images/281984ea-7fc5-40e2-9437-a31417f0ae0c-img3.jpg",
+      "images/281984ea-7fc5-40e2-9437-a31417f0ae0c-img4.jpg"
     ],
-    "mainImage": "https://picsum.photos/600/600?random=876",
+    "mainImage": "images/281984ea-7fc5-40e2-9437-a31417f0ae0c-img1.jpg",
     "rating": 3.9,
     "reviewCount": 267,
     "inStock": true,
@@ -143661,11 +143523,11 @@
       "post-it"
     ],
     "images": [
-      "https://picsum.photos/400/600?random=832",
-      "https://picsum.photos/500/400?random=646",
-      "https://picsum.photos/500/600?random=241"
+      "images/2dd08590-f92d-4bcd-bcdc-47fc5934a9a7-img2.jpg",
+      "images/2dd08590-f92d-4bcd-bcdc-47fc5934a9a7-img3.jpg",
+      "images/2dd08590-f92d-4bcd-bcdc-47fc5934a9a7-img4.jpg"
     ],
-    "mainImage": "https://picsum.photos/400/600?random=832",
+    "mainImage": "images/2dd08590-f92d-4bcd-bcdc-47fc5934a9a7-img1.jpg",
     "rating": 3.9,
     "reviewCount": 80,
     "inStock": true,
@@ -145251,11 +145113,11 @@
       "organization"
     ],
     "images": [
-      "https://picsum.photos/400/600?random=175",
-      "https://picsum.photos/500/400?random=985",
-      "https://picsum.photos/600/400?random=390"
+      "images/d46567cd-6ef7-4ba9-a6b9-d33e0d4780fd-img2.jpg",
+      "images/d46567cd-6ef7-4ba9-a6b9-d33e0d4780fd-img3.jpg",
+      "images/d46567cd-6ef7-4ba9-a6b9-d33e0d4780fd-img4.jpg"
     ],
-    "mainImage": "https://picsum.photos/400/600?random=175",
+    "mainImage": "images/d46567cd-6ef7-4ba9-a6b9-d33e0d4780fd-img1.jpg",
     "rating": 4.6,
     "reviewCount": 21,
     "inStock": true,
@@ -146839,13 +146701,11 @@
       "office supplies"
     ],
     "images": [
-      "https://picsum.photos/500/600?random=79",
-      "https://picsum.photos/500/600?random=751",
-      "https://picsum.photos/600/600?random=987",
-      "https://picsum.photos/600/500?random=662",
-      "https://picsum.photos/600/600?random=376"
+      "images/dc8b445d-c618-4c71-b12f-3f4bf5712300-img2.jpg",
+      "images/dc8b445d-c618-4c71-b12f-3f4bf5712300-img3.jpg",
+      "images/dc8b445d-c618-4c71-b12f-3f4bf5712300-img4.jpg"
     ],
-    "mainImage": "https://picsum.photos/500/600?random=79",
+    "mainImage": "images/dc8b445d-c618-4c71-b12f-3f4bf5712300-img1.jpg",
     "rating": 4.1,
     "reviewCount": 351,
     "inStock": true,
@@ -148429,14 +148289,11 @@
       "office supplies"
     ],
     "images": [
-      "https://picsum.photos/400/400?random=439",
-      "https://picsum.photos/600/500?random=875",
-      "https://picsum.photos/400/400?random=556",
-      "https://picsum.photos/400/500?random=298",
-      "https://picsum.photos/400/600?random=568",
-      "https://picsum.photos/500/400?random=402"
+      "images/fc7949ab-2999-469d-98e8-8e2b9621d99b-img2.jpg",
+      "images/fc7949ab-2999-469d-98e8-8e2b9621d99b-img3.jpg",
+      "images/fc7949ab-2999-469d-98e8-8e2b9621d99b-img4.jpg"
     ],
-    "mainImage": "https://picsum.photos/400/400?random=439",
+    "mainImage": "images/fc7949ab-2999-469d-98e8-8e2b9621d99b-img1.jpg",
     "rating": 4.9,
     "reviewCount": 329,
     "inStock": true,
@@ -150022,14 +149879,11 @@
       "electronics"
     ],
     "images": [
-      "https://picsum.photos/600/500?random=985",
-      "https://picsum.photos/600/600?random=967",
-      "https://picsum.photos/600/600?random=4",
-      "https://picsum.photos/600/500?random=845",
-      "https://picsum.photos/600/400?random=275",
-      "https://picsum.photos/500/600?random=426"
+      "images/7c36de4a-0266-4099-a8bc-1dd23726e4af-img2.jpg",
+      "images/7c36de4a-0266-4099-a8bc-1dd23726e4af-img3.jpg",
+      "images/7c36de4a-0266-4099-a8bc-1dd23726e4af-img4.jpg"
     ],
-    "mainImage": "https://picsum.photos/600/500?random=985",
+    "mainImage": "images/7c36de4a-0266-4099-a8bc-1dd23726e4af-img1.jpg",
     "rating": 4.4,
     "reviewCount": 183,
     "inStock": true,
@@ -151613,14 +151467,11 @@
       "office supplies"
     ],
     "images": [
-      "https://picsum.photos/400/600?random=796",
-      "https://picsum.photos/400/600?random=686",
-      "https://picsum.photos/400/600?random=427",
-      "https://picsum.photos/600/600?random=99",
-      "https://picsum.photos/600/400?random=875",
-      "https://picsum.photos/600/500?random=40"
+      "images/a87f4f5a-468f-4944-a673-54e87691145d-img2.jpg",
+      "images/a87f4f5a-468f-4944-a673-54e87691145d-img3.jpg",
+      "images/a87f4f5a-468f-4944-a673-54e87691145d-img4.jpg"
     ],
-    "mainImage": "https://picsum.photos/400/600?random=796",
+    "mainImage": "images/a87f4f5a-468f-4944-a673-54e87691145d-img1.jpg",
     "rating": 4.9,
     "reviewCount": 150,
     "inStock": true,
@@ -153202,11 +153053,11 @@
       "office supplies"
     ],
     "images": [
-      "https://picsum.photos/500/400?random=199",
-      "https://picsum.photos/600/400?random=649",
-      "https://picsum.photos/600/500?random=404"
+      "images/ed7680c2-8b5d-46bf-bb03-db716f2fc7df-img2.jpg",
+      "images/ed7680c2-8b5d-46bf-bb03-db716f2fc7df-img3.jpg",
+      "images/ed7680c2-8b5d-46bf-bb03-db716f2fc7df-img4.jpg"
     ],
-    "mainImage": "https://picsum.photos/500/400?random=199",
+    "mainImage": "images/ed7680c2-8b5d-46bf-bb03-db716f2fc7df-img1.jpg",
     "rating": 4.8,
     "reviewCount": 279,
     "inStock": true,
@@ -154790,11 +154641,11 @@
       "recommended"
     ],
     "images": [
-      "https://picsum.photos/400/600?random=592",
-      "https://picsum.photos/400/500?random=779",
-      "https://picsum.photos/500/500?random=523"
+      "images/ad7329c3-40c5-4384-b810-64900ca80a7d-img2.jpg",
+      "images/ad7329c3-40c5-4384-b810-64900ca80a7d-img3.jpg",
+      "images/ad7329c3-40c5-4384-b810-64900ca80a7d-img4.jpg"
     ],
-    "mainImage": "https://picsum.photos/400/600?random=592",
+    "mainImage": "images/ad7329c3-40c5-4384-b810-64900ca80a7d-img1.jpg",
     "rating": 3.8,
     "reviewCount": 66,
     "inStock": true,
@@ -156378,13 +156229,11 @@
       "office supplies"
     ],
     "images": [
-      "https://picsum.photos/400/500?random=280",
-      "https://picsum.photos/600/500?random=194",
-      "https://picsum.photos/500/600?random=898",
-      "https://picsum.photos/500/600?random=147",
-      "https://picsum.photos/600/400?random=771"
+      "images/0c66d004-a837-49d9-b75e-34b144f32312-img2.jpg",
+      "images/0c66d004-a837-49d9-b75e-34b144f32312-img3.jpg",
+      "images/0c66d004-a837-49d9-b75e-34b144f32312-img4.jpg"
     ],
-    "mainImage": "https://picsum.photos/400/500?random=280",
+    "mainImage": "images/0c66d004-a837-49d9-b75e-34b144f32312-img1.jpg",
     "rating": 4.3,
     "reviewCount": 255,
     "inStock": true,
@@ -157967,12 +157816,11 @@
       "organization"
     ],
     "images": [
-      "https://picsum.photos/400/600?random=561",
-      "https://picsum.photos/500/600?random=767",
-      "https://picsum.photos/600/400?random=152",
-      "https://picsum.photos/500/500?random=392"
+      "images/5416c093-d163-407a-a19a-c415f9a652a2-img2.jpg",
+      "images/5416c093-d163-407a-a19a-c415f9a652a2-img3.jpg",
+      "images/5416c093-d163-407a-a19a-c415f9a652a2-img4.jpg"
     ],
-    "mainImage": "https://picsum.photos/400/600?random=561",
+    "mainImage": "images/5416c093-d163-407a-a19a-c415f9a652a2-img1.jpg",
     "rating": 4.9,
     "reviewCount": 254,
     "inStock": true,
