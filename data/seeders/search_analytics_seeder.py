@@ -18,7 +18,7 @@ class SearchAnalyticsSeeder:
     def __init__(self):
         self.search_analytics_table = get_dynamodb_table('SEARCH_ANALYTICS_TABLE')
     
-    def load_search_analytics_from_json(self, filename: str = "search_analytics.json") -> List[Dict[str, Any]]:
+    def load_search_analytics_from_json(self, filename: str = "search_behaviors.json") -> List[Dict[str, Any]]:
         """Load search analytics records from JSON file"""
         try:
             filepath = os.path.join(os.path.dirname(__file__), '..', 'output', filename)
