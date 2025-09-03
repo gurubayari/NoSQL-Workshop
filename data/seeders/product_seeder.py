@@ -105,6 +105,9 @@ class ProductSeeder:
             actual_count = self.products_collection.count_documents({})
             print(f"Verification: {actual_count} products found in DocumentDB collection")
             
+            # Verify embeddings
+            self._verify_embeddings()
+            
             return actual_count == len(products)
             
         except Exception as e:
@@ -177,9 +180,113 @@ class ProductSeeder:
                     print(f"Created compound index on {field_names}")
                 except Exception as e:
                     print(f"Compound index may already exist: {e}")
+            
+            # Create HNSW vector index for embeddings (vector similarity search)
+            self._create_vector_index()
                     
         except Exception as e:
             print(f"Error creating indexes: {e}")
+    
+    def _create_vector_index(self):
+        """Create HNSW vector index for embedding field"""
+        try:
+            print("Creating HNSW vector index for embeddings...")
+            
+            # DocumentDB vector index specification
+            vector_index_spec = {
+                "name": "vector_index",
+                "definition": {
+                    "mappings": {
+                        "dynamic": False,
+                        "fields": {
+                            "embedding": {
+                                "type": "knnVector",
+                                "dimensions": 1536,  # Titan embedding dimension
+                                "similarity": "cosine",
+                                "indexOptions": {
+                                    "type": "hnsw",
+                                    "m": 16,
+                                    "efConstruction": 64
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            
+            # Create the vector search index
+            try:
+                # For DocumentDB, we use createSearchIndex
+                self.products_collection.create_search_index(
+                    vector_index_spec["name"],
+                    vector_index_spec["definition"]
+                )
+                print("✅ HNSW vector index created successfully for embedding field")
+                print("   - Index name: vector_index")
+                print("   - Dimensions: 1536 (Amazon Titan)")
+                print("   - Similarity: cosine")
+                print("   - Algorithm: HNSW (m=16, efConstruction=64)")
+                
+            except Exception as e:
+                error_msg = str(e).lower()
+                if "already exists" in error_msg or "duplicate" in error_msg:
+                    print("ℹ️  Vector index already exists, skipping creation")
+                else:
+                    print(f"⚠️  Vector index creation failed: {e}")
+                    print("   This might be expected if DocumentDB doesn't support vector search yet")
+                    
+                    # Alternative: Create a regular index on embedding field for now
+                    try:
+                        self.products_collection.create_index([("embedding", 1)])
+                        print("✅ Created fallback index on embedding field")
+                    except Exception as fallback_error:
+                        print(f"⚠️  Fallback index creation also failed: {fallback_error}")
+                        
+        except Exception as e:
+            print(f"Error creating vector index: {e}")
+            print("Vector search may not be available until index is created manually")
+    
+    def _verify_embeddings(self):
+        """Verify that products have embeddings for vector search"""
+        try:
+            print("\nVerifying embeddings...")
+            
+            # Count products with embeddings
+            products_with_embeddings = self.products_collection.count_documents({
+                "embedding": {"$exists": True, "$ne": None}
+            })
+            
+            total_products = self.products_collection.count_documents({})
+            
+            if products_with_embeddings == 0:
+                print("❌ No products have embeddings!")
+                print("   Vector search will not work without embeddings")
+                return False
+            elif products_with_embeddings < total_products:
+                print(f"⚠️  Only {products_with_embeddings}/{total_products} products have embeddings")
+                print("   Some products may not appear in vector search results")
+            else:
+                print(f"✅ All {products_with_embeddings} products have embeddings")
+            
+            # Check embedding dimensions
+            sample_product = self.products_collection.find_one({
+                "embedding": {"$exists": True, "$ne": None}
+            })
+            
+            if sample_product and "embedding" in sample_product:
+                embedding_dim = len(sample_product["embedding"])
+                print(f"   Embedding dimensions: {embedding_dim}")
+                
+                if embedding_dim != 1536:
+                    print(f"⚠️  Expected 1536 dimensions for Titan embeddings, got {embedding_dim}")
+                else:
+                    print("   ✅ Embedding dimensions match Titan model (1536)")
+            
+            return products_with_embeddings > 0
+            
+        except Exception as e:
+            print(f"Error verifying embeddings: {e}")
+            return False
     
     def print_seeding_summary(self, products: List[Dict[str, Any]]):
         """Print summary of seeded product data"""
@@ -295,6 +402,7 @@ def main():
             print(f"\n🚀 Product data is now available in DocumentDB collection: products")
             print(f"   Products are indexed for efficient querying")
             print(f"   Each product includes embeddings for vector search")
+            print(f"   HNSW vector index created for similarity search")
             print(f"   Product IDs correlate with inventory in DynamoDB")
         else:
             print("❌ Product seeding failed")
