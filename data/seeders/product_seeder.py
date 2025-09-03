@@ -195,7 +195,7 @@ class ProductSeeder:
             # DocumentDB vector index specification
             # Try different formats for compatibility
 
-            collection.create_index ([("embedding","vector")], 
+            self.products_collection.create_index ([("embedding","vector")], 
                 vectorOptions= {
                     "type": "hnsw", 
                     "similarity": "euclidean",
