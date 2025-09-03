@@ -67,6 +67,17 @@ class InventorySeeder:
             correlation_percentage = len(inventory_product_ids & product_ids) / len(product_ids) * 100
             print(f"Product-Inventory correlation: {correlation_percentage:.1f}%")
             
+            # Validate new simplified structure
+            print(f"Validating simplified inventory structure...")
+            required_fields = ['productId', 'availableQuantity', 'totalQuantity', 'reorderLevel']
+            
+            for i, record in enumerate(inventory_records[:5]):  # Check first 5 records
+                missing_fields = [field for field in required_fields if field not in record]
+                if missing_fields:
+                    print(f"Warning: Record {i+1} missing fields: {missing_fields}")
+                    return False
+            
+            print(f"✅ Inventory structure validation passed")
             return correlation_percentage > 90  # At least 90% correlation
             
         except Exception as e:
@@ -74,7 +85,7 @@ class InventorySeeder:
             return True  # Don't fail on validation errors
     
     def seed_to_dynamodb(self, inventory_records: List[Dict[str, Any]]) -> bool:
-        """Seed inventory records to DynamoDB"""
+        """Seed simplified inventory records to DynamoDB (one record per product)"""
         try:
             table = self.inventory_table
             
@@ -85,80 +96,59 @@ class InventorySeeder:
             
             with table.batch_writer() as batch:
                 for item in scan_response['Items']:
-                    batch.delete_item(Key={
-                        'productId': item['productId'],
-                        'warehouseId': item['warehouseId']
-                    })
+                    # Handle both old (with warehouseId) and new (without warehouseId) schemas
+                    if 'warehouseId' in item:
+                        batch.delete_item(Key={
+                            'productId': item['productId'],
+                            'warehouseId': item['warehouseId']
+                        })
+                    else:
+                        batch.delete_item(Key={
+                            'productId': item['productId']
+                        })
                     deleted_count += 1
             
             print(f"Deleted {deleted_count} existing inventory records")
             
-            # Transform inventory records to match DynamoDB schema
-            # Each warehouse stock becomes a separate record with composite key
-            dynamodb_records = []
-            
-            for record in inventory_records:
-                product_id = record['productId']
-                
-                # Create a record for each warehouse
-                for warehouse_stock in record['warehouseStock']:
-                    warehouse_record = {
-                        'productId': product_id,
-                        'warehouseId': warehouse_stock['warehouseId'],
-                        'productName': record['productName'],
-                        'category': record['category'],
-                        'sku': record['sku'],
-                        
-                        # Warehouse-specific stock info
-                        'warehouseName': warehouse_stock['warehouseName'],
-                        'stockQuantity': warehouse_stock['stockQuantity'],
-                        'reservedQuantity': warehouse_stock['reservedQuantity'],
-                        'availableQuantity': warehouse_stock['availableQuantity'],
-                        'lastRestocked': warehouse_stock['lastRestocked'],
-                        'reorderPoint': warehouse_stock['reorderPoint'],
-                        'maxCapacity': warehouse_stock['maxCapacity'],
-                        'location': warehouse_stock['location'],
-                        
-                        # Product-level info (duplicated across warehouses)
-                        'stockSummary': record['stockSummary'],
-                        'reorderInfo': record['reorderInfo'],
-                        'costInfo': record['costInfo'],
-                        'metadata': record['metadata'],
-                        
-                        # Alerts specific to this warehouse
-                        'alerts': [alert for alert in record['alerts'] 
-                                 if alert.get('warehouseId') == warehouse_stock['warehouseId']],
-                        
-                        # Movement history specific to this warehouse
-                        'movementHistory': [movement for movement in record['movementHistory']
-                                          if movement.get('warehouseId') == warehouse_stock['warehouseId']]
-                    }
-                    
-                    dynamodb_records.append(warehouse_record)
-            
-            # Insert new inventory records
-            print(f"Inserting {len(dynamodb_records)} warehouse inventory records...")
+            # Insert new simplified inventory records (one per product)
+            print(f"Inserting {len(inventory_records)} product inventory records...")
             inserted_count = 0
+            failed_count = 0
             
             with table.batch_writer() as batch:
-                for warehouse_record in dynamodb_records:
-                    # Convert any remaining datetime objects to strings for DynamoDB
-                    dynamodb_record = prepare_for_dynamodb(warehouse_record)
-                    batch.put_item(Item=dynamodb_record)
-                    inserted_count += 1
-                    
-                    if inserted_count % 25 == 0:  # DynamoDB batch limit is 25
-                        print(f"Inserted {inserted_count}/{len(dynamodb_records)} warehouse inventory records")
+                for i, record in enumerate(inventory_records):
+                    try:
+                        # Convert any remaining datetime objects to strings for DynamoDB
+                        dynamodb_record = prepare_for_dynamodb(record)
+                        
+                        # Validate required fields before insertion
+                        if 'productId' not in dynamodb_record:
+                            print(f"Skipping record {i+1}: missing productId")
+                            failed_count += 1
+                            continue
+                            
+                        batch.put_item(Item=dynamodb_record)
+                        inserted_count += 1
+                        
+                        if inserted_count % 25 == 0:  # DynamoDB batch limit is 25
+                            print(f"Inserted {inserted_count}/{len(inventory_records)} product inventory records")
+                            
+                    except Exception as e:
+                        print(f"Failed to insert record {i+1}: {e}")
+                        failed_count += 1
+                        continue
             
-            print(f"Successfully seeded {inserted_count} warehouse inventory records to DynamoDB")
-            print(f"This represents {len(inventory_records)} products across {len(set(r['warehouseId'] for r in dynamodb_records))} warehouses")
+            print(f"Successfully seeded {inserted_count} product inventory records to DynamoDB")
+            if failed_count > 0:
+                print(f"Failed to insert {failed_count} records")
+            print(f"Each product now has a single inventory record (simplified structure)")
             
             # Verify the seeding
             verify_response = table.scan(Select='COUNT')
             actual_count = verify_response['Count']
             print(f"Verification: {actual_count} records found in DynamoDB table")
             
-            return actual_count == len(dynamodb_records)
+            return actual_count == len(inventory_records)
             
         except Exception as e:
             print(f"Error seeding inventory to DynamoDB: {e}")
@@ -167,7 +157,7 @@ class InventorySeeder:
 
     
     def print_seeding_summary(self, inventory_records: List[Dict[str, Any]]):
-        """Print summary of seeded inventory data"""
+        """Print summary of seeded inventory data (simplified structure)"""
         if not inventory_records:
             return
         
@@ -176,54 +166,71 @@ class InventorySeeder:
         
         # Basic stats
         total_products = len(inventory_records)
-        total_stock = sum(int(record["stockSummary"]["totalStock"]) for record in inventory_records)
-        total_value = sum(Decimal(str(record["costInfo"]["totalValue"])) for record in inventory_records)
-        total_alerts = sum(len(record["alerts"]) for record in inventory_records)
+        total_stock = sum(int(record.get("totalQuantity", 0)) for record in inventory_records)
+        total_available = sum(int(record.get("availableQuantity", 0)) for record in inventory_records)
+        total_reserved = sum(int(record.get("reservedQuantity", 0)) for record in inventory_records)
+        total_value = sum(Decimal(str(record.get("totalValue", 0))) for record in inventory_records)
+        total_alerts = sum(len(record.get("alerts", [])) for record in inventory_records)
         
         print(f"Products with inventory: {total_products}")
         print(f"Total stock units: {total_stock:,}")
+        print(f"Available stock units: {total_available:,}")
+        print(f"Reserved stock units: {total_reserved:,}")
         print(f"Total inventory value: ${total_value:,.2f}")
         print(f"Active alerts: {total_alerts}")
         
         # Category breakdown
         category_stats = {}
         for record in inventory_records:
-            category = record["category"]
+            category = record.get("category", "Unknown")
             if category not in category_stats:
                 category_stats[category] = {"count": 0, "stock": 0, "value": 0}
             
             category_stats[category]["count"] += 1
-            category_stats[category]["stock"] += int(record["stockSummary"]["totalStock"])
-            category_stats[category]["value"] += Decimal(str(record["costInfo"]["totalValue"]))
+            category_stats[category]["stock"] += int(record.get("totalQuantity", 0))
+            category_stats[category]["value"] += Decimal(str(record.get("totalValue", 0)))
         
         print(f"\nInventory by category:")
         for category, stats in sorted(category_stats.items()):
             print(f"  {category}: {stats['count']} products, {stats['stock']:,} units, ${stats['value']:,.2f}")
         
-        # Warehouse distribution
-        warehouse_totals = {}
-        for record in inventory_records:
-            for ws in record["warehouseStock"]:
-                wh_name = ws["warehouseName"]
-                if wh_name not in warehouse_totals:
-                    warehouse_totals[wh_name] = 0
-                warehouse_totals[wh_name] += int(ws["stockQuantity"])
+        # Stock status summary
+        low_stock_count = 0
+        out_of_stock_count = 0
+        auto_reorder_enabled_count = 0
         
-        print(f"\nStock by warehouse:")
-        for wh_name, stock in sorted(warehouse_totals.items()):
-            print(f"  {wh_name}: {stock:,} units")
+        for record in inventory_records:
+            available = int(record.get("availableQuantity", 0))
+            reorder_level = int(record.get("reorderLevel", 0))
+            auto_reorder = record.get("autoReorderEnabled", False)
+            
+            if available == 0:
+                out_of_stock_count += 1
+            elif available <= reorder_level:
+                low_stock_count += 1
+                
+            if auto_reorder:
+                auto_reorder_enabled_count += 1
+        
+        print(f"\nStock status:")
+        print(f"  Products in stock: {total_products - out_of_stock_count}")
+        print(f"  Products with low stock: {low_stock_count}")
+        print(f"  Products out of stock: {out_of_stock_count}")
+        print(f"  Products with auto-reorder enabled: {auto_reorder_enabled_count}")
         
         # Alert summary
         alert_levels = {}
         for record in inventory_records:
-            for alert in record["alerts"]:
-                level = alert["alertLevel"]
+            for alert in record.get("alerts", []):
+                level = alert.get("alertLevel", "unknown")
                 alert_levels[level] = alert_levels.get(level, 0) + 1
         
         if alert_levels:
             print(f"\nAlert summary:")
             for level, count in sorted(alert_levels.items()):
                 print(f"  {level.title()} alerts: {count}")
+        else:
+            print(f"\nNo active alerts")
 
 def main():
     """Main function to seed inventory data to DynamoDB"""
@@ -263,8 +270,8 @@ def main():
             
             print(f"\n🚀 Inventory data is now available in DynamoDB table: {os.environ.get('INVENTORY_TABLE', 'INVENTORY_TABLE')}")
             print(f"   Products in DocumentDB are correlated with inventory in DynamoDB")
-            print(f"   Each product has stock distributed across 5 warehouses")
-            print(f"   Inventory includes alerts, movement history, and supplier info")
+            print(f"   Each product has a single inventory record (simplified structure)")
+            print(f"   Inventory includes stock levels, alerts, movement history, and supplier info")
         else:
             print("❌ Inventory seeding failed")
             return
