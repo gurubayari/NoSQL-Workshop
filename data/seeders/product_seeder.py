@@ -193,58 +193,25 @@ class ProductSeeder:
             print("Creating HNSW vector index for embeddings...")
             
             # DocumentDB vector index specification
-            vector_index_spec = {
-                "name": "vector_index",
-                "definition": {
-                    "mappings": {
-                        "dynamic": False,
-                        "fields": {
-                            "embedding": {
-                                "type": "knnVector",
-                                "dimensions": 1536,  # Titan embedding dimension
-                                "similarity": "cosine",
-                                "indexOptions": {
-                                    "type": "hnsw",
-                                    "m": 16,
-                                    "efConstruction": 64
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+            # Try different formats for compatibility
+
+            collection.create_index ([("embedding","vector")], 
+                vectorOptions= {
+                    "type": "hnsw", 
+                    "similarity": "euclidean",
+                    "dimensions": 1536,
+                    "m": 16,
+                    "efConstruction": 64},
+                name="vss_index")
             
-            # Create the vector search index
-            try:
-                # For DocumentDB, we use createSearchIndex
-                self.products_collection.create_search_index(
-                    vector_index_spec["name"],
-                    vector_index_spec["definition"]
-                )
-                print("✅ HNSW vector index created successfully for embedding field")
-                print("   - Index name: vector_index")
-                print("   - Dimensions: 1536 (Amazon Titan)")
-                print("   - Similarity: cosine")
-                print("   - Algorithm: HNSW (m=16, efConstruction=64)")
-                
-            except Exception as e:
-                error_msg = str(e).lower()
-                if "already exists" in error_msg or "duplicate" in error_msg:
-                    print("ℹ️  Vector index already exists, skipping creation")
-                else:
-                    print(f"⚠️  Vector index creation failed: {e}")
-                    print("   This might be expected if DocumentDB doesn't support vector search yet")
-                    
-                    # Alternative: Create a regular index on embedding field for now
-                    try:
-                        self.products_collection.create_index([("embedding", 1)])
-                        print("✅ Created fallback index on embedding field")
-                    except Exception as fallback_error:
-                        print(f"⚠️  Fallback index creation also failed: {fallback_error}")
+        except Exception as e:
+            print(f"Error in vector index creation process: {e}")
                         
         except Exception as e:
             print(f"Error creating vector index: {e}")
             print("Vector search may not be available until index is created manually")
+    
+    
     
     def _verify_embeddings(self):
         """Verify that products have embeddings for vector search"""
