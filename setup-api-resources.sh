@@ -222,6 +222,7 @@ create_resource $ROOT_RESOURCE_ID "cart" "CART_RESOURCE_ID"
 create_resource $CART_RESOURCE_ID "{userId}" "CART_USER_ID_RESOURCE_ID"
 create_resource $CART_USER_ID_RESOURCE_ID "items" "CART_USER_ID_ITEMS_RESOURCE_ID"
 create_resource $CART_USER_ID_ITEMS_RESOURCE_ID "{itemId}" "CART_USER_ID_ITEMS_ITEM_ID_RESOURCE_ID"
+create_resource $CART_USER_ID_RESOURCE_ID "clear" "CART_USER_ID_CLEAR_RESOURCE_ID"
 
 # Orders resources
 create_resource $ROOT_RESOURCE_ID "orders" "ORDERS_RESOURCE_ID"
@@ -271,11 +272,16 @@ echo "All resources created successfully!"
 # Create methods
 echo "Creating API methods..."
 
+# Auth base resource methods
+create_method $AUTH_RESOURCE_ID "GET" "NONE" "" $AUTH_LAMBDA_ARN "AuthGET"
+create_method $AUTH_RESOURCE_ID "POST" "NONE" "" $AUTH_LAMBDA_ARN "AuthPOST"
+
 # Auth methods (no authorization required)
 create_method $AUTH_REGISTER_RESOURCE_ID "POST" "NONE" "" $AUTH_LAMBDA_ARN "AuthRegisterPOST"
 create_method $AUTH_LOGIN_RESOURCE_ID "POST" "NONE" "" $AUTH_LAMBDA_ARN "AuthLoginPOST"
 create_method $AUTH_REFRESH_RESOURCE_ID "POST" "NONE" "" $AUTH_LAMBDA_ARN "AuthRefreshPOST"
 create_method $AUTH_VERIFY_RESOURCE_ID "GET" "NONE" "" $AUTH_LAMBDA_ARN "AuthVerifyGET"
+create_method $AUTH_RESET_PASSWORD_RESOURCE_ID "POST" "NONE" "" $AUTH_LAMBDA_ARN "AuthResetPasswordPOST"
 
 # Auth methods (Cognito authorization required)
 create_method $AUTH_PROFILE_RESOURCE_ID "GET" "COGNITO_USER_POOLS" $COGNITO_AUTHORIZER_ID $AUTH_LAMBDA_ARN "AuthProfileGET"
@@ -283,18 +289,34 @@ create_method $AUTH_PROFILE_RESOURCE_ID "PUT" "COGNITO_USER_POOLS" $COGNITO_AUTH
 create_method $AUTH_LOGOUT_RESOURCE_ID "POST" "COGNITO_USER_POOLS" $COGNITO_AUTHORIZER_ID $AUTH_LAMBDA_ARN "AuthLogoutPOST"
 
 # Product methods (no authorization required)
+# Base products resource - GET for listing products, POST for creating products
+create_method $PRODUCTS_RESOURCE_ID "GET" "NONE" "" $PRODUCT_LAMBDA_ARN "ProductsGET"
+create_method $PRODUCTS_RESOURCE_ID "POST" "COGNITO_USER_POOLS" $COGNITO_AUTHORIZER_ID $PRODUCT_LAMBDA_ARN "ProductsPOST"
+
+# Individual product methods
 create_method $PRODUCTS_ID_RESOURCE_ID "GET" "NONE" "" $PRODUCT_LAMBDA_ARN "ProductsIdGET"
 create_method $PRODUCTS_CATEGORIES_RESOURCE_ID "GET" "NONE" "" $PRODUCT_LAMBDA_ARN "ProductsCategoriesGET"
 create_method $PRODUCTS_FEATURED_RESOURCE_ID "GET" "NONE" "" $PRODUCT_LAMBDA_ARN "ProductsFeaturedGET"
 create_method $PRODUCTS_ID_REVIEWS_RESOURCE_ID "GET" "NONE" "" $PRODUCT_LAMBDA_ARN "ProductsIdReviewsGET"
+
+# Cart base resource methods
+create_method $CART_RESOURCE_ID "GET" "COGNITO_USER_POOLS" $COGNITO_AUTHORIZER_ID $CART_LAMBDA_ARN "CartGET"
+create_method $CART_RESOURCE_ID "POST" "COGNITO_USER_POOLS" $COGNITO_AUTHORIZER_ID $CART_LAMBDA_ARN "CartPOST"
 
 # Cart methods (Cognito authorization required)
 create_method $CART_USER_ID_RESOURCE_ID "GET" "COGNITO_USER_POOLS" $COGNITO_AUTHORIZER_ID $CART_LAMBDA_ARN "CartUserIdGET"
 create_method $CART_USER_ID_ITEMS_RESOURCE_ID "POST" "COGNITO_USER_POOLS" $COGNITO_AUTHORIZER_ID $CART_LAMBDA_ARN "CartUserIdItemsPOST"
 create_method $CART_USER_ID_ITEMS_ITEM_ID_RESOURCE_ID "GET" "COGNITO_USER_POOLS" $COGNITO_AUTHORIZER_ID $CART_LAMBDA_ARN "CartUserIdItemsItemIdGET"
 create_method $CART_USER_ID_ITEMS_ITEM_ID_RESOURCE_ID "PUT" "COGNITO_USER_POOLS" $COGNITO_AUTHORIZER_ID $CART_LAMBDA_ARN "CartUserIdItemsItemIdPUT"
+create_method $CART_USER_ID_ITEMS_ITEM_ID_RESOURCE_ID "DELETE" "COGNITO_USER_POOLS" $COGNITO_AUTHORIZER_ID $CART_LAMBDA_ARN "CartUserIdItemsItemIdDELETE"
+create_method $CART_USER_ID_CLEAR_RESOURCE_ID "DELETE" "COGNITO_USER_POOLS" $COGNITO_AUTHORIZER_ID $CART_LAMBDA_ARN "CartUserIdClearDELETE"
 
 # Order methods (Cognito authorization required)
+# Base orders resource - GET for listing orders, POST for creating orders
+create_method $ORDERS_RESOURCE_ID "GET" "COGNITO_USER_POOLS" $COGNITO_AUTHORIZER_ID $ORDER_LAMBDA_ARN "OrdersGET"
+create_method $ORDERS_RESOURCE_ID "POST" "COGNITO_USER_POOLS" $COGNITO_AUTHORIZER_ID $ORDER_LAMBDA_ARN "OrdersPOST"
+
+# Individual order methods
 create_method $ORDERS_ORDER_ID_RESOURCE_ID "GET" "COGNITO_USER_POOLS" $COGNITO_AUTHORIZER_ID $ORDER_LAMBDA_ARN "OrdersOrderIdGET"
 create_method $ORDERS_ORDER_ID_RESOURCE_ID "PUT" "COGNITO_USER_POOLS" $COGNITO_AUTHORIZER_ID $ORDER_LAMBDA_ARN "OrdersOrderIdPUT"
 create_method $ORDERS_ORDER_ID_CANCEL_RESOURCE_ID "POST" "COGNITO_USER_POOLS" $COGNITO_AUTHORIZER_ID $ORDER_LAMBDA_ARN "OrdersOrderIdCancelPOST"
@@ -307,6 +329,10 @@ create_method $REVIEWS_REVIEW_ID_RESOURCE_ID "GET" "NONE" "" $REVIEW_LAMBDA_ARN 
 create_method $REVIEWS_REVIEW_ID_HELPFUL_RESOURCE_ID "POST" "COGNITO_USER_POOLS" $COGNITO_AUTHORIZER_ID $REVIEW_LAMBDA_ARN "ReviewsReviewIdHelpfulPOST"
 create_method $REVIEWS_PRODUCT_PRODUCT_ID_RESOURCE_ID "GET" "NONE" "" $REVIEW_LAMBDA_ARN "ReviewsProductProductIdGET"
 
+# Search base resource methods
+create_method $SEARCH_RESOURCE_ID "GET" "NONE" "" $SEARCH_LAMBDA_ARN "SearchGET"
+create_method $SEARCH_RESOURCE_ID "POST" "NONE" "" $SEARCH_LAMBDA_ARN "SearchPOST"
+
 # Search methods (no authorization required)
 create_method $SEARCH_PRODUCTS_RESOURCE_ID "GET" "NONE" "" $SEARCH_LAMBDA_ARN "SearchProductsGET"
 create_method $SEARCH_PRODUCTS_RESOURCE_ID "POST" "NONE" "" $SEARCH_LAMBDA_ARN "SearchProductsPOST"
@@ -314,12 +340,21 @@ create_method $SEARCH_SUGGESTIONS_RESOURCE_ID "GET" "NONE" "" $SEARCH_LAMBDA_ARN
 create_method $SEARCH_AUTOCOMPLETE_RESOURCE_ID "GET" "NONE" "" $SEARCH_LAMBDA_ARN "SearchAutocompleteGET"
 create_method $SEARCH_FILTERS_RESOURCE_ID "GET" "NONE" "" $SEARCH_LAMBDA_ARN "SearchFiltersGET"
 
+# Analytics base resource methods
+create_method $ANALYTICS_RESOURCE_ID "GET" "NONE" "" $ANALYTICS_LAMBDA_ARN "AnalyticsGET"
+create_method $ANALYTICS_RESOURCE_ID "POST" "NONE" "" $ANALYTICS_LAMBDA_ARN "AnalyticsPOST"
+
 # Analytics methods (no authorization required)
 create_method $ANALYTICS_EVENTS_RESOURCE_ID "POST" "NONE" "" $ANALYTICS_LAMBDA_ARN "AnalyticsEventsPOST"
 create_method $ANALYTICS_DASHBOARD_RESOURCE_ID "GET" "NONE" "" $ANALYTICS_LAMBDA_ARN "AnalyticsDashboardGET"
 create_method $ANALYTICS_REPORTS_RESOURCE_ID "GET" "NONE" "" $ANALYTICS_LAMBDA_ARN "AnalyticsReportsGET"
 
+# Chat base resource methods
+create_method $CHAT_RESOURCE_ID "GET" "COGNITO_USER_POOLS" $COGNITO_AUTHORIZER_ID $CHAT_LAMBDA_ARN "ChatGET"
+create_method $CHAT_RESOURCE_ID "POST" "COGNITO_USER_POOLS" $COGNITO_AUTHORIZER_ID $CHAT_LAMBDA_ARN "ChatPOST"
+
 # Chat methods (Cognito authorization required)
+create_method $CHAT_SESSIONS_RESOURCE_ID "GET" "COGNITO_USER_POOLS" $COGNITO_AUTHORIZER_ID $CHAT_LAMBDA_ARN "ChatSessionsGET"
 create_method $CHAT_SESSIONS_RESOURCE_ID "POST" "COGNITO_USER_POOLS" $COGNITO_AUTHORIZER_ID $CHAT_LAMBDA_ARN "ChatSessionsPOST"
 create_method $CHAT_SESSIONS_SESSION_ID_RESOURCE_ID "GET" "COGNITO_USER_POOLS" $COGNITO_AUTHORIZER_ID $CHAT_LAMBDA_ARN "ChatSessionsSessionIdGET"
 create_method $CHAT_SESSIONS_SESSION_ID_RESOURCE_ID "DELETE" "COGNITO_USER_POOLS" $COGNITO_AUTHORIZER_ID $CHAT_LAMBDA_ARN "ChatSessionsSessionIdDELETE"
@@ -335,7 +370,7 @@ echo "Creating OPTIONS methods for CORS support..."
 create_options_method $ROOT_RESOURCE_ID "Root" "GET,OPTIONS"
 
 # Auth resources OPTIONS
-create_options_method $AUTH_RESOURCE_ID "Auth" "OPTIONS"
+create_options_method $AUTH_RESOURCE_ID "Auth" "GET,POST,OPTIONS"
 create_options_method $AUTH_REGISTER_RESOURCE_ID "AuthRegister" "POST,OPTIONS"
 create_options_method $AUTH_LOGIN_RESOURCE_ID "AuthLogin" "POST,OPTIONS"
 create_options_method $AUTH_LOGOUT_RESOURCE_ID "AuthLogout" "POST,OPTIONS"
@@ -345,20 +380,21 @@ create_options_method $AUTH_VERIFY_RESOURCE_ID "AuthVerify" "GET,OPTIONS"
 create_options_method $AUTH_RESET_PASSWORD_RESOURCE_ID "AuthResetPassword" "POST,OPTIONS"
 
 # Products resources OPTIONS
-create_options_method $PRODUCTS_RESOURCE_ID "Products" "GET,OPTIONS"
+create_options_method $PRODUCTS_RESOURCE_ID "Products" "GET,POST,OPTIONS"
 create_options_method $PRODUCTS_ID_RESOURCE_ID "ProductsId" "GET,OPTIONS"
 create_options_method $PRODUCTS_ID_REVIEWS_RESOURCE_ID "ProductsIdReviews" "GET,OPTIONS"
 create_options_method $PRODUCTS_CATEGORIES_RESOURCE_ID "ProductsCategories" "GET,OPTIONS"
 create_options_method $PRODUCTS_FEATURED_RESOURCE_ID "ProductsFeatured" "GET,OPTIONS"
 
 # Cart resources OPTIONS
-create_options_method $CART_RESOURCE_ID "Cart" "OPTIONS"
+create_options_method $CART_RESOURCE_ID "Cart" "GET,POST,OPTIONS"
 create_options_method $CART_USER_ID_RESOURCE_ID "CartUserId" "GET,OPTIONS"
 create_options_method $CART_USER_ID_ITEMS_RESOURCE_ID "CartUserIdItems" "POST,OPTIONS"
 create_options_method $CART_USER_ID_ITEMS_ITEM_ID_RESOURCE_ID "CartUserIdItemsItemId" "GET,PUT,DELETE,OPTIONS"
+create_options_method $CART_USER_ID_CLEAR_RESOURCE_ID "CartUserIdClear" "DELETE,OPTIONS"
 
 # Orders resources OPTIONS
-create_options_method $ORDERS_RESOURCE_ID "Orders" "OPTIONS"
+create_options_method $ORDERS_RESOURCE_ID "Orders" "GET,POST,OPTIONS"
 create_options_method $ORDERS_ORDER_ID_RESOURCE_ID "OrdersOrderId" "GET,PUT,OPTIONS"
 create_options_method $ORDERS_ORDER_ID_CANCEL_RESOURCE_ID "OrdersOrderIdCancel" "POST,OPTIONS"
 create_options_method $ORDERS_USER_RESOURCE_ID "OrdersUser" "OPTIONS"
@@ -372,20 +408,20 @@ create_options_method $REVIEWS_PRODUCT_RESOURCE_ID "ReviewsProduct" "OPTIONS"
 create_options_method $REVIEWS_PRODUCT_PRODUCT_ID_RESOURCE_ID "ReviewsProductProductId" "GET,OPTIONS"
 
 # Search resources OPTIONS
-create_options_method $SEARCH_RESOURCE_ID "Search" "OPTIONS"
+create_options_method $SEARCH_RESOURCE_ID "Search" "GET,POST,OPTIONS"
 create_options_method $SEARCH_PRODUCTS_RESOURCE_ID "SearchProducts" "GET,POST,OPTIONS"
 create_options_method $SEARCH_SUGGESTIONS_RESOURCE_ID "SearchSuggestions" "GET,OPTIONS"
 create_options_method $SEARCH_AUTOCOMPLETE_RESOURCE_ID "SearchAutocomplete" "GET,OPTIONS"
 create_options_method $SEARCH_FILTERS_RESOURCE_ID "SearchFilters" "GET,OPTIONS"
 
 # Chat resources OPTIONS
-create_options_method $CHAT_RESOURCE_ID "Chat" "OPTIONS"
-create_options_method $CHAT_SESSIONS_RESOURCE_ID "ChatSessions" "POST,OPTIONS"
+create_options_method $CHAT_RESOURCE_ID "Chat" "GET,POST,OPTIONS"
+create_options_method $CHAT_SESSIONS_RESOURCE_ID "ChatSessions" "GET,POST,OPTIONS"
 create_options_method $CHAT_SESSIONS_SESSION_ID_RESOURCE_ID "ChatSessionsSessionId" "GET,DELETE,OPTIONS"
 create_options_method $CHAT_SESSIONS_SESSION_ID_MESSAGES_RESOURCE_ID "ChatSessionsSessionIdMessages" "GET,POST,OPTIONS"
 
 # Analytics resources OPTIONS
-create_options_method $ANALYTICS_RESOURCE_ID "Analytics" "OPTIONS"
+create_options_method $ANALYTICS_RESOURCE_ID "Analytics" "GET,POST,OPTIONS"
 create_options_method $ANALYTICS_EVENTS_RESOURCE_ID "AnalyticsEvents" "POST,OPTIONS"
 create_options_method $ANALYTICS_DASHBOARD_RESOURCE_ID "AnalyticsDashboard" "GET,OPTIONS"
 create_options_method $ANALYTICS_REPORTS_RESOURCE_ID "AnalyticsReports" "GET,OPTIONS"
