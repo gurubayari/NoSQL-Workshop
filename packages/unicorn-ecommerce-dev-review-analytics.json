@@ -1,9 +1,0 @@
-{
-    "function_name": "unicorn-ecommerce-dev-review-analytics",
-    "function_file": "review_analytics.py",
-    "description": "Review Analytics API for Unicorn E-Commerce",
-    "timeout": 60,
-    "memory": 1024,
-    "zip_file": "packages/unicorn-ecommerce-dev-review-analytics.zip",
-    "created_at": "2025-09-01T07:23:41Z"
-}
