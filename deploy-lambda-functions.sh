@@ -1,14 +1,14 @@
 #!/bin/bash
 
-# AWS NoSQL Workshop - Lambda Functions Deployment Script
-# This script deploys pre-packaged Lambda functions to AWS
+# AWS NoSQL Workshop - Lambda Functions Redeployment Script
+# This script redeploys Lambda zip files to existing functions with LIVE aliases
 
 set -e
 
-# Configuration
-PROJECT_NAME="unicorn-ecommerce"
-ENVIRONMENT="dev"
-REGION="us-east-1"
+# Configuration - Accept command line arguments with defaults
+PROJECT_NAME="${1:-unicorn-ecommerce}"
+ENVIRONMENT="${2:-dev}"
+REGION="${3:-${AWS_DEFAULT_REGION:-us-east-1}}"
 
 # Colors for output
 RED='\033[0;31m'
@@ -17,46 +17,42 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
-echo -e "${BLUE}AWS NoSQL Workshop - Lambda Functions Deployment${NC}"
-echo "=================================================="
+echo -e "${BLUE}AWS NoSQL Workshop - Lambda Functions Redeployment${NC}"
+echo "======================================================="
 echo "Project: $PROJECT_NAME"
 echo "Environment: $ENVIRONMENT"
 echo "Region: $REGION"
 echo ""
+echo "This script assumes Lambda functions already exist with LIVE aliases and provisioned capacity."
+echo "It will only update the function code and update the LIVE alias to point to the new version."
+echo ""
 
 # Check for help flag
 if [[ "$1" == "--help" ]] || [[ "$1" == "-h" ]]; then
-    echo "Usage: $0 <lambda_role_arn> <security_group_id> <subnet1_id> <subnet2_id> [documentdb_endpoint] [elasticache_endpoint] [user_pool_id] [user_pool_client_id]"
+    echo "Usage: $0 [PROJECT_NAME] [ENVIRONMENT] [REGION]"
     echo ""
-    echo "Parameters:"
-    echo "  lambda_role_arn    - ARN of the Lambda execution role"
-    echo "  security_group_id  - Security group ID for Lambda functions"
-    echo "  subnet1_id         - First private subnet ID for VPC Lambda"
-    echo "  subnet2_id         - Second private subnet ID for VPC Lambda"
-    echo "  documentdb_endpoint - DocumentDB cluster endpoint"
-    echo "  elasticache_endpoint - ElastiCache Redis endpoint"
-    echo "  user_pool_id       - Cognito User Pool ID"
-    echo "  user_pool_client_id - Cognito User Pool Client ID"
+    echo "Arguments:"
+    echo "  PROJECT_NAME  Project name (default: 'unicorn-ecommerce')"
+    echo "  ENVIRONMENT   Environment name (default: 'dev')"
+    echo "  REGION        AWS region (default: \$AWS_DEFAULT_REGION or 'us-east-1')"
     echo ""
-    echo "Environment Variables (alternative to parameters):"
-    echo "  LAMBDA_EXECUTION_ROLE_ARN"
-    echo "  LAMBDA_SECURITY_GROUP_ID"
-    echo "  PRIVATE_SUBNET_1_ID"
-    echo "  PRIVATE_SUBNET_2_ID"
-    echo "  DOCUMENTDB_ENDPOINT"
-    echo "  ELASTICACHE_ENDPOINT"
-    echo "  USER_POOL_ID"
-    echo "  USER_POOL_CLIENT_ID"
-    echo ""
-    echo "Example:"
-    echo "  $0 arn:aws:iam::123456789:role/lambda-role sg-12345 subnet-123 subnet-456"
+    echo "Examples:"
+    echo "  $0                              # Uses defaults: unicorn-ecommerce, dev, us-east-1"
+    echo "  $0 my-project                   # Uses my-project, dev, default region"
+    echo "  $0 my-project staging           # Uses my-project, staging, default region"
+    echo "  $0 my-project prod us-west-2    # Uses my-project, prod, us-west-2"
     echo ""
     echo "This script will:"
-    echo "  1. Deploy all packaged Lambda functions"
-    echo "  2. Configure environment variables"
-    echo "  3. Set up VPC configuration"
+    echo "  1. Update existing Lambda function code from packages"
+    echo "  2. Update LIVE aliases to point to the new version"
+    echo "  3. Preserve existing provisioned capacity configuration"
     echo ""
-    echo "After running this script, use setup-api-gateway.sh to configure API Gateway integrations and CORS."
+    echo "Prerequisites:"
+    echo "  - Lambda functions must already exist (created via CloudFormation)"
+    echo "  - LIVE aliases must already exist with provisioned capacity"
+    echo "  - packages/ directory must contain the Lambda zip files"
+    echo ""
+    echo "The script will automatically detect existing functions and update them."
     echo ""
     exit 0
 fi
@@ -121,222 +117,106 @@ if [ ! -f "packages/deployment-manifest.json" ]; then
     exit 1
 fi
 
-# Get parameters from command line or environment
-LAMBDA_EXECUTION_ROLE_ARN=${1:-$LAMBDA_EXECUTION_ROLE_ARN}
-LAMBDA_SECURITY_GROUP_ID=${2:-$LAMBDA_SECURITY_GROUP_ID}
-PRIVATE_SUBNET_1_ID=${3:-$PRIVATE_SUBNET_1_ID}
-PRIVATE_SUBNET_2_ID=${4:-$PRIVATE_SUBNET_2_ID}
-DOCUMENTDB_ENDPOINT=${5:-$DOCUMENTDB_ENDPOINT}
-ELASTICACHE_ENDPOINT=${6:-$ELASTICACHE_ENDPOINT}
-USER_POOL_ID=${7:-$USER_POOL_ID}
-USER_POOL_CLIENT_ID=${8:-$USER_POOL_CLIENT_ID}
+# Update existing alias to point to latest version after code update
+update_alias_after_deployment() {
+    local function_name=$1
+    local alias_name=${2:-"LIVE"}
+    
+    print_info "Updating alias $alias_name to point to latest version of $function_name..."
+    
+    # Check if alias exists
+    if aws lambda get-alias --function-name "$function_name" --name "$alias_name" --region "$REGION" > /dev/null 2>&1; then
+        # Update alias to point to $LATEST
+        aws lambda update-alias \
+            --function-name "$function_name" \
+            --name "$alias_name" \
+            --function-version '$LATEST' \
+            --description "Updated to latest version - $(date)" \
+            --region "$REGION" > /dev/null
+        
+        if [ $? -eq 0 ]; then
+            print_status "Successfully updated alias $alias_name to point to latest version"
+            return 0
+        else
+            print_error "Failed to update alias $alias_name"
+            return 1
+        fi
+    else
+        print_warning "Alias $alias_name does not exist for $function_name"
+        return 1
+    fi
+}
 
-# Get DynamoDB table names
-USERS_TABLE="${PROJECT_NAME}-${ENVIRONMENT}-users"
-CART_TABLE="${PROJECT_NAME}-${ENVIRONMENT}-shopping-cart"
-INVENTORY_TABLE="${PROJECT_NAME}-${ENVIRONMENT}-inventory"
-ORDERS_TABLE="${PROJECT_NAME}-${ENVIRONMENT}-orders"
-CHAT_HISTORY_TABLE="${PROJECT_NAME}-${ENVIRONMENT}-chat-history"
-SEARCH_ANALYTICS_TABLE="${PROJECT_NAME}-${ENVIRONMENT}-search-analytics"
-
-# Validate required parameters
-if [ -z "$LAMBDA_EXECUTION_ROLE_ARN" ]; then
-    print_error "Lambda Execution Role ARN is required (parameter 1 or LAMBDA_EXECUTION_ROLE_ARN env var)"
-    exit 1
-fi
-
-if [ -z "$LAMBDA_SECURITY_GROUP_ID" ]; then
-    print_error "Lambda Security Group ID is required (parameter 2 or LAMBDA_SECURITY_GROUP_ID env var)"
-    exit 1
-fi
-
-if [ -z "$PRIVATE_SUBNET_1_ID" ]; then
-    print_error "Private Subnet 1 ID is required (parameter 3 or PRIVATE_SUBNET_1_ID env var)"
-    exit 1
-fi
-
-if [ -z "$PRIVATE_SUBNET_2_ID" ]; then
-    print_error "Private Subnet 2 ID is required (parameter 4 or PRIVATE_SUBNET_2_ID env var)"
-    exit 1
-fi
-
-if [ -z "$DOCUMENTDB_ENDPOINT" ]; then
-    print_info "DocumentDB Endpoint is required (parameter 5 or DOCUMENTDB_ENDPOINT env var)"
-fi
-
-if [ -z "$ELASTICACHE_ENDPOINT" ]; then
-    print_info "ElastiCache Endpoint: is required (parameter 6 or ELASTICACHE_ENDPOINT env var)"
-fi
-
-if [ -z "$USER_POOL_ID" ]; then
-    print_info "User Pool ID: is required (parameter 7 or USER_POOL_ID env var)"
-fi
-
-if [ -z "$USER_POOL_CLIENT_ID" ]; then
-    print_info "User Pool Client ID: is required (parameter 8 or USER_POOL_CLIENT_ID env var)"
-fi
-
-print_info "Lambda Execution Role ARN: $LAMBDA_EXECUTION_ROLE_ARN"
-print_info "Lambda Security Group ID: $LAMBDA_SECURITY_GROUP_ID"
-print_info "Private Subnet 1 ID: $PRIVATE_SUBNET_1_ID"
-print_info "Private Subnet 2 ID: $PRIVATE_SUBNET_2_ID"
-
-
-
-# Deploy Lambda function from package
-deploy_lambda_function() {
+# Redeploy Lambda function code to existing function
+redeploy_lambda_function() {
     local function_name=$1
     
-    print_info "Deploying Lambda function: $function_name"
+    print_info "Redeploying Lambda function: $function_name"
     
     # Check if package exists
     local zip_file="packages/${function_name}.zip"
-    local metadata_file="packages/${function_name}.json"
     
     if [ ! -f "$zip_file" ]; then
         print_error "Package file $zip_file not found for $function_name"
         return 1
     fi
     
-    if [ ! -f "$metadata_file" ]; then
-        print_error "Metadata file $metadata_file not found for $function_name"
+    # Check if function exists
+    if ! aws lambda get-function --function-name "$function_name" --region "$REGION" > /dev/null 2>&1; then
+        print_error "Function $function_name does not exist. Please create it via CloudFormation first."
         return 1
     fi
     
-    # Read metadata
-    local description=$(jq -r '.description' "$metadata_file")
-    local timeout=$(jq -r '.timeout' "$metadata_file")
-    local memory=$(jq -r '.memory' "$metadata_file")
+    print_info "Function $function_name exists, updating code..."
     
-    print_info "Description: $description"
-    print_info "Timeout: ${timeout}s, Memory: ${memory}MB"
+    # Update function code
+    aws lambda update-function-code \
+        --function-name "$function_name" \
+        --zip-file "fileb://$zip_file" \
+        --region "$REGION" > /dev/null
     
-    # Check if function exists
-    if aws lambda get-function --function-name "$function_name" --region "$REGION" > /dev/null 2>&1; then
-        print_info "Function $function_name exists, updating..."
-        
-        # Update function code
-        aws lambda update-function-code \
-            --function-name "$function_name" \
-            --zip-file "fileb://$zip_file" \
-            --region "$REGION" > /dev/null
-            
-    else
-        print_info "Creating new function $function_name..."
-        
-        # Clean up any partial deployment first
-        cleanup_partial_deployment "$function_name"
-        
-        # Create function with comprehensive environment variables
-        aws lambda create-function \
-            --function-name "$function_name" \
-            --runtime python3.9 \
-            --role "$LAMBDA_EXECUTION_ROLE_ARN" \
-            --handler lambda_function.lambda_handler \
-            --zip-file "fileb://$zip_file" \
-            --description "$description" \
-            --timeout "$timeout" \
-            --memory-size "$memory" \
-            --vpc-config SubnetIds="$PRIVATE_SUBNET_1_ID,$PRIVATE_SUBNET_2_ID",SecurityGroupIds="$LAMBDA_SECURITY_GROUP_ID" \
-            --environment Variables="{
-                PROJECT_NAME=$PROJECT_NAME,
-                ENVIRONMENT=$ENVIRONMENT,
-                REGION=$REGION,
-                DOCUMENTDB_HOST=$DOCUMENTDB_ENDPOINT,
-                DOCUMENTDB_PORT=27017,
-                DOCUMENTDB_DATABASE=unicorn_ecommerce_${ENVIRONMENT},
-                DOCUMENTDB_SSL_CA_CERTS=/opt/global-bundle.pem,
-                ELASTICACHE_HOST=$ELASTICACHE_ENDPOINT,
-                ELASTICACHE_PORT=6379,
-                USERS_TABLE=$USERS_TABLE,
-                SHOPPING_CART_TABLE=$CART_TABLE,
-                INVENTORY_TABLE=$INVENTORY_TABLE,
-                ORDERS_TABLE=$ORDERS_TABLE,
-                CHAT_HISTORY_TABLE=$CHAT_HISTORY_TABLE,
-                SEARCH_ANALYTICS_TABLE=$SEARCH_ANALYTICS_TABLE,
-                USER_POOL_ID=$USER_POOL_ID,
-                USER_POOL_CLIENT_ID=$USER_POOL_CLIENT_ID
-            }" \
-            --region "$REGION" > /dev/null
+    if [ $? -ne 0 ]; then
+        print_error "Failed to update function code for $function_name"
+        return 1
     fi
     
-    # Wait for function to be active with extended timeout for VPC functions
-    print_info "Waiting for function $function_name to be active..."
-    
-    # For VPC functions, we need to wait longer for ENI creation
-    local max_attempts=60  # 10 minutes (60 * 10 seconds)
+    # Wait for update to complete before updating alias
+    print_info "Waiting for code update to complete..."
+    local max_attempts=30
     local attempt=0
-    local wait_time=10
     
     while [ $attempt -lt $max_attempts ]; do
-        local state=$(aws lambda get-function \
-            --function-name "$function_name" \
-            --region "$REGION" \
-            --query 'Configuration.State' \
-            --output text 2>/dev/null || echo "Pending")
-        
         local last_update_status=$(aws lambda get-function \
             --function-name "$function_name" \
             --region "$REGION" \
             --query 'Configuration.LastUpdateStatus' \
             --output text 2>/dev/null || echo "InProgress")
         
-        if [ "$state" = "Active" ] && [ "$last_update_status" = "Successful" ]; then
-            print_status "Function $function_name is now active"
-
-            # Update function configuration with comprehensive environment variables
-            aws lambda update-function-configuration \
-                --function-name "$function_name" \
-                --timeout "$timeout" \
-                --memory-size "$memory" \
-                --environment Variables="{
-                    PROJECT_NAME=$PROJECT_NAME,
-                    ENVIRONMENT=$ENVIRONMENT,
-                    REGION=$REGION,
-                    DOCUMENTDB_HOST=$DOCUMENTDB_ENDPOINT,
-                    DOCUMENTDB_PORT=27017,
-                    DOCUMENTDB_DATABASE=unicorn_ecommerce_${ENVIRONMENT},
-                    DOCUMENTDB_SSL_CA_CERTS=/opt/global-bundle.pem,
-                    ELASTICACHE_HOST=$ELASTICACHE_ENDPOINT,
-                    ELASTICACHE_PORT=6379,
-                    USERS_TABLE=$USERS_TABLE,
-                    SHOPPING_CART_TABLE=$CART_TABLE,
-                    INVENTORY_TABLE=$INVENTORY_TABLE,
-                    ORDERS_TABLE=$ORDERS_TABLE,
-                    CHAT_HISTORY_TABLE=$CHAT_HISTORY_TABLE,
-                    SEARCH_ANALYTICS_TABLE=$SEARCH_ANALYTICS_TABLE,
-                    USER_POOL_ID=$USER_POOL_ID,
-                    USER_POOL_CLIENT_ID=$USER_POOL_CLIENT_ID
-                }" \
-                --region "$REGION" > /dev/null
-
-            break
-        elif [ "$state" = "Failed" ] || [ "$last_update_status" = "Failed" ]; then
-            print_error "Function $function_name deployment failed"
+        if [ "$last_update_status" = "Successful" ]; then
+            print_status "Code update completed successfully"
             
-            # Get the failure reason
-            local state_reason=$(aws lambda get-function \
-                --function-name "$function_name" \
-                --region "$REGION" \
-                --query 'Configuration.StateReason' \
-                --output text 2>/dev/null || echo "Unknown")
-            
-            print_error "Failure reason: $state_reason"
+            # Update alias to point to the new $LATEST version
+            if update_alias_after_deployment "$function_name" "LIVE"; then
+                print_status "Successfully redeployed $function_name and updated LIVE alias"
+                return 0
+            else
+                print_warning "Code updated but failed to update LIVE alias for $function_name"
+                return 1
+            fi
+        elif [ "$last_update_status" = "Failed" ]; then
+            print_error "Code update failed for $function_name"
             return 1
         else
             attempt=$((attempt + 1))
-            if [ $attempt -eq 1 ]; then
-                print_warning "VPC Lambda deployment detected - this may take 5-10 minutes for ENI creation"
-            fi
-            
-            # Progressive status updates
-            if [ $((attempt % 6)) -eq 0 ]; then  # Every minute
-                local elapsed=$((attempt * wait_time / 60))
-                print_info "Still waiting... (${elapsed} minutes elapsed, state: $state, status: $last_update_status)"
-            fi
-            
-            sleep $wait_time
+            sleep 2
         fi
+    done
+    
+    if [ $attempt -eq $max_attempts ]; then
+        print_warning "Timeout waiting for code update to complete for $function_name"
+        return 1
+    fi
+
     done
     
     if [ $attempt -eq $max_attempts ]; then
@@ -363,129 +243,412 @@ deploy_lambda_function() {
     print_status "Successfully deployed $function_name"
 }
 
-# Check if this is the first VPC Lambda deployment
-check_vpc_lambda_readiness() {
-    print_info "Checking VPC readiness for Lambda deployments..."
+# Deploy a single function in parallel (simplified for redeployment)
+redeploy_function_parallel() {
+    local function_name=$1
+    local log_file="/tmp/redeploy_${function_name}.log"
     
-    # Check if there are existing Lambda functions in the VPC
-    local existing_vpc_functions=$(aws lambda list-functions \
-        --region "$REGION" \
-        --query "Functions[?VpcConfig.SubnetIds && contains(VpcConfig.SubnetIds, '$PRIVATE_SUBNET_1_ID')].FunctionName" \
-        --output text 2>/dev/null || echo "")
-    
-    if [ -z "$existing_vpc_functions" ]; then
-        print_warning "No existing VPC Lambda functions detected"
-        print_warning "First VPC Lambda deployment may take 5-10 minutes for ENI creation"
-        print_info "AWS needs to create Elastic Network Interfaces (ENIs) for VPC connectivity"
+    {
+        echo "=== Starting redeployment of $function_name at $(date) ===" 
         
-        # Auto-continue for first VPC deployment
-        echo ""
-        print_info "Continuing with first VPC Lambda deployment..."
-        print_info "This will take 5-10 minutes for ENI creation - please be patient"
-        echo ""
-    else
-        print_status "Existing VPC Lambda functions found - ENIs should already be available"
-    fi
+        if redeploy_lambda_function "$function_name"; then
+            echo "✅ Successfully redeployed $function_name and updated LIVE alias"
+            echo "SUCCESS:$function_name" > "/tmp/result_${function_name}.status"
+        else
+            echo "❌ Failed to redeploy $function_name"
+            echo "FAILED:$function_name" > "/tmp/result_${function_name}.status"
+        fi
+        
+        echo "=== Completed redeployment of $function_name at $(date) ==="
+    } > "$log_file" 2>&1
+                echo "⚠️ Failed to create alias or configure provisioned concurrency for $function_name"
+                echo "PARTIAL:$function_name" > "/tmp/result_${function_name}.status"
+            fi
+        else
+            echo "❌ Failed to deploy $function_name"
+            echo "FAILED:$function_name" > "/tmp/result_${function_name}.status"
+        fi
+        
+        echo "=== Completed deployment of $function_name at $(date) ==="
+    } > "$log_file" 2>&1
 }
 
-# Main deployment function
-deploy_all_lambda_functions() {
-    # Deploy all Lambda functions from manifest
-    print_info "Starting Lambda function deployment..."
+# Monitor parallel deployment progress with timeout
+monitor_parallel_deployments() {
+    local functions=("$@")
+    local total_functions=${#functions[@]}
+    local completed=0
+    local last_status_time=$(date +%s)
+    local start_time=$(date +%s)
+    local timeout_seconds=1800  # 30 minutes timeout for all deployments
+    
+    print_info "Monitoring deployment progress for $total_functions functions (timeout: ${timeout_seconds}s)..."
+    
+    while [ $completed -lt $total_functions ]; do
+        local current_completed=0
+        local current_time=$(date +%s)
+        local elapsed_time=$((current_time - start_time))
+        
+        # Check for timeout
+        if [ $elapsed_time -gt $timeout_seconds ]; then
+            print_error "Deployment timeout reached (${timeout_seconds}s). Some deployments may still be in progress."
+            
+            # Show which functions are still incomplete
+            local incomplete=()
+            for function_name in "${functions[@]}"; do
+                if [ ! -f "/tmp/result_${function_name}.status" ]; then
+                    incomplete+=("$function_name")
+                fi
+            done
+            
+            if [ ${#incomplete[@]} -gt 0 ]; then
+                print_warning "Functions that did not complete: ${incomplete[*]}"
+                print_info "You can check their status in the AWS Console or re-run the script"
+            fi
+            
+            return 1
+        fi
+        
+        # Count completed deployments
+        for function_name in "${functions[@]}"; do
+            if [ -f "/tmp/result_${function_name}.status" ]; then
+                current_completed=$((current_completed + 1))
+            fi
+        done
+        
+        # Update progress if changed or every 30 seconds
+        if [ $current_completed -ne $completed ] || [ $((current_time - last_status_time)) -ge 30 ]; then
+            completed=$current_completed
+            last_status_time=$current_time
+            
+            local remaining=$((total_functions - completed))
+            local elapsed_minutes=$((elapsed_time / 60))
+            print_info "Progress: $completed/$total_functions functions completed ($remaining remaining, ${elapsed_minutes}m elapsed)"
+            
+            # Show which functions are still in progress
+            if [ $remaining -gt 0 ]; then
+                local in_progress=()
+                for function_name in "${functions[@]}"; do
+                    if [ ! -f "/tmp/result_${function_name}.status" ]; then
+                        in_progress+=("$function_name")
+                    fi
+                done
+                
+                if [ ${#in_progress[@]} -le 5 ]; then
+                    print_info "Still deploying: ${in_progress[*]}"
+                else
+                    print_info "Still deploying: ${in_progress[0]}, ${in_progress[1]}, ${in_progress[2]} and $((${#in_progress[@]} - 3)) others"
+                fi
+            fi
+        fi
+        
+        sleep 5
+    done
+    
+    local total_elapsed=$(($(date +%s) - start_time))
+    local total_minutes=$((total_elapsed / 60))
+    local total_seconds=$((total_elapsed % 60))
+    print_status "All parallel deployments completed in ${total_minutes}m ${total_seconds}s!"
+    return 0
+}
 
-    # Check if this is an update deployment (functions already exist from CloudFormation)
-    existing_functions=$(aws lambda list-functions \
-        --region "$REGION" \
-        --query "Functions[?starts_with(FunctionName, '${PROJECT_NAME}-${ENVIRONMENT}-')].FunctionName" \
-        --output text 2>/dev/null || echo "")
-
-    if [ -n "$existing_functions" ]; then
-        print_status "Detected existing Lambda functions from CloudFormation"
-        print_info "Running in UPDATE mode - updating existing functions with application code"
-        print_info "This should be much faster since ENIs are already created"
-    else
-        print_info "Running in CREATE mode - creating new functions"
-        # Check VPC readiness
-        check_vpc_lambda_readiness
-    fi
-
+# Main redeployment function with parallel execution
+redeploy_all_lambda_functions() {
+    local start_time=$(date +%s)
+    
+    print_info "Starting parallel Lambda function redeployment..."
+    print_info "This script assumes functions already exist with LIVE aliases and provisioned capacity"
+    
     # Read function list from manifest
-    functions=$(jq -r '.functions[]' packages/deployment-manifest.json)
+    functions=($(jq -r '.functions[]' packages/deployment-manifest.json))
+    
+    print_info "Found ${#functions[@]} functions to redeploy in parallel"
+    
+    # Verify all functions exist before starting
+    print_info "Verifying existing functions..."
+    missing_functions=()
+    for function_name in "${functions[@]}"; do
+        if ! aws lambda get-function --function-name "$function_name" --region "$REGION" > /dev/null 2>&1; then
+            missing_functions+=("$function_name")
+        fi
+    done
+    
+    if [ ${#missing_functions[@]} -gt 0 ]; then
+        print_error "The following functions do not exist and need to be created via CloudFormation first:"
+        for func in "${missing_functions[@]}"; do
+            echo "  ❌ $func"
+        done
+        print_error "Please deploy the CloudFormation template first to create the functions with aliases and provisioned capacity"
+        exit 1
+    fi
+    
+    print_status "All functions exist - proceeding with redeployment"
+    
+    # Clean up any previous deployment artifacts
+    rm -f /tmp/redeploy_*.log /tmp/result_*.status
 
-    # Deploy functions with error handling
+    # Set up signal handler for cleanup
+    cleanup_parallel_redeployment() {
+        print_warning "Redeployment interrupted. Cleaning up background processes..."
+        for pid in "${pids[@]}"; do
+            if kill -0 "$pid" 2>/dev/null; then
+                print_info "Terminating redeployment process $pid..."
+                kill -TERM "$pid" 2>/dev/null || true
+            fi
+        done
+        
+        # Wait a moment for graceful termination
+        sleep 2
+        
+        # Force kill any remaining processes
+        for pid in "${pids[@]}"; do
+            if kill -0 "$pid" 2>/dev/null; then
+                print_warning "Force killing process $pid..."
+                kill -KILL "$pid" 2>/dev/null || true
+            fi
+        done
+        
+        # Clean up temporary files
+        rm -f /tmp/redeploy_*.log /tmp/result_*.status
+        
+        print_error "Redeployment interrupted and cleaned up"
+        exit 1
+    }
+    
+    trap cleanup_parallel_redeployment INT TERM
+    
+    # Start parallel redeployments
+    print_info "Starting parallel redeployment of all functions..."
+    pids=()
+    
+    for function_name in "${functions[@]}"; do
+        print_info "Starting redeployment of $function_name in background..."
+        redeploy_function_parallel "$function_name" &
+        pids+=($!)
+    done
+    
+    print_status "All ${#functions[@]} redeployments started in parallel (PIDs: ${pids[*]})"
+    print_info "Press Ctrl+C to interrupt and clean up all redeployments"
+    # Wait for all background processes to complete
+    print_info "Waiting for all redeployment processes to finish..."
+    for pid in "${pids[@]}"; do
+        wait $pid
+    done
+    
+    # Collect results
     failed_functions=()
     successful_functions=()
-
-    for function_name in $functions; do
-        if deploy_lambda_function "$function_name"; then
-            successful_functions+=("$function_name")
+    
+    for function_name in "${functions[@]}"; do
+        if [ -f "/tmp/result_${function_name}.status" ]; then
+            local status=$(cat "/tmp/result_${function_name}.status")
+            case "$status" in
+                "SUCCESS:$function_name")
+                    successful_functions+=("$function_name")
+                    ;;
+                "FAILED:$function_name")
+                    failed_functions+=("$function_name")
+                    ;;
+            esac
         else
             failed_functions+=("$function_name")
-            print_error "Failed to deploy $function_name"
         fi
     done
 
-    # Report deployment results
+    # Report redeployment results
     echo ""
+    print_status "=== PARALLEL REDEPLOYMENT RESULTS ==="
+    
     if [ ${#successful_functions[@]} -gt 0 ]; then
-        print_status "Successfully deployed ${#successful_functions[@]} functions:"
+        print_status "Successfully redeployed ${#successful_functions[@]} functions:"
         for func in "${successful_functions[@]}"; do
             echo "  ✅ $func"
         done
     fi
 
     if [ ${#failed_functions[@]} -gt 0 ]; then
-        print_error "Failed to deploy ${#failed_functions[@]} functions:"
+        print_error "Failed to redeploy ${#failed_functions[@]} functions:"
         for func in "${failed_functions[@]}"; do
             echo "  ❌ $func"
         done
-        echo ""
-        print_warning "Some functions failed to deploy. Common solutions:"
-        echo "1. Wait 5-10 minutes and re-run the script (VPC ENI creation)"
-        echo "2. Check AWS Console for detailed error messages"
-        echo "3. Verify VPC configuration and security groups"
-        echo "4. Ensure Lambda execution role has proper permissions"
-        echo ""
         
-        read -p "Do you want to retry failed deployments? (y/N): " -n 1 -r
         echo ""
-        if [[ $REPLY =~ ^[Yy]$ ]]; then
-            print_info "Retrying failed deployments..."
-            for function_name in "${failed_functions[@]}"; do
-                print_info "Retrying deployment of $function_name..."
-                if deploy_lambda_function "$function_name"; then
-                    print_status "Successfully deployed $function_name on retry"
-                else
-                    print_error "Failed to deploy $function_name even on retry"
-                fi
-            done
-        fi
+        print_info "=== REDEPLOYMENT LOGS FOR FAILED FUNCTIONS ==="
+        for func in "${failed_functions[@]}"; do
+            if [ -f "/tmp/redeploy_${func}.log" ]; then
+                echo ""
+                print_error "Log for $func:"
+                echo "----------------------------------------"
+                cat "/tmp/redeploy_${func}.log"
+                echo "----------------------------------------"
+            fi
+        done
+        
+        echo ""
+        print_warning "Some functions failed to redeploy. You can:"
+        echo "1. Check the logs above for specific error details"
+        echo "2. Verify the function packages exist in the packages/ directory"
+        echo "3. Check AWS Console for function status"
+        echo "4. Re-run this script to retry failed redeployments"
+        echo ""
     fi
+
+    # Remove signal handler
+    trap - INT TERM
+    
+    # Clean up temporary files
+    rm -f /tmp/redeploy_*.log /tmp/result_*.status
 
     if [ ${#failed_functions[@]} -eq 0 ]; then
-        print_status "All Lambda functions deployed successfully!"
+        print_status "All Lambda functions redeployed successfully!"
+        print_info "LIVE aliases have been updated to point to the new code versions"
     else
-        print_warning "Deployment completed with some failures"
-        print_info "You can re-run this script to retry failed deployments"
+        print_warning "Redeployment completed with some failures"
+        print_info "You can re-run this script to retry failed redeployments"
     fi
 
-    # Display deployment summary
+    # Calculate and display deployment time
+    local end_time=$(date +%s)
+    local total_time=$((end_time - start_time))
+    local minutes=$((total_time / 60))
+    local seconds=$((total_time % 60))
+    
+    # Display redeployment summary
     echo ""
-    echo -e "${GREEN}🎉 Lambda Functions Deployment Complete!${NC}"
-    echo "=================================================="
+    echo -e "${GREEN}🎉 Lambda Functions Redeployment Complete!${NC}"
+    echo "================================================="
+    echo "Total redeployment time: ${minutes}m ${seconds}s"
+    echo "Functions redeployed in parallel: ${#functions[@]}"
     echo ""
-    echo "Deployed Functions:"
-    for function_name in $functions; do
-        echo "- $function_name"
+    echo "Redeployed Functions (LIVE aliases updated):"
+    
+    # Display function information
+    for function_name in "${successful_functions[@]}"; do
+        # Get function version that the LIVE alias points to
+        local version=$(aws lambda get-alias \
+            --function-name "$function_name" \
+            --name "LIVE" \
+            --region "$REGION" \
+            --query 'FunctionVersion' \
+            --output text 2>/dev/null || echo "N/A")
+        
+        if [ "$version" != "N/A" ]; then
+            echo "- $function_name ✅ (LIVE alias -> version: $version)"
+        else
+            echo "- $function_name ⚠️  (LIVE alias not found)"
+        fi
     done
     echo ""
-    echo "Next Steps:"
-    echo "1. Run ./setup-api-gateway.sh to configure API Gateway integrations and CORS"
-    echo "2. Test the API endpoints"
-    echo "3. Deploy the frontend application"
-    echo "4. Seed the databases with sample data"
+}
+
+# Main execution
+redeploy_all_lambda_functions
+
+print_status "Lambda function redeployment completed!"
+print_info "All LIVE aliases have been updated to point to the new code versions"
+print_info "Existing provisioned capacity configurations have been p
+        --function-name "$function_name" \
+        --name "$alias_name" \
+        --region "$REGION" \
+        --query 'AliasArn' \
+        --output text 2>/dev/null || echo ""
+}
+
+# Function to create deployment report with alias information
+create_deployment_report() {
+    local timestamp=$(date +"%Y%m%d-%H%M%S")
+    local report_file="deployment-report-${timestamp}.json"
+    
+    print_info "Creating deployment report: $report_file"
+    
+    # Start JSON structure
+    cat > "$report_file" << EOF
+{
+  "deployment": {
+    "timestamp": "$(date -u +"%Y-%m-%dT%H:%M:%SZ")",
+    "project": "$PROJECT_NAME",
+    "environment": "$ENVIRONMENT",
+    "region": "$REGION"
+  },
+  "functions": [
+EOF
+
+    # Add function details
+    local first=true
+    for function_name in $(jq -r '.functions[]' packages/deployment-manifest.json); do
+        if [ "$first" = false ]; then
+            echo "," >> "$report_file"
+        fi
+        first=false
+        
+        # Get function ARN
+        local function_arn=$(aws lambda get-function \
+            --function-name "$function_name" \
+            --region "$REGION" \
+            --query 'Configuration.FunctionArn' \
+            --output text 2>/dev/null || echo "")
+        
+        # Get alias ARN
+        local alias_arn=$(get_lambda_arn_with_alias "$function_name" "LIVE")
+        
+        # Get provisioned concurrency status
+        local pc_status="N/A"
+        local pc_allocated="0"
+        local pc_available="0"
+        
+        if [ -n "$alias_arn" ]; then
+            local pc_info=$(aws lambda get-provisioned-concurrency-config \
+                --function-name "$function_name" \
+                --qualifier "LIVE" \
+                --region "$REGION" \
+                --query '[Status, AllocatedConcurrentExecutions, AvailableConcurrentExecutions]' \
+                --output text 2>/dev/null || echo "N/A 0 0")
+            
+            pc_status=$(echo "$pc_info" | cut -f1)
+            pc_allocated=$(echo "$pc_info" | cut -f2)
+            pc_available=$(echo "$pc_info" | cut -f3)
+        fi
+        
+        cat >> "$report_file" << EOF
+    {
+      "name": "$function_name",
+      "functionArn": "$function_arn",
+      "aliasArn": "$alias_arn",
+      "alias": "LIVE",
+      "provisionedConcurrency": {
+        "status": "$pc_status",
+        "allocated": $pc_allocated,
+        "available": $pc_available
+      }
+    }
+EOF
+    done
+    
+    # Close JSON structure
+    cat >> "$report_file" << EOF
+  ]
+}
+EOF
+
+    print_status "Deployment report created: $report_file"
+    
+    # Display key ARNs for API Gateway configuration
+    echo ""
+    print_info "Lambda ARNs with LIVE aliases for API Gateway configuration:"
+    echo "============================================================="
+    for function_name in $(jq -r '.functions[]' packages/deployment-manifest.json); do
+        local alias_arn=$(get_lambda_arn_with_alias "$function_name" "LIVE")
+        if [ -n "$alias_arn" ]; then
+            echo "$function_name: $alias_arn"
+        else
+            echo "$function_name: ❌ Alias not found"
+        fi
+    done
     echo ""
 }
 
 # Main execution
 deploy_all_lambda_functions
+
+# Create deployment report
+create_deployment_report

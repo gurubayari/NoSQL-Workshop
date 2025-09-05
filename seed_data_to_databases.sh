@@ -5,11 +5,6 @@
 
 set -e
 
-# Configuration
-PROJECT_NAME="unicorn-ecommerce"
-ENVIRONMENT="dev"
-REGION="us-east-1"
-
 # Colors for output
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -33,9 +28,47 @@ print_warning() {
     echo -e "${YELLOW}⚠️  $1${NC}"
 }
 
+usage() {
+    echo "Usage: $0 <PROJECT_NAME> <ENVIRONMENT> <REGION> <SECRET_ARN> <DOCDB_ENDPOINT> <ELASTICACHE_ENDPOINT>"
+    echo ""
+    echo "Parameters:"
+    echo "  PROJECT_NAME        - Project name (e.g., unicorn-ecommerce)"
+    echo "  ENVIRONMENT         - Environment (e.g., dev, staging, prod)"
+    echo "  REGION              - AWS region (e.g., us-east-1)"
+    echo "  SECRET_ARN          - ARN of the database credentials secret"
+    echo "  DOCDB_ENDPOINT      - DocumentDB cluster endpoint"
+    echo "  ELASTICACHE_ENDPOINT - ElastiCache cluster endpoint"
+    echo ""
+    echo "Example:"
+    echo "  $0 unicorn-ecommerce dev us-east-1 arn:aws:secretsmanager:us-east-1:123456789012:secret:unicorn-ecommerce-dev-database-credentials-AbCdEf docdb-cluster.cluster-xyz.us-east-1.docdb.amazonaws.com cache-cluster.xyz.cache.amazonaws.com"
+    exit 1
+}
+
+# Check if correct number of arguments provided
+if [ $# -ne 6 ]; then
+    print_error "Invalid number of arguments. Expected 6, got $#"
+    usage
+fi
+
+# Parse input parameters
+PROJECT_NAME="${1:-unicorn-ecommerce}"
+ENVIRONMENT="${2:-dev}"
+REGION="${3:-${AWS_DEFAULT_REGION:-us-east-1}}"
+SECRET_ARN="$4"
+DOCDB_ENDPOINT="$5"
+ELASTICACHE_ENDPOINT="$6"
+
 echo "🦄 Unicorn E-Commerce Database Seeding Script"
 echo "=============================================="
 echo "Started at: $(date)"
+echo ""
+echo "Configuration:"
+echo "  Project Name: $PROJECT_NAME"
+echo "  Environment: $ENVIRONMENT"
+echo "  Region: $REGION"
+echo "  Secret ARN: $SECRET_ARN"
+echo "  DocumentDB Endpoint: $DOCDB_ENDPOINT"
+echo "  ElastiCache Endpoint: $ELASTICACHE_ENDPOINT"
 echo ""
 
 # Check if data files exist
@@ -56,14 +89,23 @@ done
 print_status "Required data files found"
 
 
-# Extract values from inputs
-SECRET_ARN=$1
-DOCDB_ENDPOINT=$2
-ELASTICACHE_ENDPOINT=$3
+# Validate parameters
+if [[ ! "$REGION" =~ ^[a-z0-9-]+$ ]]; then
+    print_error "Invalid region format: $REGION"
+    exit 1
+fi
 
-print_info "DocumentDB Secret ARN: $SECRET_ARN"
-print_info "DocumentDB Endpoint: $DOCDB_ENDPOINT"
-print_info "ElastiCache Name: $ELASTICACHE_ENDPOINT"
+if [[ ! "$ENVIRONMENT" =~ ^[a-z0-9-]+$ ]]; then
+    print_error "Invalid environment format: $ENVIRONMENT"
+    exit 1
+fi
+
+if [[ ! "$PROJECT_NAME" =~ ^[a-z0-9-]+$ ]]; then
+    print_error "Invalid project name format: $PROJECT_NAME"
+    exit 1
+fi
+
+print_info "Parameters validated successfully"
 
 # Get DocumentDB credentials from Secrets Manager
 print_info "Retrieving DocumentDB credentials from Secrets Manager..."
@@ -74,16 +116,20 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-# Parse credentials
-DOCDB_USERNAME=$(echo "$SECRET_JSON" | python3 -c "import sys, json; print(json.load(sys.stdin)['username'])")
-DOCDB_PASSWORD=$(echo "$SECRET_JSON" | python3 -c "import sys, json; print(json.load(sys.stdin)['password'])")
+# Parse credentials (updated for new secret structure)
+DOCDB_USERNAME=$(echo "$SECRET_JSON" | python3 -c "import sys, json; print(json.load(sys.stdin)['docdb_username'])")
+DOCDB_PASSWORD=$(echo "$SECRET_JSON" | python3 -c "import sys, json; print(json.load(sys.stdin)['shared_password'])")
+ELASTICACHE_USERNAME=$(echo "$SECRET_JSON" | python3 -c "import sys, json; print(json.load(sys.stdin)['elasticache_username'])")
+ELASTICACHE_PASSWORD=$(echo "$SECRET_JSON" | python3 -c "import sys, json; print(json.load(sys.stdin)['shared_password'])")
 
-print_status "DocumentDB credentials retrieved successfully"
+print_status "Database credentials retrieved successfully"
+print_info "DocumentDB Username: $DOCDB_USERNAME"
+print_info "ElastiCache Username: $ELASTICACHE_USERNAME"
 
 # Download SSL certificate if not present
-if [ ! -f "global-bundle.pem" ]; then
+if [ ! -f "./../global-bundle.pem" ]; then
     print_info "Downloading DocumentDB SSL certificate..."
-    curl -o global-bundle.pem https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem
+    curl -o ./../global-bundle.pem https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem
     
     if [ $? -ne 0 ]; then
         print_warning "Failed to download SSL certificate, proceeding without it"
@@ -97,10 +143,12 @@ export DOCUMENTDB_HOST="$DOCDB_ENDPOINT"
 export DOCUMENTDB_PORT="27017"
 export DOCUMENTDB_USERNAME="$DOCDB_USERNAME"
 export DOCUMENTDB_PASSWORD="$DOCDB_PASSWORD"
-export DOCUMENTDB_DATABASE="unicorn_ecommerce_dev"
-export DOCUMENTDB_SSL_CA_CERTS="./global-bundle.pem"
+export DOCUMENTDB_DATABASE="${PROJECT_NAME}-${ENVIRONMENT}_dev"
+export DOCUMENTDB_SSL_CA_CERTS="./../global-bundle.pem"
 export ELASTICACHE_HOST="$ELASTICACHE_ENDPOINT"
 export ELASTICACHE_PORT="6379"
+export ELASTICACHE_USERNAME="$ELASTICACHE_USERNAME"
+export ELASTICACHE_AUTH_TOKEN="$ELASTICACHE_PASSWORD"
 export AWS_REGION="$REGION"
 export PROJECT_NAME="$PROJECT_NAME"
 export ENVIRONMENT="$ENVIRONMENT"
@@ -114,9 +162,14 @@ export CHAT_HISTORY_TABLE="${PROJECT_NAME}-${ENVIRONMENT}-chat-history"
 export SEARCH_ANALYTICS_TABLE="${PROJECT_NAME}-${ENVIRONMENT}-search-analytics"
 
 print_info "Environment variables configured:"
+echo "  Project: $PROJECT_NAME"
+echo "  Environment: $ENVIRONMENT"
+echo "  Region: $REGION"
 echo "  DocumentDB Host: $DOCUMENTDB_HOST"
 echo "  DocumentDB Database: $DOCUMENTDB_DATABASE"
+echo "  DocumentDB Username: $DOCDB_USERNAME"
 echo "  ElastiCache Host: $ELASTICACHE_HOST"
+echo "  ElastiCache Username: $ELASTICACHE_USERNAME"
 echo "  Users Table: $USERS_TABLE"
 echo "  Inventory Table: $INVENTORY_TABLE"
 echo ""

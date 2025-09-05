@@ -5,17 +5,44 @@
 
 set -e
 
-# Check if required parameters are provided
-if [ $# -lt 2 ]; then
-    echo "Usage: $0 <API_GATEWAY_ID> <USER_POOL_ID> [ENVIRONMENT]"
-    echo "Example: $0 abc123def456 us-west-2_ABC123DEF dev"
+# Configuration - Accept command line arguments with defaults
+PROJECT_NAME="${1:-unicorn-ecommerce}"
+ENVIRONMENT="${2:-dev}"
+REGION="${3:-${AWS_DEFAULT_REGION:-us-east-1}}"
+
+# Check for help flag
+if [[ "$1" == "--help" ]] || [[ "$1" == "-h" ]]; then
+    echo "Usage: $0 [PROJECT_NAME] [ENVIRONMENT] [REGION]"
+    echo ""
+    echo "Arguments:"
+    echo "  PROJECT_NAME  Project name (default: 'unicorn-ecommerce')"
+    echo "  ENVIRONMENT   Environment name (default: 'dev')"
+    echo "  REGION        AWS region (default: \$AWS_DEFAULT_REGION or 'us-east-1')"
+    echo ""
+    echo "Examples:"
+    echo "  $0                              # Uses defaults: unicorn-ecommerce, dev, us-east-1"
+    echo "  $0 my-project                   # Uses my-project, dev, default region"
+    echo "  $0 my-project staging           # Uses my-project, staging, default region"
+    echo "  $0 my-project prod us-west-2    # Uses my-project, prod, us-west-2"
+    echo ""
+    exit 0
+fi
+
+# Derive API Gateway and User Pool IDs from project and environment
+API_GATEWAY_ID=$(aws apigateway get-rest-apis --query "items[?name=='${PROJECT_NAME}-${ENVIRONMENT}-api'].id" --output text --region "$REGION")
+USER_POOL_ID=$(aws cognito-idp list-user-pools --max-items 60 --query "UserPools[?Name=='${PROJECT_NAME}-${ENVIRONMENT}-users'].Id" --output text --region "$REGION")
+
+if [ -z "$API_GATEWAY_ID" ] || [ "$API_GATEWAY_ID" = "None" ]; then
+    echo "❌ Error: API Gateway not found for ${PROJECT_NAME}-${ENVIRONMENT}-api in region $REGION"
     exit 1
 fi
 
-API_GATEWAY_ID=$1
-USER_POOL_ID=$2
-ENVIRONMENT=${3:-dev}
-AWS_REGION=${AWS_DEFAULT_REGION:-$(aws configure get region)}
+if [ -z "$USER_POOL_ID" ] || [ "$USER_POOL_ID" = "None" ]; then
+    echo "❌ Error: User Pool not found for ${PROJECT_NAME}-${ENVIRONMENT}-users in region $REGION"
+    exit 1
+fi
+
+AWS_REGION="$REGION"
 AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
 
 echo "Setting up API Gateway resources and methods..."
@@ -165,12 +192,31 @@ create_options_method() {
     echo "Processed OPTIONS method for $resource_name"
 }
 
-# Get Lambda function ARNs
+# Get Lambda function ARNs with LIVE alias for provisioned concurrency
 get_lambda_arn() {
     local function_name=$1
-    aws lambda get-function --function-name "unicorn-ecommerce-$ENVIRONMENT-$function_name" --query 'Configuration.FunctionArn' --output text
+    local full_function_name="$PROJECT_NAME-$ENVIRONMENT-$function_name"
+    
+    # Try to get the LIVE alias ARN first (for provisioned concurrency)
+    local alias_arn=$(aws lambda get-alias \
+        --function-name "$full_function_name" \
+        --name "LIVE" \
+        --query 'AliasArn' \
+        --output text 2>/dev/null)
+    
+    if [ $? -eq 0 ] && [ "$alias_arn" != "None" ] && [ -n "$alias_arn" ]; then
+        echo "$alias_arn"
+    else
+        # Fallback to base function ARN if alias doesn't exist
+        echo "⚠️  Warning: LIVE alias not found for $full_function_name, using base function ARN" >&2
+        aws lambda get-function \
+            --function-name "$full_function_name" \
+            --query 'Configuration.FunctionArn' \
+            --output text
+    fi
 }
 
+echo "Retrieving Lambda function ARNs with LIVE aliases..."
 AUTH_LAMBDA_ARN=$(get_lambda_arn "AuthApi")
 PRODUCT_LAMBDA_ARN=$(get_lambda_arn "ProductApi")
 CART_LAMBDA_ARN=$(get_lambda_arn "CartApi")
@@ -180,7 +226,73 @@ SEARCH_LAMBDA_ARN=$(get_lambda_arn "SearchApi")
 CHAT_LAMBDA_ARN=$(get_lambda_arn "ChatApi")
 ANALYTICS_LAMBDA_ARN=$(get_lambda_arn "AnalyticsApi")
 
-echo "Lambda ARNs retrieved successfully"
+# Verify Lambda aliases and provisioned concurrency
+verify_lambda_aliases() {
+    echo "Verifying Lambda aliases and provisioned concurrency..."
+    echo "======================================================"
+    
+    local functions=("AuthApi" "ProductApi" "CartApi" "OrderApi" "ReviewApi" "SearchApi" "ChatApi" "AnalyticsApi")
+    local aliases_found=0
+    local provisioned_found=0
+    
+    for func in "${functions[@]}"; do
+        local full_function_name="$PROJECT_NAME-$ENVIRONMENT-$func"
+        
+        # Check if LIVE alias exists
+        local alias_check=$(aws lambda get-alias \
+            --function-name "$full_function_name" \
+            --name "LIVE" \
+            --query 'Name' \
+            --output text 2>/dev/null)
+        
+        if [ $? -eq 0 ] && [ "$alias_check" = "LIVE" ]; then
+            aliases_found=$((aliases_found + 1))
+            echo "✅ $func: LIVE alias found"
+            
+            # Check provisioned concurrency
+            local pc_status=$(aws lambda get-provisioned-concurrency-config \
+                --function-name "$full_function_name" \
+                --qualifier "LIVE" \
+                --query 'Status' \
+                --output text 2>/dev/null)
+            
+            if [ $? -eq 0 ] && [ "$pc_status" = "READY" ]; then
+                provisioned_found=$((provisioned_found + 1))
+                local allocated=$(aws lambda get-provisioned-concurrency-config \
+                    --function-name "$full_function_name" \
+                    --qualifier "LIVE" \
+                    --query 'AllocatedConcurrentExecutions' \
+                    --output text 2>/dev/null)
+                echo "  ✅ Provisioned concurrency: $allocated executions (Status: $pc_status)"
+            else
+                echo "  ⚠️  No provisioned concurrency configured"
+            fi
+        else
+            echo "❌ $func: LIVE alias not found - using base function ARN"
+        fi
+    done
+    
+    echo ""
+    echo "Summary: $aliases_found/${#functions[@]} functions have LIVE aliases, $provisioned_found/${#functions[@]} have provisioned concurrency"
+    
+    if [ $aliases_found -lt ${#functions[@]} ]; then
+        echo ""
+        echo "⚠️  Warning: Some functions don't have LIVE aliases."
+        echo "   Run ./deploy-lambda-functions.sh to create aliases and provisioned concurrency."
+        echo "   API Gateway will use base function ARNs for functions without aliases."
+    fi
+    
+    if [ $provisioned_found -lt ${#functions[@]} ]; then
+        echo ""
+        echo "ℹ️  Info: Functions without provisioned concurrency may experience cold starts."
+    fi
+    
+    echo ""
+}
+
+verify_lambda_aliases
+
+echo "Lambda ARNs retrieved successfully (using LIVE aliases where available)"
 
 # Create or get existing Cognito Authorizer
 echo "Creating or getting Cognito Authorizer..."
@@ -207,29 +319,23 @@ else
     echo "Created new Cognito Authorizer ID: $COGNITO_AUTHORIZER_ID"
 fi
 
-# Create main API resources
+# Create main API resources (only those used by frontend)
 echo "Creating main API resources..."
 
 # Products resources
 create_resource $ROOT_RESOURCE_ID "products" "PRODUCTS_RESOURCE_ID"
 create_resource $PRODUCTS_RESOURCE_ID "{id}" "PRODUCTS_ID_RESOURCE_ID"
 create_resource $PRODUCTS_ID_RESOURCE_ID "reviews" "PRODUCTS_ID_REVIEWS_RESOURCE_ID"
-create_resource $PRODUCTS_RESOURCE_ID "categories" "PRODUCTS_CATEGORIES_RESOURCE_ID"
-create_resource $PRODUCTS_RESOURCE_ID "featured" "PRODUCTS_FEATURED_RESOURCE_ID"
 
 # Cart resources
 create_resource $ROOT_RESOURCE_ID "cart" "CART_RESOURCE_ID"
-create_resource $CART_RESOURCE_ID "{userId}" "CART_USER_ID_RESOURCE_ID"
-create_resource $CART_USER_ID_RESOURCE_ID "items" "CART_USER_ID_ITEMS_RESOURCE_ID"
-create_resource $CART_USER_ID_ITEMS_RESOURCE_ID "{itemId}" "CART_USER_ID_ITEMS_ITEM_ID_RESOURCE_ID"
-create_resource $CART_USER_ID_RESOURCE_ID "clear" "CART_USER_ID_CLEAR_RESOURCE_ID"
+create_resource $CART_RESOURCE_ID "items" "CART_ITEMS_RESOURCE_ID"
+create_resource $CART_ITEMS_RESOURCE_ID "{itemId}" "CART_ITEMS_ITEM_ID_RESOURCE_ID"
+create_resource $CART_RESOURCE_ID "clear" "CART_CLEAR_RESOURCE_ID"
 
 # Orders resources
 create_resource $ROOT_RESOURCE_ID "orders" "ORDERS_RESOURCE_ID"
 create_resource $ORDERS_RESOURCE_ID "{orderId}" "ORDERS_ORDER_ID_RESOURCE_ID"
-create_resource $ORDERS_ORDER_ID_RESOURCE_ID "cancel" "ORDERS_ORDER_ID_CANCEL_RESOURCE_ID"
-create_resource $ORDERS_RESOURCE_ID "user" "ORDERS_USER_RESOURCE_ID"
-create_resource $ORDERS_USER_RESOURCE_ID "{userId}" "ORDERS_USER_USER_ID_RESOURCE_ID"
 
 # Auth resources
 create_resource $ROOT_RESOURCE_ID "auth" "AUTH_RESOURCE_ID"
@@ -245,36 +351,30 @@ create_resource $AUTH_RESOURCE_ID "reset-password" "AUTH_RESET_PASSWORD_RESOURCE
 create_resource $ROOT_RESOURCE_ID "reviews" "REVIEWS_RESOURCE_ID"
 create_resource $REVIEWS_RESOURCE_ID "{reviewId}" "REVIEWS_REVIEW_ID_RESOURCE_ID"
 create_resource $REVIEWS_REVIEW_ID_RESOURCE_ID "helpful" "REVIEWS_REVIEW_ID_HELPFUL_RESOURCE_ID"
-create_resource $REVIEWS_RESOURCE_ID "product" "REVIEWS_PRODUCT_RESOURCE_ID"
-create_resource $REVIEWS_PRODUCT_RESOURCE_ID "{productId}" "REVIEWS_PRODUCT_PRODUCT_ID_RESOURCE_ID"
 
 # Search resources
 create_resource $ROOT_RESOURCE_ID "search" "SEARCH_RESOURCE_ID"
 create_resource $SEARCH_RESOURCE_ID "products" "SEARCH_PRODUCTS_RESOURCE_ID"
 create_resource $SEARCH_RESOURCE_ID "suggestions" "SEARCH_SUGGESTIONS_RESOURCE_ID"
-create_resource $SEARCH_RESOURCE_ID "autocomplete" "SEARCH_AUTOCOMPLETE_RESOURCE_ID"
-create_resource $SEARCH_RESOURCE_ID "filters" "SEARCH_FILTERS_RESOURCE_ID"
 
 # Chat resources
 create_resource $ROOT_RESOURCE_ID "chat" "CHAT_RESOURCE_ID"
-create_resource $CHAT_RESOURCE_ID "sessions" "CHAT_SESSIONS_RESOURCE_ID"
-create_resource $CHAT_SESSIONS_RESOURCE_ID "{sessionId}" "CHAT_SESSIONS_SESSION_ID_RESOURCE_ID"
-create_resource $CHAT_SESSIONS_SESSION_ID_RESOURCE_ID "messages" "CHAT_SESSIONS_SESSION_ID_MESSAGES_RESOURCE_ID"
+create_resource $CHAT_RESOURCE_ID "message" "CHAT_MESSAGE_RESOURCE_ID"
+create_resource $CHAT_RESOURCE_ID "history" "CHAT_HISTORY_RESOURCE_ID"
 
 # Analytics resources
 create_resource $ROOT_RESOURCE_ID "analytics" "ANALYTICS_RESOURCE_ID"
-create_resource $ANALYTICS_RESOURCE_ID "events" "ANALYTICS_EVENTS_RESOURCE_ID"
 create_resource $ANALYTICS_RESOURCE_ID "dashboard" "ANALYTICS_DASHBOARD_RESOURCE_ID"
-create_resource $ANALYTICS_RESOURCE_ID "reports" "ANALYTICS_REPORTS_RESOURCE_ID"
+create_resource $ANALYTICS_RESOURCE_ID "reviews" "ANALYTICS_REVIEWS_RESOURCE_ID"
+create_resource $ANALYTICS_REVIEWS_RESOURCE_ID "insights" "ANALYTICS_REVIEWS_INSIGHTS_RESOURCE_ID"
+create_resource $ANALYTICS_REVIEWS_INSIGHTS_RESOURCE_ID "{id}" "ANALYTICS_REVIEWS_INSIGHTS_ID_RESOURCE_ID"
+create_resource $ANALYTICS_RESOURCE_ID "products" "ANALYTICS_PRODUCTS_RESOURCE_ID"
+create_resource $ANALYTICS_PRODUCTS_RESOURCE_ID "recommendations" "ANALYTICS_PRODUCTS_RECOMMENDATIONS_RESOURCE_ID"
 
 echo "All resources created successfully!"
 
-# Create methods
+# Create methods (only those used by frontend)
 echo "Creating API methods..."
-
-# Auth base resource methods
-create_method $AUTH_RESOURCE_ID "GET" "NONE" "" $AUTH_LAMBDA_ARN "AuthGET"
-create_method $AUTH_RESOURCE_ID "POST" "NONE" "" $AUTH_LAMBDA_ARN "AuthPOST"
 
 # Auth methods (no authorization required)
 create_method $AUTH_REGISTER_RESOURCE_ID "POST" "NONE" "" $AUTH_LAMBDA_ARN "AuthRegisterPOST"
@@ -288,89 +388,47 @@ create_method $AUTH_PROFILE_RESOURCE_ID "GET" "COGNITO_USER_POOLS" $COGNITO_AUTH
 create_method $AUTH_PROFILE_RESOURCE_ID "PUT" "COGNITO_USER_POOLS" $COGNITO_AUTHORIZER_ID $AUTH_LAMBDA_ARN "AuthProfilePUT"
 create_method $AUTH_LOGOUT_RESOURCE_ID "POST" "COGNITO_USER_POOLS" $COGNITO_AUTHORIZER_ID $AUTH_LAMBDA_ARN "AuthLogoutPOST"
 
-# Product methods (no authorization required)
-# Base products resource - GET for listing products, POST for creating products
+# Product methods
 create_method $PRODUCTS_RESOURCE_ID "GET" "NONE" "" $PRODUCT_LAMBDA_ARN "ProductsGET"
-create_method $PRODUCTS_RESOURCE_ID "POST" "COGNITO_USER_POOLS" $COGNITO_AUTHORIZER_ID $PRODUCT_LAMBDA_ARN "ProductsPOST"
-
-# Individual product methods
 create_method $PRODUCTS_ID_RESOURCE_ID "GET" "NONE" "" $PRODUCT_LAMBDA_ARN "ProductsIdGET"
-create_method $PRODUCTS_CATEGORIES_RESOURCE_ID "GET" "NONE" "" $PRODUCT_LAMBDA_ARN "ProductsCategoriesGET"
-create_method $PRODUCTS_FEATURED_RESOURCE_ID "GET" "NONE" "" $PRODUCT_LAMBDA_ARN "ProductsFeaturedGET"
-create_method $PRODUCTS_ID_REVIEWS_RESOURCE_ID "GET" "NONE" "" $PRODUCT_LAMBDA_ARN "ProductsIdReviewsGET"
-
-# Cart base resource methods
-create_method $CART_RESOURCE_ID "GET" "COGNITO_USER_POOLS" $COGNITO_AUTHORIZER_ID $CART_LAMBDA_ARN "CartGET"
-create_method $CART_RESOURCE_ID "POST" "COGNITO_USER_POOLS" $COGNITO_AUTHORIZER_ID $CART_LAMBDA_ARN "CartPOST"
+create_method $PRODUCTS_ID_REVIEWS_RESOURCE_ID "GET" "NONE" "" $REVIEW_LAMBDA_ARN "ProductsIdReviewsGET"
 
 # Cart methods (Cognito authorization required)
-create_method $CART_USER_ID_RESOURCE_ID "GET" "COGNITO_USER_POOLS" $COGNITO_AUTHORIZER_ID $CART_LAMBDA_ARN "CartUserIdGET"
-create_method $CART_USER_ID_ITEMS_RESOURCE_ID "POST" "COGNITO_USER_POOLS" $COGNITO_AUTHORIZER_ID $CART_LAMBDA_ARN "CartUserIdItemsPOST"
-create_method $CART_USER_ID_ITEMS_ITEM_ID_RESOURCE_ID "GET" "COGNITO_USER_POOLS" $COGNITO_AUTHORIZER_ID $CART_LAMBDA_ARN "CartUserIdItemsItemIdGET"
-create_method $CART_USER_ID_ITEMS_ITEM_ID_RESOURCE_ID "PUT" "COGNITO_USER_POOLS" $COGNITO_AUTHORIZER_ID $CART_LAMBDA_ARN "CartUserIdItemsItemIdPUT"
-create_method $CART_USER_ID_ITEMS_ITEM_ID_RESOURCE_ID "DELETE" "COGNITO_USER_POOLS" $COGNITO_AUTHORIZER_ID $CART_LAMBDA_ARN "CartUserIdItemsItemIdDELETE"
-create_method $CART_USER_ID_CLEAR_RESOURCE_ID "DELETE" "COGNITO_USER_POOLS" $COGNITO_AUTHORIZER_ID $CART_LAMBDA_ARN "CartUserIdClearDELETE"
+create_method $CART_RESOURCE_ID "GET" "COGNITO_USER_POOLS" $COGNITO_AUTHORIZER_ID $CART_LAMBDA_ARN "CartGET"
+create_method $CART_ITEMS_RESOURCE_ID "POST" "COGNITO_USER_POOLS" $COGNITO_AUTHORIZER_ID $CART_LAMBDA_ARN "CartItemsPOST"
+create_method $CART_ITEMS_ITEM_ID_RESOURCE_ID "PUT" "COGNITO_USER_POOLS" $COGNITO_AUTHORIZER_ID $CART_LAMBDA_ARN "CartItemsItemIdPUT"
+create_method $CART_ITEMS_ITEM_ID_RESOURCE_ID "DELETE" "COGNITO_USER_POOLS" $COGNITO_AUTHORIZER_ID $CART_LAMBDA_ARN "CartItemsItemIdDELETE"
+create_method $CART_CLEAR_RESOURCE_ID "DELETE" "COGNITO_USER_POOLS" $COGNITO_AUTHORIZER_ID $CART_LAMBDA_ARN "CartClearDELETE"
 
 # Order methods (Cognito authorization required)
-# Base orders resource - GET for listing orders, POST for creating orders
 create_method $ORDERS_RESOURCE_ID "GET" "COGNITO_USER_POOLS" $COGNITO_AUTHORIZER_ID $ORDER_LAMBDA_ARN "OrdersGET"
 create_method $ORDERS_RESOURCE_ID "POST" "COGNITO_USER_POOLS" $COGNITO_AUTHORIZER_ID $ORDER_LAMBDA_ARN "OrdersPOST"
-
-# Individual order methods
 create_method $ORDERS_ORDER_ID_RESOURCE_ID "GET" "COGNITO_USER_POOLS" $COGNITO_AUTHORIZER_ID $ORDER_LAMBDA_ARN "OrdersOrderIdGET"
-create_method $ORDERS_ORDER_ID_RESOURCE_ID "PUT" "COGNITO_USER_POOLS" $COGNITO_AUTHORIZER_ID $ORDER_LAMBDA_ARN "OrdersOrderIdPUT"
-create_method $ORDERS_ORDER_ID_CANCEL_RESOURCE_ID "POST" "COGNITO_USER_POOLS" $COGNITO_AUTHORIZER_ID $ORDER_LAMBDA_ARN "OrdersOrderIdCancelPOST"
-create_method $ORDERS_USER_USER_ID_RESOURCE_ID "GET" "COGNITO_USER_POOLS" $COGNITO_AUTHORIZER_ID $ORDER_LAMBDA_ARN "OrdersUserUserIdGET"
 
-# Review methods (mixed authorization)
-create_method $REVIEWS_RESOURCE_ID "GET" "NONE" "" $REVIEW_LAMBDA_ARN "ReviewsGET"
+# Review methods
 create_method $REVIEWS_RESOURCE_ID "POST" "COGNITO_USER_POOLS" $COGNITO_AUTHORIZER_ID $REVIEW_LAMBDA_ARN "ReviewsPOST"
-create_method $REVIEWS_REVIEW_ID_RESOURCE_ID "GET" "NONE" "" $REVIEW_LAMBDA_ARN "ReviewsReviewIdGET"
 create_method $REVIEWS_REVIEW_ID_HELPFUL_RESOURCE_ID "POST" "COGNITO_USER_POOLS" $COGNITO_AUTHORIZER_ID $REVIEW_LAMBDA_ARN "ReviewsReviewIdHelpfulPOST"
-create_method $REVIEWS_PRODUCT_PRODUCT_ID_RESOURCE_ID "GET" "NONE" "" $REVIEW_LAMBDA_ARN "ReviewsProductProductIdGET"
-
-# Search base resource methods
-create_method $SEARCH_RESOURCE_ID "GET" "NONE" "" $SEARCH_LAMBDA_ARN "SearchGET"
-create_method $SEARCH_RESOURCE_ID "POST" "NONE" "" $SEARCH_LAMBDA_ARN "SearchPOST"
 
 # Search methods (no authorization required)
 create_method $SEARCH_PRODUCTS_RESOURCE_ID "GET" "NONE" "" $SEARCH_LAMBDA_ARN "SearchProductsGET"
 create_method $SEARCH_PRODUCTS_RESOURCE_ID "POST" "NONE" "" $SEARCH_LAMBDA_ARN "SearchProductsPOST"
 create_method $SEARCH_SUGGESTIONS_RESOURCE_ID "GET" "NONE" "" $SEARCH_LAMBDA_ARN "SearchSuggestionsGET"
-create_method $SEARCH_AUTOCOMPLETE_RESOURCE_ID "GET" "NONE" "" $SEARCH_LAMBDA_ARN "SearchAutocompleteGET"
-create_method $SEARCH_FILTERS_RESOURCE_ID "GET" "NONE" "" $SEARCH_LAMBDA_ARN "SearchFiltersGET"
 
-# Analytics base resource methods
-create_method $ANALYTICS_RESOURCE_ID "GET" "NONE" "" $ANALYTICS_LAMBDA_ARN "AnalyticsGET"
-create_method $ANALYTICS_RESOURCE_ID "POST" "NONE" "" $ANALYTICS_LAMBDA_ARN "AnalyticsPOST"
-
-# Analytics methods (no authorization required)
-create_method $ANALYTICS_EVENTS_RESOURCE_ID "POST" "NONE" "" $ANALYTICS_LAMBDA_ARN "AnalyticsEventsPOST"
-create_method $ANALYTICS_DASHBOARD_RESOURCE_ID "GET" "NONE" "" $ANALYTICS_LAMBDA_ARN "AnalyticsDashboardGET"
-create_method $ANALYTICS_REPORTS_RESOURCE_ID "GET" "NONE" "" $ANALYTICS_LAMBDA_ARN "AnalyticsReportsGET"
-
-# Chat base resource methods
-create_method $CHAT_RESOURCE_ID "GET" "COGNITO_USER_POOLS" $COGNITO_AUTHORIZER_ID $CHAT_LAMBDA_ARN "ChatGET"
-create_method $CHAT_RESOURCE_ID "POST" "COGNITO_USER_POOLS" $COGNITO_AUTHORIZER_ID $CHAT_LAMBDA_ARN "ChatPOST"
+# Analytics methods
+create_method $ANALYTICS_DASHBOARD_RESOURCE_ID "GET" "COGNITO_USER_POOLS" $COGNITO_AUTHORIZER_ID $ANALYTICS_LAMBDA_ARN "AnalyticsDashboardGET"
+create_method $ANALYTICS_REVIEWS_INSIGHTS_ID_RESOURCE_ID "GET" "NONE" "" $ANALYTICS_LAMBDA_ARN "AnalyticsReviewsInsightsIdGET"
+create_method $ANALYTICS_PRODUCTS_RECOMMENDATIONS_RESOURCE_ID "GET" "COGNITO_USER_POOLS" $COGNITO_AUTHORIZER_ID $ANALYTICS_LAMBDA_ARN "AnalyticsProductsRecommendationsGET"
 
 # Chat methods (Cognito authorization required)
-create_method $CHAT_SESSIONS_RESOURCE_ID "GET" "COGNITO_USER_POOLS" $COGNITO_AUTHORIZER_ID $CHAT_LAMBDA_ARN "ChatSessionsGET"
-create_method $CHAT_SESSIONS_RESOURCE_ID "POST" "COGNITO_USER_POOLS" $COGNITO_AUTHORIZER_ID $CHAT_LAMBDA_ARN "ChatSessionsPOST"
-create_method $CHAT_SESSIONS_SESSION_ID_RESOURCE_ID "GET" "COGNITO_USER_POOLS" $COGNITO_AUTHORIZER_ID $CHAT_LAMBDA_ARN "ChatSessionsSessionIdGET"
-create_method $CHAT_SESSIONS_SESSION_ID_RESOURCE_ID "DELETE" "COGNITO_USER_POOLS" $COGNITO_AUTHORIZER_ID $CHAT_LAMBDA_ARN "ChatSessionsSessionIdDELETE"
-create_method $CHAT_SESSIONS_SESSION_ID_MESSAGES_RESOURCE_ID "GET" "COGNITO_USER_POOLS" $COGNITO_AUTHORIZER_ID $CHAT_LAMBDA_ARN "ChatSessionsSessionIdMessagesGET"
-create_method $CHAT_SESSIONS_SESSION_ID_MESSAGES_RESOURCE_ID "POST" "COGNITO_USER_POOLS" $COGNITO_AUTHORIZER_ID $CHAT_LAMBDA_ARN "ChatSessionsSessionIdMessagesPOST"
+create_method $CHAT_MESSAGE_RESOURCE_ID "POST" "COGNITO_USER_POOLS" $COGNITO_AUTHORIZER_ID $CHAT_LAMBDA_ARN "ChatMessagePOST"
+create_method $CHAT_HISTORY_RESOURCE_ID "GET" "COGNITO_USER_POOLS" $COGNITO_AUTHORIZER_ID $CHAT_LAMBDA_ARN "ChatHistoryGET"
 
 echo "All methods created successfully!"
 
-# Create OPTIONS methods for CORS support
+# Create OPTIONS methods for CORS support (only for used resources)
 echo "Creating OPTIONS methods for CORS support..."
 
-# Root resource OPTIONS
-create_options_method $ROOT_RESOURCE_ID "Root" "GET,OPTIONS"
-
 # Auth resources OPTIONS
-create_options_method $AUTH_RESOURCE_ID "Auth" "GET,POST,OPTIONS"
 create_options_method $AUTH_REGISTER_RESOURCE_ID "AuthRegister" "POST,OPTIONS"
 create_options_method $AUTH_LOGIN_RESOURCE_ID "AuthLogin" "POST,OPTIONS"
 create_options_method $AUTH_LOGOUT_RESOURCE_ID "AuthLogout" "POST,OPTIONS"
@@ -380,51 +438,36 @@ create_options_method $AUTH_VERIFY_RESOURCE_ID "AuthVerify" "GET,OPTIONS"
 create_options_method $AUTH_RESET_PASSWORD_RESOURCE_ID "AuthResetPassword" "POST,OPTIONS"
 
 # Products resources OPTIONS
-create_options_method $PRODUCTS_RESOURCE_ID "Products" "GET,POST,OPTIONS"
+create_options_method $PRODUCTS_RESOURCE_ID "Products" "GET,OPTIONS"
 create_options_method $PRODUCTS_ID_RESOURCE_ID "ProductsId" "GET,OPTIONS"
 create_options_method $PRODUCTS_ID_REVIEWS_RESOURCE_ID "ProductsIdReviews" "GET,OPTIONS"
-create_options_method $PRODUCTS_CATEGORIES_RESOURCE_ID "ProductsCategories" "GET,OPTIONS"
-create_options_method $PRODUCTS_FEATURED_RESOURCE_ID "ProductsFeatured" "GET,OPTIONS"
 
 # Cart resources OPTIONS
-create_options_method $CART_RESOURCE_ID "Cart" "GET,POST,OPTIONS"
-create_options_method $CART_USER_ID_RESOURCE_ID "CartUserId" "GET,OPTIONS"
-create_options_method $CART_USER_ID_ITEMS_RESOURCE_ID "CartUserIdItems" "POST,OPTIONS"
-create_options_method $CART_USER_ID_ITEMS_ITEM_ID_RESOURCE_ID "CartUserIdItemsItemId" "GET,PUT,DELETE,OPTIONS"
-create_options_method $CART_USER_ID_CLEAR_RESOURCE_ID "CartUserIdClear" "DELETE,OPTIONS"
+create_options_method $CART_RESOURCE_ID "Cart" "GET,OPTIONS"
+create_options_method $CART_ITEMS_RESOURCE_ID "CartItems" "POST,OPTIONS"
+create_options_method $CART_ITEMS_ITEM_ID_RESOURCE_ID "CartItemsItemId" "PUT,DELETE,OPTIONS"
+create_options_method $CART_CLEAR_RESOURCE_ID "CartClear" "DELETE,OPTIONS"
 
 # Orders resources OPTIONS
 create_options_method $ORDERS_RESOURCE_ID "Orders" "GET,POST,OPTIONS"
-create_options_method $ORDERS_ORDER_ID_RESOURCE_ID "OrdersOrderId" "GET,PUT,OPTIONS"
-create_options_method $ORDERS_ORDER_ID_CANCEL_RESOURCE_ID "OrdersOrderIdCancel" "POST,OPTIONS"
-create_options_method $ORDERS_USER_RESOURCE_ID "OrdersUser" "OPTIONS"
-create_options_method $ORDERS_USER_USER_ID_RESOURCE_ID "OrdersUserUserId" "GET,OPTIONS"
+create_options_method $ORDERS_ORDER_ID_RESOURCE_ID "OrdersOrderId" "GET,OPTIONS"
 
 # Reviews resources OPTIONS
-create_options_method $REVIEWS_RESOURCE_ID "Reviews" "GET,POST,OPTIONS"
-create_options_method $REVIEWS_REVIEW_ID_RESOURCE_ID "ReviewsReviewId" "GET,OPTIONS"
+create_options_method $REVIEWS_RESOURCE_ID "Reviews" "POST,OPTIONS"
 create_options_method $REVIEWS_REVIEW_ID_HELPFUL_RESOURCE_ID "ReviewsReviewIdHelpful" "POST,OPTIONS"
-create_options_method $REVIEWS_PRODUCT_RESOURCE_ID "ReviewsProduct" "OPTIONS"
-create_options_method $REVIEWS_PRODUCT_PRODUCT_ID_RESOURCE_ID "ReviewsProductProductId" "GET,OPTIONS"
 
 # Search resources OPTIONS
-create_options_method $SEARCH_RESOURCE_ID "Search" "GET,POST,OPTIONS"
 create_options_method $SEARCH_PRODUCTS_RESOURCE_ID "SearchProducts" "GET,POST,OPTIONS"
 create_options_method $SEARCH_SUGGESTIONS_RESOURCE_ID "SearchSuggestions" "GET,OPTIONS"
-create_options_method $SEARCH_AUTOCOMPLETE_RESOURCE_ID "SearchAutocomplete" "GET,OPTIONS"
-create_options_method $SEARCH_FILTERS_RESOURCE_ID "SearchFilters" "GET,OPTIONS"
 
 # Chat resources OPTIONS
-create_options_method $CHAT_RESOURCE_ID "Chat" "GET,POST,OPTIONS"
-create_options_method $CHAT_SESSIONS_RESOURCE_ID "ChatSessions" "GET,POST,OPTIONS"
-create_options_method $CHAT_SESSIONS_SESSION_ID_RESOURCE_ID "ChatSessionsSessionId" "GET,DELETE,OPTIONS"
-create_options_method $CHAT_SESSIONS_SESSION_ID_MESSAGES_RESOURCE_ID "ChatSessionsSessionIdMessages" "GET,POST,OPTIONS"
+create_options_method $CHAT_MESSAGE_RESOURCE_ID "ChatMessage" "POST,OPTIONS"
+create_options_method $CHAT_HISTORY_RESOURCE_ID "ChatHistory" "GET,OPTIONS"
 
 # Analytics resources OPTIONS
-create_options_method $ANALYTICS_RESOURCE_ID "Analytics" "GET,POST,OPTIONS"
-create_options_method $ANALYTICS_EVENTS_RESOURCE_ID "AnalyticsEvents" "POST,OPTIONS"
 create_options_method $ANALYTICS_DASHBOARD_RESOURCE_ID "AnalyticsDashboard" "GET,OPTIONS"
-create_options_method $ANALYTICS_REPORTS_RESOURCE_ID "AnalyticsReports" "GET,OPTIONS"
+create_options_method $ANALYTICS_REVIEWS_INSIGHTS_ID_RESOURCE_ID "AnalyticsReviewsInsightsId" "GET,OPTIONS"
+create_options_method $ANALYTICS_PRODUCTS_RECOMMENDATIONS_RESOURCE_ID "AnalyticsProductsRecommendations" "GET,OPTIONS"
 
 echo "All OPTIONS methods for CORS created successfully!"
 
@@ -470,7 +513,7 @@ add_lambda_permission() {
     local statement_id=$2
     
     aws lambda add-permission \
-        --function-name "unicorn-ecommerce-$ENVIRONMENT-$function_name" \
+        --function-name "$PROJECT_NAME-$ENVIRONMENT-$function_name" \
         --statement-id "$statement_id" \
         --action lambda:InvokeFunction \
         --principal apigateway.amazonaws.com \
@@ -512,7 +555,7 @@ echo "Cognito Authorizer ID: $COGNITO_AUTHORIZER_ID"
 echo "Deployment ID: $DEPLOYMENT_ID"
 echo "=========================================="
 
-# Save configuration to file
+# Save configuration to file with Lambda ARN details
 cat > api-gateway-config.json << EOF
 {
   "apiGatewayId": "$API_GATEWAY_ID",
@@ -521,11 +564,46 @@ cat > api-gateway-config.json << EOF
   "deploymentId": "$DEPLOYMENT_ID",
   "environment": "$ENVIRONMENT",
   "region": "$AWS_REGION",
-  "userPoolId": "$USER_POOL_ID"
+  "userPoolId": "$USER_POOL_ID",
+  "lambdaArns": {
+    "authApi": "$AUTH_LAMBDA_ARN",
+    "productApi": "$PRODUCT_LAMBDA_ARN",
+    "cartApi": "$CART_LAMBDA_ARN",
+    "orderApi": "$ORDER_LAMBDA_ARN",
+    "reviewApi": "$REVIEW_LAMBDA_ARN",
+    "searchApi": "$SEARCH_LAMBDA_ARN",
+    "chatApi": "$CHAT_LAMBDA_ARN",
+    "analyticsApi": "$ANALYTICS_LAMBDA_ARN"
+  }
 }
 EOF
 
 echo "Configuration saved to api-gateway-config.json"
+
+# Create Lambda integration summary
+cat > lambda-integration-summary.txt << EOF
+Lambda Integration Summary
+==========================
+
+API Gateway is configured to use the following Lambda integrations:
+
+Auth API: $AUTH_LAMBDA_ARN
+Product API: $PRODUCT_LAMBDA_ARN
+Cart API: $CART_LAMBDA_ARN
+Order API: $ORDER_LAMBDA_ARN
+Review API: $REVIEW_LAMBDA_ARN
+Search API: $SEARCH_LAMBDA_ARN
+Chat API: $CHAT_LAMBDA_ARN
+Analytics API: $ANALYTICS_LAMBDA_ARN
+
+Performance Notes:
+- ARNs ending with ':LIVE' use provisioned concurrency (no cold starts)
+- ARNs without ':LIVE' may experience cold starts
+- Run ./deploy-lambda-functions.sh to create LIVE aliases with provisioned concurrency
+
+Integration Type: AWS_PROXY
+All integrations use POST method to Lambda (AWS_PROXY requirement)
+EOF
 
 # Create CORS configuration summary
 cat > cors-config-summary.txt << EOF
@@ -546,12 +624,12 @@ Headers Allowed:
 Methods Configured per Resource:
 - Auth endpoints: POST (register, login, logout, refresh), GET (verify), GET/PUT (profile)
 - Product endpoints: GET (all product-related endpoints)
-- Cart endpoints: GET (cart), POST (add items), GET/PUT/DELETE (manage items)
-- Order endpoints: GET (view orders), PUT (update), POST (cancel)
-- Review endpoints: GET (view), POST (create, mark helpful)
+- Cart endpoints: GET (/cart), POST (/cart/items), PUT/DELETE (/cart/items/{itemId}), DELETE (/cart/clear)
+- Order endpoints: GET (/orders/user), POST (/orders), GET/PUT (/orders/{orderId})
+- Review endpoints: GET (view), POST (create, mark helpful), GET (/reviews/user for user reviews)
 - Search endpoints: GET/POST (search products), GET (suggestions, autocomplete, filters)
-- Chat endpoints: POST (create session), GET/DELETE (manage sessions), GET/POST (messages)
-- Analytics endpoints: POST (events), GET (dashboard, reports)
+- Chat endpoints: POST (/chat/message), GET (/chat/history), GET/POST (sessions and messages)
+- Analytics endpoints: POST (events), GET (dashboard - requires auth, reports), GET (recommendations - requires auth)
 
 Origin: * (all origins allowed)
 Credentials: true
@@ -566,5 +644,14 @@ echo "CORS Configuration Summary:"
 echo "=========================================="
 cat cors-config-summary.txt
 echo "=========================================="
+echo ""
+echo "Lambda Integration Summary:"
+echo "=========================="
+cat lambda-integration-summary.txt
+echo ""
+echo "=========================================="
 echo "Setup completed successfully!"
-echo "CORS summary saved to cors-config-summary.txt"
+echo "Configuration files created:"
+echo "- api-gateway-config.json (API Gateway configuration)"
+echo "- cors-config-summary.txt (CORS configuration details)"
+echo "- lambda-integration-summary.txt (Lambda integration details)"
