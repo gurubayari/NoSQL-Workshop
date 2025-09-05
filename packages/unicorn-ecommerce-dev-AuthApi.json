@@ -1,0 +1,9 @@
+{
+    "function_name": "unicorn-ecommerce-dev-AuthApi",
+    "function_file": "auth_api.py",
+    "description": "Authentication API for Unicorn E-Commerce",
+    "timeout": 30,
+    "memory": 256,
+    "zip_file": "packages/unicorn-ecommerce-dev-AuthApi.zip",
+    "created_at": "2025-09-05T19:12:59Z"
+}
