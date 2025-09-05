@@ -1,9 +1,0 @@
-{
-    "function_name": "unicorn-ecommerce-dev-cart-api",
-    "function_file": "cart_api.py",
-    "description": "Shopping Cart API for Unicorn E-Commerce",
-    "timeout": 30,
-    "memory": 256,
-    "zip_file": "packages/unicorn-ecommerce-dev-cart-api.zip",
-    "created_at": "2025-09-01T07:22:37Z"
-}
