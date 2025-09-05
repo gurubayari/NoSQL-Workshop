@@ -23,8 +23,8 @@ echo "Project: $PROJECT_NAME"
 echo "Environment: $ENVIRONMENT"
 echo "Region: $REGION"
 echo ""
-echo "This script assumes Lambda functions already exist with LIVE aliases and provisioned capacity."
-echo "It will only update the function code and update the LIVE alias to point to the new version."
+echo "This script assumes Lambda functions already exist."
+echo "It will only update the function code to the \$LATEST version."
 echo ""
 
 # Check for help flag
@@ -44,12 +44,10 @@ if [[ "$1" == "--help" ]] || [[ "$1" == "-h" ]]; then
     echo ""
     echo "This script will:"
     echo "  1. Update existing Lambda function code from packages"
-    echo "  2. Update LIVE aliases to point to the new version"
-    echo "  3. Preserve existing provisioned capacity configuration"
+    echo "  2. Deploy to \$LATEST version (no aliases used)"
     echo ""
     echo "Prerequisites:"
     echo "  - Lambda functions must already exist (created via CloudFormation)"
-    echo "  - LIVE aliases must already exist with provisioned capacity"
     echo "  - packages/ directory must contain the Lambda zip files"
     echo ""
     echo "The script will automatically detect existing functions and update them."
@@ -117,34 +115,35 @@ if [ ! -f "packages/deployment-manifest.json" ]; then
     exit 1
 fi
 
-# Update existing alias to point to latest version after code update
-update_alias_after_deployment() {
+# Wait for function update to complete
+wait_for_function_update() {
     local function_name=$1
-    local alias_name=${2:-"LIVE"}
     
-    print_info "Updating alias $alias_name to point to latest version of $function_name..."
+    print_info "Waiting for function update to complete..."
+    local max_attempts=30
+    local attempt=0
     
-    # Check if alias exists
-    if aws lambda get-alias --function-name "$function_name" --name "$alias_name" --region "$REGION" > /dev/null 2>&1; then
-        # Update alias to point to $LATEST
-        aws lambda update-alias \
+    while [ $attempt -lt $max_attempts ]; do
+        local last_update_status=$(aws lambda get-function \
             --function-name "$function_name" \
-            --name "$alias_name" \
-            --function-version '$LATEST' \
-            --description "Updated to latest version - $(date)" \
-            --region "$REGION" > /dev/null
+            --region "$REGION" \
+            --query 'Configuration.LastUpdateStatus' \
+            --output text 2>/dev/null || echo "InProgress")
         
-        if [ $? -eq 0 ]; then
-            print_status "Successfully updated alias $alias_name to point to latest version"
+        if [ "$last_update_status" = "Successful" ]; then
+            print_status "Function update completed successfully"
             return 0
-        else
-            print_error "Failed to update alias $alias_name"
+        elif [ "$last_update_status" = "Failed" ]; then
+            print_error "Function update failed"
             return 1
+        else
+            attempt=$((attempt + 1))
+            sleep 2
         fi
-    else
-        print_warning "Alias $alias_name does not exist for $function_name"
-        return 1
-    fi
+    done
+    
+    print_warning "Timeout waiting for function update to complete"
+    return 1
 }
 
 # Redeploy Lambda function code to existing function
@@ -180,40 +179,12 @@ redeploy_lambda_function() {
         return 1
     fi
     
-    # Wait for update to complete before updating alias
-    print_info "Waiting for code update to complete..."
-    local max_attempts=30
-    local attempt=0
-    
-    while [ $attempt -lt $max_attempts ]; do
-        local last_update_status=$(aws lambda get-function \
-            --function-name "$function_name" \
-            --region "$REGION" \
-            --query 'Configuration.LastUpdateStatus' \
-            --output text 2>/dev/null || echo "InProgress")
-        
-        if [ "$last_update_status" = "Successful" ]; then
-            print_status "Code update completed successfully"
-            
-            # Update alias to point to the new $LATEST version
-            if update_alias_after_deployment "$function_name" "LIVE"; then
-                print_status "Successfully redeployed $function_name and updated LIVE alias"
-                return 0
-            else
-                print_warning "Code updated but failed to update LIVE alias for $function_name"
-                return 1
-            fi
-        elif [ "$last_update_status" = "Failed" ]; then
-            print_error "Code update failed for $function_name"
-            return 1
-        else
-            attempt=$((attempt + 1))
-            sleep 2
-        fi
-    done
-    
-    if [ $attempt -eq $max_attempts ]; then
-        print_warning "Timeout waiting for code update to complete for $function_name"
+    # Wait for update to complete
+    if wait_for_function_update "$function_name"; then
+        print_status "Successfully redeployed $function_name to \$LATEST"
+        return 0
+    else
+        print_error "Failed to redeploy $function_name"
         return 1
     fi
 
@@ -252,7 +223,7 @@ redeploy_function_parallel() {
         echo "=== Starting redeployment of $function_name at $(date) ===" 
         
         if redeploy_lambda_function "$function_name"; then
-            echo "✅ Successfully redeployed $function_name and updated LIVE alias"
+            echo "✅ Successfully redeployed $function_name to \$LATEST"
             echo "SUCCESS:$function_name" > "/tmp/result_${function_name}.status"
         else
             echo "❌ Failed to redeploy $function_name"
@@ -260,16 +231,6 @@ redeploy_function_parallel() {
         fi
         
         echo "=== Completed redeployment of $function_name at $(date) ==="
-    } > "$log_file" 2>&1
-                echo "⚠️ Failed to create alias or configure provisioned concurrency for $function_name"
-                echo "PARTIAL:$function_name" > "/tmp/result_${function_name}.status"
-            fi
-        else
-            echo "❌ Failed to deploy $function_name"
-            echo "FAILED:$function_name" > "/tmp/result_${function_name}.status"
-        fi
-        
-        echo "=== Completed deployment of $function_name at $(date) ==="
     } > "$log_file" 2>&1
 }
 
@@ -357,7 +318,7 @@ redeploy_all_lambda_functions() {
     local start_time=$(date +%s)
     
     print_info "Starting parallel Lambda function redeployment..."
-    print_info "This script assumes functions already exist with LIVE aliases and provisioned capacity"
+    print_info "This script assumes functions already exist and will deploy to \$LATEST"
     
     # Read function list from manifest
     functions=($(jq -r '.functions[]' packages/deployment-manifest.json))
@@ -378,7 +339,7 @@ redeploy_all_lambda_functions() {
         for func in "${missing_functions[@]}"; do
             echo "  ❌ $func"
         done
-        print_error "Please deploy the CloudFormation template first to create the functions with aliases and provisioned capacity"
+        print_error "Please deploy the CloudFormation template first to create the functions"
         exit 1
     fi
     
@@ -501,7 +462,7 @@ redeploy_all_lambda_functions() {
 
     if [ ${#failed_functions[@]} -eq 0 ]; then
         print_status "All Lambda functions redeployed successfully!"
-        print_info "LIVE aliases have been updated to point to the new code versions"
+        print_info "All functions have been updated to \$LATEST version"
     else
         print_warning "Redeployment completed with some failures"
         print_info "You can re-run this script to retry failed redeployments"
@@ -520,23 +481,11 @@ redeploy_all_lambda_functions() {
     echo "Total redeployment time: ${minutes}m ${seconds}s"
     echo "Functions redeployed in parallel: ${#functions[@]}"
     echo ""
-    echo "Redeployed Functions (LIVE aliases updated):"
+    echo "Redeployed Functions (\$LATEST version):"
     
     # Display function information
     for function_name in "${successful_functions[@]}"; do
-        # Get function version that the LIVE alias points to
-        local version=$(aws lambda get-alias \
-            --function-name "$function_name" \
-            --name "LIVE" \
-            --region "$REGION" \
-            --query 'FunctionVersion' \
-            --output text 2>/dev/null || echo "N/A")
-        
-        if [ "$version" != "N/A" ]; then
-            echo "- $function_name ✅ (LIVE alias -> version: $version)"
-        else
-            echo "- $function_name ⚠️  (LIVE alias not found)"
-        fi
+        echo "- $function_name ✅ (\$LATEST version)"
     done
     echo ""
 }
@@ -545,16 +494,9 @@ redeploy_all_lambda_functions() {
 redeploy_all_lambda_functions
 
 print_status "Lambda function redeployment completed!"
-print_info "All LIVE aliases have been updated to point to the new code versions"
-print_info "Existing provisioned capacity configurations have been p
-        --function-name "$function_name" \
-        --name "$alias_name" \
-        --region "$REGION" \
-        --query 'AliasArn' \
-        --output text 2>/dev/null || echo ""
-}
+print_info "All functions have been updated to \$LATEST version"
 
-# Function to create deployment report with alias information
+# Function to create deployment report
 create_deployment_report() {
     local timestamp=$(date +"%Y%m%d-%H%M%S")
     local report_file="deployment-report-${timestamp}.json"
@@ -588,38 +530,11 @@ EOF
             --query 'Configuration.FunctionArn' \
             --output text 2>/dev/null || echo "")
         
-        # Get alias ARN
-        local alias_arn=$(get_lambda_arn_with_alias "$function_name" "LIVE")
-        
-        # Get provisioned concurrency status
-        local pc_status="N/A"
-        local pc_allocated="0"
-        local pc_available="0"
-        
-        if [ -n "$alias_arn" ]; then
-            local pc_info=$(aws lambda get-provisioned-concurrency-config \
-                --function-name "$function_name" \
-                --qualifier "LIVE" \
-                --region "$REGION" \
-                --query '[Status, AllocatedConcurrentExecutions, AvailableConcurrentExecutions]' \
-                --output text 2>/dev/null || echo "N/A 0 0")
-            
-            pc_status=$(echo "$pc_info" | cut -f1)
-            pc_allocated=$(echo "$pc_info" | cut -f2)
-            pc_available=$(echo "$pc_info" | cut -f3)
-        fi
-        
         cat >> "$report_file" << EOF
     {
       "name": "$function_name",
       "functionArn": "$function_arn",
-      "aliasArn": "$alias_arn",
-      "alias": "LIVE",
-      "provisionedConcurrency": {
-        "status": "$pc_status",
-        "allocated": $pc_allocated,
-        "available": $pc_available
-      }
+      "version": "\$LATEST"
     }
 EOF
     done
@@ -634,21 +549,26 @@ EOF
     
     # Display key ARNs for API Gateway configuration
     echo ""
-    print_info "Lambda ARNs with LIVE aliases for API Gateway configuration:"
-    echo "============================================================="
+    print_info "Lambda ARNs (\$LATEST) for API Gateway configuration:"
+    echo "===================================================="
     for function_name in $(jq -r '.functions[]' packages/deployment-manifest.json); do
-        local alias_arn=$(get_lambda_arn_with_alias "$function_name" "LIVE")
-        if [ -n "$alias_arn" ]; then
-            echo "$function_name: $alias_arn"
+        local function_arn=$(aws lambda get-function \
+            --function-name "$function_name" \
+            --region "$REGION" \
+            --query 'Configuration.FunctionArn' \
+            --output text 2>/dev/null || echo "")
+        
+        if [ -n "$function_arn" ]; then
+            echo "$function_name: $function_arn"
         else
-            echo "$function_name: ❌ Alias not found"
+            echo "$function_name: ❌ Function not found"
         fi
     done
     echo ""
 }
 
 # Main execution
-deploy_all_lambda_functions
+redeploy_all_lambda_functions
 
 # Create deployment report
 create_deployment_report

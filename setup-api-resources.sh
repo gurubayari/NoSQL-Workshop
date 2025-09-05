@@ -192,31 +192,19 @@ create_options_method() {
     echo "Processed OPTIONS method for $resource_name"
 }
 
-# Get Lambda function ARNs with LIVE alias for provisioned concurrency
+# Get Lambda function ARNs (using $LATEST directly)
 get_lambda_arn() {
     local function_name=$1
     local full_function_name="$PROJECT_NAME-$ENVIRONMENT-$function_name"
     
-    # Try to get the LIVE alias ARN first (for provisioned concurrency)
-    local alias_arn=$(aws lambda get-alias \
+    # Get the base function ARN (using $LATEST)
+    aws lambda get-function \
         --function-name "$full_function_name" \
-        --name "LIVE" \
-        --query 'AliasArn' \
-        --output text 2>/dev/null)
-    
-    if [ $? -eq 0 ] && [ "$alias_arn" != "None" ] && [ -n "$alias_arn" ]; then
-        echo "$alias_arn"
-    else
-        # Fallback to base function ARN if alias doesn't exist
-        echo "⚠️  Warning: LIVE alias not found for $full_function_name, using base function ARN" >&2
-        aws lambda get-function \
-            --function-name "$full_function_name" \
-            --query 'Configuration.FunctionArn' \
-            --output text
-    fi
+        --query 'Configuration.FunctionArn' \
+        --output text
 }
 
-echo "Retrieving Lambda function ARNs with LIVE aliases..."
+echo "Retrieving Lambda function ARNs (using $LATEST)..."
 AUTH_LAMBDA_ARN=$(get_lambda_arn "AuthApi")
 PRODUCT_LAMBDA_ARN=$(get_lambda_arn "ProductApi")
 CART_LAMBDA_ARN=$(get_lambda_arn "CartApi")
@@ -226,73 +214,48 @@ SEARCH_LAMBDA_ARN=$(get_lambda_arn "SearchApi")
 CHAT_LAMBDA_ARN=$(get_lambda_arn "ChatApi")
 ANALYTICS_LAMBDA_ARN=$(get_lambda_arn "AnalyticsApi")
 
-# Verify Lambda aliases and provisioned concurrency
-verify_lambda_aliases() {
-    echo "Verifying Lambda aliases and provisioned concurrency..."
-    echo "======================================================"
+# Verify Lambda functions exist
+verify_lambda_functions() {
+    echo "Verifying Lambda functions exist..."
+    echo "=================================="
     
     local functions=("AuthApi" "ProductApi" "CartApi" "OrderApi" "ReviewApi" "SearchApi" "ChatApi" "AnalyticsApi")
-    local aliases_found=0
-    local provisioned_found=0
+    local functions_found=0
     
     for func in "${functions[@]}"; do
         local full_function_name="$PROJECT_NAME-$ENVIRONMENT-$func"
         
-        # Check if LIVE alias exists
-        local alias_check=$(aws lambda get-alias \
+        # Check if function exists
+        local function_check=$(aws lambda get-function \
             --function-name "$full_function_name" \
-            --name "LIVE" \
-            --query 'Name' \
+            --query 'Configuration.FunctionName' \
             --output text 2>/dev/null)
         
-        if [ $? -eq 0 ] && [ "$alias_check" = "LIVE" ]; then
-            aliases_found=$((aliases_found + 1))
-            echo "✅ $func: LIVE alias found"
-            
-            # Check provisioned concurrency
-            local pc_status=$(aws lambda get-provisioned-concurrency-config \
-                --function-name "$full_function_name" \
-                --qualifier "LIVE" \
-                --query 'Status' \
-                --output text 2>/dev/null)
-            
-            if [ $? -eq 0 ] && [ "$pc_status" = "READY" ]; then
-                provisioned_found=$((provisioned_found + 1))
-                local allocated=$(aws lambda get-provisioned-concurrency-config \
-                    --function-name "$full_function_name" \
-                    --qualifier "LIVE" \
-                    --query 'AllocatedConcurrentExecutions' \
-                    --output text 2>/dev/null)
-                echo "  ✅ Provisioned concurrency: $allocated executions (Status: $pc_status)"
-            else
-                echo "  ⚠️  No provisioned concurrency configured"
-            fi
+        if [ $? -eq 0 ] && [ "$function_check" = "$full_function_name" ]; then
+            functions_found=$((functions_found + 1))
+            echo "✅ $func: Function exists (using \$LATEST)"
         else
-            echo "❌ $func: LIVE alias not found - using base function ARN"
+            echo "❌ $func: Function not found"
         fi
     done
     
     echo ""
-    echo "Summary: $aliases_found/${#functions[@]} functions have LIVE aliases, $provisioned_found/${#functions[@]} have provisioned concurrency"
+    echo "Summary: $functions_found/${#functions[@]} functions found"
     
-    if [ $aliases_found -lt ${#functions[@]} ]; then
+    if [ $functions_found -lt ${#functions[@]} ]; then
         echo ""
-        echo "⚠️  Warning: Some functions don't have LIVE aliases."
-        echo "   Run ./deploy-lambda-functions.sh to create aliases and provisioned concurrency."
-        echo "   API Gateway will use base function ARNs for functions without aliases."
+        echo "⚠️  Warning: Some functions are missing."
+        echo "   Please ensure the CloudFormation template has been deployed successfully."
+        exit 1
     fi
     
-    if [ $provisioned_found -lt ${#functions[@]} ]; then
-        echo ""
-        echo "ℹ️  Info: Functions without provisioned concurrency may experience cold starts."
-    fi
-    
+    echo "ℹ️  Info: All functions will use \$LATEST version (no aliases or provisioned concurrency)."
     echo ""
 }
 
-verify_lambda_aliases
+verify_lambda_functions
 
-echo "Lambda ARNs retrieved successfully (using LIVE aliases where available)"
+echo "Lambda ARNs retrieved successfully (using \$LATEST)"
 
 # Create or get existing Cognito Authorizer
 echo "Creating or getting Cognito Authorizer..."
@@ -597,9 +560,9 @@ Chat API: $CHAT_LAMBDA_ARN
 Analytics API: $ANALYTICS_LAMBDA_ARN
 
 Performance Notes:
-- ARNs ending with ':LIVE' use provisioned concurrency (no cold starts)
-- ARNs without ':LIVE' may experience cold starts
-- Run ./deploy-lambda-functions.sh to create LIVE aliases with provisioned concurrency
+- All functions use \$LATEST version (no aliases or provisioned concurrency)
+- Functions may experience cold starts on first invocation
+- Run ./deploy-lambda-functions.sh to update function code
 
 Integration Type: AWS_PROXY
 All integrations use POST method to Lambda (AWS_PROXY requirement)
