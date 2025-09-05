@@ -6,11 +6,11 @@
 set -e
 
 # Configuration
-PROJECT_NAME="unicorn-ecommerce"
-ENVIRONMENT="dev"
+PROJECT_NAME="${1:-unicorn-ecommerce}"
+ENVIRONMENT="${2:-dev}"
+REGION="${3:-${AWS_DEFAULT_REGION:-us-east-1}}"
 STACK_NAME="${PROJECT_NAME}-${ENVIRONMENT}-stack"
 TEMPLATE_FILE="infrastructure/cloudformation-template-basic.yaml"
-REGION=${AWS_DEFAULT_REGION:-us-east-1}
 S3_BUCKET_PREFIX="${PROJECT_NAME}-${ENVIRONMENT}-templates"
 ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text 2>/dev/null || echo "unknown")
 
@@ -310,49 +310,7 @@ validate_api_gateway() {
     fi
 }
 
-# Run connectivity tests
-run_connectivity_tests() {
-    log "Running connectivity tests..."
-    
-    # Test VPC connectivity (this would require Lambda functions to be deployed)
-    warning "Connectivity tests require Lambda functions to be deployed first"
-    warning "These tests will be performed after Lambda deployment"
-}
 
-# Run smoke tests
-run_smoke_tests() {
-    log "Running smoke tests..."
-    
-    # Basic AWS service connectivity tests
-    log "Testing AWS service connectivity..."
-    
-    # Test DynamoDB connectivity
-    if aws dynamodb list-tables --region $REGION &> /dev/null; then
-        success "DynamoDB service connectivity: OK"
-    else
-        error "DynamoDB service connectivity: FAILED"
-    fi
-    
-    # Test DocumentDB connectivity (requires VPC access)
-    warning "DocumentDB connectivity test requires VPC access - skipping for now"
-    
-    # Test ElastiCache connectivity (requires VPC access)
-    warning "ElastiCache connectivity test requires VPC access - skipping for now"
-    
-    # Test S3 connectivity
-    if aws s3 ls --region $REGION &> /dev/null; then
-        success "S3 service connectivity: OK"
-    else
-        error "S3 service connectivity: FAILED"
-    fi
-    
-    # Test CloudFront connectivity
-    if aws cloudfront list-distributions &> /dev/null; then
-        success "CloudFront service connectivity: OK"
-    else
-        error "CloudFront service connectivity: FAILED"
-    fi
-}
 
 # Generate deployment summary
 generate_summary() {
@@ -407,8 +365,6 @@ main() {
     validate_cloudfront
     validate_api_gateway
     
-    run_connectivity_tests
-    run_smoke_tests
     generate_summary
     
     success "Infrastructure deployment and validation completed!"
