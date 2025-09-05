@@ -277,7 +277,7 @@ Resources:
                 Action:
                   - secretsmanager:GetSecretValue
                   - secretsmanager:DescribeSecret
-                Resource: !Ref DocumentDBSecret
+                Resource: !Ref DatabaseSecret
 
   Ec2HostInstanceRole:
     Type: AWS::IAM::Role
@@ -356,8 +356,6 @@ Resources:
       TimeToLiveSpecification:
         AttributeName: ttl
         Enabled: true
-      PointInTimeRecoverySpecification:
-        PointInTimeRecoveryEnabled: true
 
   InventoryTable:
     Type: AWS::DynamoDB::Table
@@ -370,8 +368,6 @@ Resources:
       KeySchema:
         - AttributeName: productId
           KeyType: HASH
-      PointInTimeRecoverySpecification:
-        PointInTimeRecoveryEnabled: true
 
   OrdersTable:
     Type: AWS::DynamoDB::Table
@@ -397,8 +393,6 @@ Resources:
               KeyType: RANGE
           Projection:
             ProjectionType: ALL
-      PointInTimeRecoverySpecification:
-        PointInTimeRecoveryEnabled: true
 
   ChatHistoryTable:
     Type: AWS::DynamoDB::Table
@@ -418,8 +412,6 @@ Resources:
       TimeToLiveSpecification:
         AttributeName: ttl
         Enabled: true
-      PointInTimeRecoverySpecification:
-        PointInTimeRecoveryEnabled: true
 
   SearchAnalyticsTable:
     Type: AWS::DynamoDB::Table
@@ -455,8 +447,6 @@ Resources:
               KeyType: RANGE
           Projection:
             ProjectionType: ALL
-      PointInTimeRecoverySpecification:
-        PointInTimeRecoveryEnabled: true
 
   WebsiteBucket:
     Type: AWS::S3::Bucket
@@ -556,23 +546,25 @@ Resources:
         - !Ref PrivateSubnet1
         - !Ref PrivateSubnet2
 
-  DocumentDBSecret:
+  DatabaseSecret:
     Type: AWS::SecretsManager::Secret
     Properties:
-      Name: !Sub '${ProjectName}-${Environment}-docdb-credentials'
-      Description: DocumentDB cluster credentials
+      Name: !Sub '${ProjectName}-${Environment}-database-credentials'
+      Description: Database credentials for DocumentDB and ElastiCache
       GenerateSecretString:
-        SecretStringTemplate: '{"username": "docdbadmin"}'
-        GenerateStringKey: 'password'
+        SecretStringTemplate: '{"docdb_username": "docdbadmin", "elasticache_username": "cacheadmin"}'
+        GenerateStringKey: 'shared_password'
         PasswordLength: 32
         ExcludeCharacters: '"@/\'
+
+
 
   DocumentDBCluster:
     Type: AWS::DocDB::DBCluster
     Properties:
       DBClusterIdentifier: !Sub '${ProjectName}-${Environment}-docdb-cluster'
-      MasterUsername: !Sub '{{resolve:secretsmanager:${DocumentDBSecret}:SecretString:username}}'
-      MasterUserPassword: !Sub '{{resolve:secretsmanager:${DocumentDBSecret}:SecretString:password}}'
+      MasterUsername: !Sub '{{resolve:secretsmanager:${DatabaseSecret}:SecretString:docdb_username}}'
+      MasterUserPassword: !Sub '{{resolve:secretsmanager:${DatabaseSecret}:SecretString:shared_password}}'
       EngineVersion: '5.0.0'
       Port: 27017
       ServerlessV2ScalingConfiguration:
@@ -599,8 +591,29 @@ Resources:
         - !Ref PrivateSubnet1
         - !Ref PrivateSubnet2
 
+  ElastiCacheUserGroup:
+    Type: AWS::ElastiCache::UserGroup
+    Properties:
+      UserGroupId: !Sub '${ProjectName}-${Environment}-cache-user-group'
+      Engine: valkey
+      UserIds:
+        - !Ref ElastiCacheUser
+
+  ElastiCacheUser:
+    Type: AWS::ElastiCache::User
+    Properties:
+      UserId: !Sub '{{resolve:secretsmanager:${DatabaseSecret}:SecretString:elasticache_username}}'
+      UserName: !Sub '{{resolve:secretsmanager:${DatabaseSecret}:SecretString:elasticache_username}}'
+      Engine: valkey
+      Passwords:
+        - !Sub '{{resolve:secretsmanager:${DatabaseSecret}:SecretString:shared_password}}'
+      AccessString: 'on ~* &* +@all'
+
   ElastiCacheServerlessCache:
     Type: AWS::ElastiCache::ServerlessCache
+    DependsOn: 
+      - ElastiCacheUserGroup
+      - ElastiCacheUser
     Properties:
       ServerlessCacheName: !Sub '${ProjectName}-${Environment}-cache'
       Description: Valkey serverless cache for Unicorn E-Commerce
@@ -616,6 +629,7 @@ Resources:
       SubnetIds:
         - !Ref PrivateSubnet1
         - !Ref PrivateSubnet2
+      UserGroupId: !Ref ElastiCacheUserGroup
 
   ApiGateway:
     Type: AWS::ApiGateway::RestApi
@@ -633,40 +647,387 @@ Resources:
             Action: 'execute-api:Invoke'
             Resource: '*'
 
-  'Fn::ForEach::LambdaLoop':
-    - FunctionKey
-    - - ProductApi
-      - CartApi
-      - OrderApi
-      - AuthApi
-      - ReviewApi
-      - SearchApi
-      - ChatApi
-      - AnalyticsApi
-    - '${FunctionKey}Function':
-        Type: AWS::Lambda::Function
-        Properties:
-          FunctionName: !Sub '${ProjectName}-${Environment}-${FunctionKey}'
-          Description: !Sub '${FunctionKey} - Handles API operations'
-          Runtime: python3.11
-          Handler: lambda_function.lambda_handler
-          Role: !GetAtt LambdaExecutionRole.Arn
-          Timeout: 30
-          MemorySize: 256
-          VpcConfig:
-            SecurityGroupIds:
-              - !Ref LambdaSecurityGroup
-            SubnetIds:
-              - !Ref PrivateSubnet1
-              - !Ref PrivateSubnet2
-          Code:
-            ZipFile: !Sub |
-              import json
-              def lambda_handler(event, context):
-                  return {
-                      'statusCode': 200,
-                      'body': json.dumps(response_data, indent=2)
-                  }
+  # Lambda Functions - Expanded from loop
+  ProductApiFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub '${ProjectName}-${Environment}-ProductApi'
+      Description: 'ProductApi - Handles API operations'
+      Runtime: python3.11
+      Handler: lambda_function.lambda_handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Timeout: 30
+      MemorySize: 256
+      VpcConfig:
+        SecurityGroupIds:
+          - !Ref LambdaSecurityGroup
+        SubnetIds:
+          - !Ref PrivateSubnet1
+          - !Ref PrivateSubnet2
+      Environment:
+        Variables:
+          # Project Configuration
+          PROJECT_NAME: !Ref ProjectName
+          ENVIRONMENT: !Ref Environment
+          # Database Configuration
+          DOCUMENTDB_HOST: !GetAtt DocumentDBCluster.Endpoint
+          DOCUMENTDB_PORT: '27017'
+          ELASTICACHE_HOST: !GetAtt ElastiCacheServerlessCache.Endpoint.Address
+          ELASTICACHE_PORT: '6379'
+          USERS_TABLE: !Ref UsersTable
+          INVENTORY_TABLE: !Ref InventoryTable
+          USER_POOL_ID: !Ref UserPool
+      Code:
+        ZipFile: !Sub |
+          import json
+          def lambda_handler(event, context):
+              return {
+                  'statusCode': 200,
+                  'body': json.dumps({'message': 'ProductApi function'}, indent=2)
+              }
+
+  ProductApiAlias:
+    Type: AWS::Lambda::Alias
+    Properties:
+      FunctionName: !Ref ProductApiFunction
+      FunctionVersion: $LATEST
+      Name: LIVE
+      ProvisionedConcurrencyConfig:
+        ProvisionedConcurrencyUnits: 2
+
+  CartApiFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub '${ProjectName}-${Environment}-CartApi'
+      Description: 'CartApi - Handles API operations'
+      Runtime: python3.11
+      Handler: lambda_function.lambda_handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Timeout: 30
+      MemorySize: 256
+      VpcConfig:
+        SecurityGroupIds:
+          - !Ref LambdaSecurityGroup
+        SubnetIds:
+          - !Ref PrivateSubnet1
+          - !Ref PrivateSubnet2
+      Environment:
+        Variables:
+          # Project Configuration
+          PROJECT_NAME: !Ref ProjectName
+          ENVIRONMENT: !Ref Environment
+          # Database Configuration
+          DOCUMENTDB_HOST: !GetAtt DocumentDBCluster.Endpoint
+          DOCUMENTDB_PORT: '27017'
+          ELASTICACHE_HOST: !GetAtt ElastiCacheServerlessCache.Endpoint.Address
+          ELASTICACHE_PORT: '6379'
+          USERS_TABLE: !Ref UsersTable          
+          SHOPPING_CART_TABLE: !Ref ShoppingCartTable
+          INVENTORY_TABLE: !Ref InventoryTable
+          USER_POOL_ID: !Ref UserPool
+      Code:
+        ZipFile: !Sub |
+          import json
+          def lambda_handler(event, context):
+              return {
+                  'statusCode': 200,
+                  'body': json.dumps({'message': 'CartApi function'}, indent=2)
+              }
+
+  CartApiAlias:
+    Type: AWS::Lambda::Alias
+    Properties:
+      FunctionName: !Ref CartApiFunction
+      FunctionVersion: $LATEST
+      Name: LIVE
+      ProvisionedConcurrencyConfig:
+        ProvisionedConcurrencyUnits: 2
+
+  OrderApiFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub '${ProjectName}-${Environment}-OrderApi'
+      Description: 'OrderApi - Handles API operations'
+      Runtime: python3.11
+      Handler: lambda_function.lambda_handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Timeout: 30
+      MemorySize: 256
+      VpcConfig:
+        SecurityGroupIds:
+          - !Ref LambdaSecurityGroup
+        SubnetIds:
+          - !Ref PrivateSubnet1
+          - !Ref PrivateSubnet2
+      Environment:
+        Variables:
+          # Project Configuration
+          PROJECT_NAME: !Ref ProjectName
+          ENVIRONMENT: !Ref Environment
+          # Database Configuration
+          DOCUMENTDB_HOST: !GetAtt DocumentDBCluster.Endpoint
+          DOCUMENTDB_PORT: '27017'
+          ELASTICACHE_HOST: !GetAtt ElastiCacheServerlessCache.Endpoint.Address
+          ELASTICACHE_PORT: '6379'
+          USERS_TABLE: !Ref UsersTable
+          SHOPPING_CART_TABLE: !Ref ShoppingCartTable
+          INVENTORY_TABLE: !Ref InventoryTable
+          ORDERS_TABLE: !Ref OrdersTable
+          USER_POOL_ID: !Ref UserPool
+      Code:
+        ZipFile: !Sub |
+          import json
+          def lambda_handler(event, context):
+              return {
+                  'statusCode': 200,
+                  'body': json.dumps({'message': 'OrderApi function'}, indent=2)
+              }
+
+  OrderApiAlias:
+    Type: AWS::Lambda::Alias
+    Properties:
+      FunctionName: !Ref OrderApiFunction
+      FunctionVersion: $LATEST
+      Name: LIVE
+      ProvisionedConcurrencyConfig:
+        ProvisionedConcurrencyUnits: 2
+
+  AuthApiFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub '${ProjectName}-${Environment}-AuthApi'
+      Description: 'AuthApi - Handles API operations'
+      Runtime: python3.11
+      Handler: lambda_function.lambda_handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Timeout: 30
+      MemorySize: 256
+      VpcConfig:
+        SecurityGroupIds:
+          - !Ref LambdaSecurityGroup
+        SubnetIds:
+          - !Ref PrivateSubnet1
+          - !Ref PrivateSubnet2
+      Environment:
+        Variables:
+          # Project Configuration
+          PROJECT_NAME: !Ref ProjectName
+          ENVIRONMENT: !Ref Environment
+          # Database Configuration
+          DOCUMENTDB_HOST: !GetAtt DocumentDBCluster.Endpoint
+          DOCUMENTDB_PORT: '27017'
+          ELASTICACHE_HOST: !GetAtt ElastiCacheServerlessCache.Endpoint.Address
+          ELASTICACHE_PORT: '6379'
+          USERS_TABLE: !Ref UsersTable
+          USER_POOL_ID: !Ref UserPool
+      Code:
+        ZipFile: !Sub |
+          import json
+          def lambda_handler(event, context):
+              return {
+                  'statusCode': 200,
+                  'body': json.dumps({'message': 'AuthApi function'}, indent=2)
+              }
+
+  AuthApiAlias:
+    Type: AWS::Lambda::Alias
+    Properties:
+      FunctionName: !Ref AuthApiFunction
+      FunctionVersion: $LATEST
+      Name: LIVE
+      ProvisionedConcurrencyConfig:
+        ProvisionedConcurrencyUnits: 2
+
+  ReviewApiFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub '${ProjectName}-${Environment}-ReviewApi'
+      Description: 'ReviewApi - Handles API operations'
+      Runtime: python3.11
+      Handler: lambda_function.lambda_handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Timeout: 30
+      MemorySize: 256
+      VpcConfig:
+        SecurityGroupIds:
+          - !Ref LambdaSecurityGroup
+        SubnetIds:
+          - !Ref PrivateSubnet1
+          - !Ref PrivateSubnet2
+      Environment:
+        Variables:
+          # Project Configuration
+          PROJECT_NAME: !Ref ProjectName
+          ENVIRONMENT: !Ref Environment
+          # Database Configuration
+          DOCUMENTDB_HOST: !GetAtt DocumentDBCluster.Endpoint
+          DOCUMENTDB_PORT: '27017'
+          ELASTICACHE_HOST: !GetAtt ElastiCacheServerlessCache.Endpoint.Address
+          ELASTICACHE_PORT: '6379'
+          USERS_TABLE: !Ref UsersTable         
+          USER_POOL_ID: !Ref UserPool
+      Code:
+        ZipFile: !Sub |
+          import json
+          def lambda_handler(event, context):
+              return {
+                  'statusCode': 200,
+                  'body': json.dumps({'message': 'ReviewApi function'}, indent=2)
+              }
+
+  ReviewApiAlias:
+    Type: AWS::Lambda::Alias
+    Properties:
+      FunctionName: !Ref ReviewApiFunction
+      FunctionVersion: $LATEST
+      Name: LIVE
+      ProvisionedConcurrencyConfig:
+        ProvisionedConcurrencyUnits: 2
+
+  SearchApiFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub '${ProjectName}-${Environment}-SearchApi'
+      Description: 'SearchApi - Handles API operations'
+      Runtime: python3.11
+      Handler: lambda_function.lambda_handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Timeout: 30
+      MemorySize: 256
+      VpcConfig:
+        SecurityGroupIds:
+          - !Ref LambdaSecurityGroup
+        SubnetIds:
+          - !Ref PrivateSubnet1
+          - !Ref PrivateSubnet2
+      Environment:
+        Variables:
+          # Project Configuration
+          PROJECT_NAME: !Ref ProjectName
+          ENVIRONMENT: !Ref Environment
+          # Database Configuration
+          DOCUMENTDB_HOST: !GetAtt DocumentDBCluster.Endpoint
+          DOCUMENTDB_PORT: '27017'
+          ELASTICACHE_HOST: !GetAtt ElastiCacheServerlessCache.Endpoint.Address
+          ELASTICACHE_PORT: '6379'
+          USERS_TABLE: !Ref UsersTable
+          ORDERS_TABLE: !Ref OrdersTable
+          SEARCH_ANALYTICS_TABLE: !Ref SearchAnalyticsTable
+          USER_POOL_ID: !Ref UserPool
+      Code:
+        ZipFile: !Sub |
+          import json
+          def lambda_handler(event, context):
+              return {
+                  'statusCode': 200,
+                  'body': json.dumps({'message': 'SearchApi function'}, indent=2)
+              }
+
+  SearchApiAlias:
+    Type: AWS::Lambda::Alias
+    Properties:
+      FunctionName: !Ref SearchApiFunction
+      FunctionVersion: $LATEST
+      Name: LIVE
+      ProvisionedConcurrencyConfig:
+        ProvisionedConcurrencyUnits: 2
+
+  ChatApiFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub '${ProjectName}-${Environment}-ChatApi'
+      Description: 'ChatApi - Handles API operations'
+      Runtime: python3.11
+      Handler: lambda_function.lambda_handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Timeout: 30
+      MemorySize: 256
+      VpcConfig:
+        SecurityGroupIds:
+          - !Ref LambdaSecurityGroup
+        SubnetIds:
+          - !Ref PrivateSubnet1
+          - !Ref PrivateSubnet2
+      Environment:
+        Variables:
+          # Project Configuration
+          PROJECT_NAME: !Ref ProjectName
+          ENVIRONMENT: !Ref Environment
+          # Database Configuration
+          DOCUMENTDB_HOST: !GetAtt DocumentDBCluster.Endpoint
+          DOCUMENTDB_PORT: '27017'
+          ELASTICACHE_HOST: !GetAtt ElastiCacheServerlessCache.Endpoint.Address
+          ELASTICACHE_PORT: '6379'
+          USERS_TABLE: !Ref UsersTable
+          INVENTORY_TABLE: !Ref InventoryTable
+          ORDERS_TABLE: !Ref OrdersTable
+          CHAT_HISTORY_TABLE: !Ref ChatHistoryTable
+          SEARCH_ANALYTICS_TABLE: !Ref SearchAnalyticsTable
+          USER_POOL_ID: !Ref UserPool
+      Code:
+        ZipFile: !Sub |
+          import json
+          def lambda_handler(event, context):
+              return {
+                  'statusCode': 200,
+                  'body': json.dumps({'message': 'ChatApi function'}, indent=2)
+              }
+
+  ChatApiAlias:
+    Type: AWS::Lambda::Alias
+    Properties:
+      FunctionName: !Ref ChatApiFunction
+      FunctionVersion: $LATEST
+      Name: LIVE
+      ProvisionedConcurrencyConfig:
+        ProvisionedConcurrencyUnits: 2
+
+  AnalyticsApiFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub '${ProjectName}-${Environment}-AnalyticsApi'
+      Description: 'AnalyticsApi - Handles API operations'
+      Runtime: python3.11
+      Handler: lambda_function.lambda_handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Timeout: 30
+      MemorySize: 256
+      VpcConfig:
+        SecurityGroupIds:
+          - !Ref LambdaSecurityGroup
+        SubnetIds:
+          - !Ref PrivateSubnet1
+          - !Ref PrivateSubnet2
+      Environment:
+        Variables:
+          # Project Configuration
+          PROJECT_NAME: !Ref ProjectName
+          ENVIRONMENT: !Ref Environment
+          # Database Configuration
+          DOCUMENTDB_HOST: !GetAtt DocumentDBCluster.Endpoint
+          DOCUMENTDB_PORT: '27017'
+          ELASTICACHE_HOST: !GetAtt ElastiCacheServerlessCache.Endpoint.Address
+          ELASTICACHE_PORT: '6379'
+          USERS_TABLE: !Ref UsersTable
+          SEARCH_ANALYTICS_TABLE: !Ref SearchAnalyticsTable
+          USER_POOL_ID: !Ref UserPool
+      Code:
+        ZipFile: !Sub |
+          import json
+          def lambda_handler(event, context):
+              return {
+                  'statusCode': 200,
+                  'body': json.dumps({'message': 'AnalyticsApi function'}, indent=2)
+              }
+
+  AnalyticsApiAlias:
+    Type: AWS::Lambda::Alias
+    Properties:
+      FunctionName: !Ref AnalyticsApiFunction
+      FunctionVersion: $LATEST
+      Name: LIVE
+      ProvisionedConcurrencyConfig:
+        ProvisionedConcurrencyUnits: 2
 
   Ec2HostInstanceProfile:
     DependsOn: Ec2HostInstanceRole
@@ -681,14 +1042,14 @@ Resources:
     DependsOn: 
       - ElastiCacheServerlessCache
       - DocumentDBInstance
-      - ProductApiFunction
-      - CartApiFunction
-      - OrderApiFunction
-      - AuthApiFunction
-      - ReviewApiFunction
-      - SearchApiFunction
-      - ChatApiFunction
-      - AnalyticsApiFunction
+      - ProductApiAlias
+      - CartApiAlias
+      - OrderApiAlias
+      - AuthApiAlias
+      - ReviewApiAlias
+      - SearchApiAlias
+      - ChatApiAlias
+      - AnalyticsApiAlias
     CreationPolicy:
       ResourceSignal:
         Count: 1
@@ -738,29 +1099,108 @@ Resources:
             echo 'export AWS_DEFAULT_REGION=${AWS::Region}' >> /home/ec2-user/.bashrc
             echo 'export PROJECT_NAME=${ProjectName}' >> /home/ec2-user/.bashrc
             echo 'export ENVIRONMENT=${Environment}' >> /home/ec2-user/.bashrc
-          
+
+          }
+
+          function setup_database_clients {
+            echo "Setting up database clients..."
+            
+            # Ensure ec2-user home directory exists
+            echo "Creating ec2-user home directory if needed..."
+            sudo mkdir -p /home/ec2-user
+            sudo chown ec2-user:ec2-user /home/ec2-user
+            sudo chmod 755 /home/ec2-user
+            
+            # Install valkey-cli (Redis-compatible client)
+            echo "Installing valkey-cli..."
+            sudo dnf -q -y install valkey-cli
+            
+            # Install mongosh (MongoDB Shell)
+            echo "Installing mongosh..."
+            cat <<EOF | sudo tee /etc/yum.repos.d/mongodb-org-7.0.repo
+[mongodb-org-7.0]
+name=MongoDB Repository
+baseurl=https://repo.mongodb.org/yum/amazon/2023/mongodb-org/7.0/x86_64/
+gpgcheck=1
+enabled=1
+gpgkey=https://www.mongodb.org/static/pgp/server-7.0.asc
+EOF
+            
+            sudo dnf -q -y install mongodb-mongosh
+            
+            # Download DocumentDB SSL certificate
+            echo "Downloading DocumentDB SSL certificate..."
+            wget -O /home/ec2-user/global-bundle.pem https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem
+            chown ec2-user:ec2-user /home/ec2-user/global-bundle.pem
+            chmod 644 /home/ec2-user/global-bundle.pem
+            
+            # Get credentials from Secrets Manager
+            echo "Retrieving database credentials..."
+            SECRET_VALUE=$(aws secretsmanager get-secret-value --secret-id "${DatabaseSecret}" --region "${AWS::Region}" --query SecretString --output text)
+            
+            DOCDB_USERNAME=$(echo $SECRET_VALUE | jq -r '.docdb_username')
+            ELASTICACHE_USERNAME=$(echo $SECRET_VALUE | jq -r '.elasticache_username')
+            SHARED_PASSWORD=$(echo $SECRET_VALUE | jq -r '.shared_password')
+            
+            # URL encode the password for MongoDB connection string
+            ENCODED_PASSWORD=$(python3 -c "import urllib.parse; print(urllib.parse.quote('$SHARED_PASSWORD', safe=''))")
+            
+            # Create aliases for ec2-user
+            echo "Creating database client aliases..."
+            
+            # Valkey/ElastiCache alias
+            cat <<EOF >> /home/ec2-user/.bashrc
+
+# Database client aliases - using safe functions
+alias valkey='connect-valkey'
+alias docdb='connect-docdb'
+
+# Helper commands
+alias get-db-creds='aws secretsmanager get-secret-value --secret-id "${DatabaseSecret}" --region "${AWS::Region}" --query SecretString --output text | jq .'
+
+# Safe connection functions that handle special characters
+connect-docdb() {
+    local secret_value=\$(aws secretsmanager get-secret-value --secret-id "${DatabaseSecret}" --region "${AWS::Region}" --query SecretString --output text)
+    local username=\$(echo "\$secret_value" | jq -r '.docdb_username')
+    local password=\$(echo "\$secret_value" | jq -r '.shared_password')
+    local encoded_password=\$(python3 -c "import urllib.parse; print(urllib.parse.quote('\$password', safe=''))")
+    mongosh "mongodb://\$username:\$encoded_password@${DocumentDBCluster.Endpoint}:27017/?tls=true&tlsCAFile=~/global-bundle.pem&replicaSet=rs0&readPreference=secondaryPreferred&retryWrites=false"
+}
+
+connect-valkey() {
+    local secret_value=\$(aws secretsmanager get-secret-value --secret-id "${DatabaseSecret}" --region "${AWS::Region}" --query SecretString --output text)
+    local username=\$(echo "\$secret_value" | jq -r '.elasticache_username')
+    local password=\$(echo "\$secret_value" | jq -r '.shared_password')
+    valkey-cli -h ${ElastiCacheServerlessCache.Endpoint.Address} -p 6379 --user "\$username" --pass "\$password"
+}
+EOF
+
+           
+            
+           
           }
 
           function deploy {
 
-            sudo git clone https://github.com/gurubayari/NoSQL-Workshop.git
+            sudo git clone https://github.com/gurubayari/NoSQL-Workshop.git /home/ec2-user/NoSQL-Workshop
+            sudo chown -R ec2-user:ec2-user /home/ec2-user/NoSQL-Workshop
 
-            cd NoSQL-Workshop
+            cd /home/ec2-user/NoSQL-Workshop
 
             # Wait for resources to be ready
             echo "Waiting for resources to be ready..."
             
             echo "Deploying lambda functions"
-            nohup sudo bash ./deploy-lambda-functions.sh "${LambdaExecutionRole.Arn}" "${LambdaSecurityGroup}" "${PrivateSubnet1}" "${PrivateSubnet2}" "${DocumentDBCluster.Endpoint}" "${ElastiCacheServerlessCache.Endpoint.Address}" "${UserPool}" "${UserPoolClient}" > deploy-lambda-functions.log 2>&1 &
+            nohup sudo bash ./deploy-lambda-functions.sh "${ProjectName}" "${Environment}" "${AWS::Region}" > deploy-lambda-functions.log 2>&1 &
             
             echo "Setting up API Gateway resources and methods"
-            nohup sudo bash ./setup-api-resources.sh "${ApiGateway}" "${UserPool}" > setup-api-resources.log 2>&1 &
+            nohup sudo bash ./setup-api-resources.sh "${ProjectName}" "${Environment}" "${AWS::Region}" > setup-api-resources.log 2>&1 &
           
             echo "Deploying front end application"
-            nohup sudo bash ./deploy-frontend.sh "${WebsiteBucket}" "${CloudFrontDistribution}" "${CloudFrontDistribution.DomainName}" "https://${ApiGateway}.execute-api.${AWS::Region}.amazonaws.com/${Environment}" "${UserPool}" "${UserPoolClient}"  > deploy-frontend.log 2>&1 &
+            nohup sudo bash ./deploy-frontend.sh "${ProjectName}" "${Environment}" "${AWS::Region}" "${WebsiteBucket}" "https://${ApiGateway}.execute-api.${AWS::Region}.amazonaws.com/${Environment}" "${UserPool}" "${UserPoolClient}" "${CloudFrontDistribution}" "${CloudFrontDistribution.DomainName}" > deploy-frontend.log 2>&1 &
 
-            echo "Seeding data to databses"
-            nohup sudo bash ./seed_data_to_databases.sh "${DocumentDBSecret}" "${DocumentDBCluster.Endpoint}" "${ElastiCacheServerlessCache.Endpoint.Address}"  > seed_data_to_databases.log 2>&1 &
+            echo "Seeding data to databases"
+            nohup sudo bash ./seed_data_to_databases.sh "${ProjectName}" "${Environment}" "${AWS::Region}" "${DatabaseSecret}" "${DocumentDBCluster.Endpoint}" "${ElastiCacheServerlessCache.Endpoint.Address}" > seed_data_to_databases.log 2>&1 &
           }
 
           function cfn_signal {
@@ -769,6 +1209,7 @@ Resources:
           }
           
           prerequisites
+          setup_database_clients
           deploy
           cfn_signal
 
@@ -828,3 +1269,15 @@ Outputs:
       SearchApi: ${SearchApiFunction.Arn}
       ChatApi: ${ChatApiFunction.Arn}
       AnalyticsApi: ${AnalyticsApiFunction.Arn}
+
+  LambdaAliasArns:
+    Description: Lambda Function Alias ARNs with Provisioned Capacity
+    Value: !Sub |
+      ProductApi-LIVE: ${ProductApiAlias} (2 units)
+      CartApi-LIVE: ${CartApiAlias} (2 units)
+      OrderApi-LIVE: ${OrderApiAlias} (2 units)
+      AuthApi-LIVE: ${AuthApiAlias} (2 units)
+      ReviewApi-LIVE: ${ReviewApiAlias} (2 units)
+      SearchApi-LIVE: ${SearchApiAlias} (2 units)
+      ChatApi-LIVE: ${ChatApiAlias} (2 units)
+      AnalyticsApi-LIVE: ${AnalyticsApiAlias} (2 units)
