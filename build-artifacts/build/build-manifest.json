@@ -1,31 +1,35 @@
 {
-  "buildTime": "2025-08-30T16:57:35.950Z",
+  "buildTime": "2025-09-05T19:14:49.162Z",
   "version": "1.0.0",
   "environment": "production",
   "files": {
     "asset-manifest.json": {
       "size": 243,
-      "modified": "2025-08-30T16:57:34.544Z"
+      "modified": "2025-09-05T19:14:49.028Z"
     },
     "cache-config.json": {
       "size": 434,
-      "modified": "2025-08-30T16:57:34.659Z"
+      "modified": "2025-09-05T19:14:49.163Z"
+    },
+    "favicon.ico": {
+      "size": 1150,
+      "modified": "2025-09-05T19:14:41.337Z"
     },
     "index.html": {
       "size": 953,
-      "modified": "2025-08-30T16:57:34.658Z"
+      "modified": "2025-09-05T19:14:49.163Z"
     },
-    "static/css/main.ff851366.css": {
-      "size": 37803,
-      "modified": "2025-08-30T16:57:34.544Z"
+    "static/css/main.d3858aee.css": {
+      "size": 38651,
+      "modified": "2025-09-05T19:14:49.029Z"
     },
-    "static/js/main.03b24f42.js": {
-      "size": 514404,
-      "modified": "2025-08-30T16:57:34.544Z"
+    "static/js/main.4e3e8d06.js": {
+      "size": 608217,
+      "modified": "2025-09-05T19:14:49.029Z"
     },
-    "static/js/main.03b24f42.js.LICENSE.txt": {
+    "static/js/main.4e3e8d06.js.LICENSE.txt": {
       "size": 1652,
-      "modified": "2025-08-30T16:57:34.544Z"
+      "modified": "2025-09-05T19:14:49.029Z"
     }
   }
 }
