@@ -1,0 +1,9 @@
+{
+    "function_name": "unicorn-ecommerce-dev-OrderApi",
+    "function_file": "order_api.py",
+    "description": "Order Management API for Unicorn E-Commerce",
+    "timeout": 30,
+    "memory": 256,
+    "zip_file": "packages/unicorn-ecommerce-dev-OrderApi.zip",
+    "created_at": "2025-09-05T19:12:44Z"
+}
