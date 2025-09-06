@@ -132,7 +132,7 @@ parse_arguments() {
         # Optional parameters
         CLOUDFRONT_DISTRIBUTION_ID="${5:-}"
         CLOUDFRONT_DOMAIN="${6:-}"
-        USER_POOL_REGION="${7:-$REGION}"
+        USER_POOL_REGION="$REGION"
     else
         # Check minimum required arguments (old format)
         if [ $# -lt 4 ]; then
@@ -151,7 +151,7 @@ parse_arguments() {
         # Optional parameters
         CLOUDFRONT_DISTRIBUTION_ID="${5:-}"
         CLOUDFRONT_DOMAIN="${6:-}"
-        USER_POOL_REGION="${7:-$REGION}"
+        USER_POOL_REGION="$REGION"
     fi
     
     # Validate required parameters
@@ -233,6 +233,18 @@ update_environment_variables() {
     # Set default values for optional parameters
     CLOUDFRONT_DOMAIN_VALUE=${CLOUDFRONT_DOMAIN:-""}
     
+    # Display environment variables being set
+    log "Environment variables to be replaced:"
+    echo "  __API_GATEWAY_URL__ -> $API_GATEWAY_URL"
+    echo "  __USER_POOL_ID__ -> $USER_POOL_ID"
+    echo "  __USER_POOL_CLIENT_ID__ -> $USER_POOL_CLIENT_ID"
+    echo "  __USER_POOL_REGION__ -> $USER_POOL_REGION"
+    echo "  __CLOUDFRONT_DOMAIN__ -> $CLOUDFRONT_DOMAIN_VALUE"
+    echo "  __AWS_REGION__ -> $REGION"
+    echo "  __PROJECT_NAME__ -> $PROJECT_NAME"
+    echo "  __ENVIRONMENT__ -> $ENVIRONMENT"
+    echo ""
+    
     # Update environment variables in JavaScript files
     log "Updating JavaScript files with environment variables..."
     
@@ -242,11 +254,18 @@ update_environment_variables() {
             -e "s|__API_GATEWAY_URL__|$API_GATEWAY_URL|g" \
             -e "s|__USER_POOL_ID__|$USER_POOL_ID|g" \
             -e "s|__USER_POOL_CLIENT_ID__|$USER_POOL_CLIENT_ID|g" \
+            -e "s|__USER_POOL_REGION__|$USER_POOL_REGION|g" \
             -e "s|__CLOUDFRONT_DOMAIN__|$CLOUDFRONT_DOMAIN_VALUE|g" \
+            -e "s|__AWS_REGION__|$REGION|g" \
+            -e "s|__PROJECT_NAME__|$PROJECT_NAME|g" \
+            -e "s|__ENVIRONMENT__|$ENVIRONMENT|g" \
             "$file"
         
         # Remove backup file
         rm -f "$file.bak"
+        
+        # Log replacement for debugging
+        log "Updated environment variables in: $file"
     done
     
     # Update environment variables in HTML files
@@ -258,11 +277,64 @@ update_environment_variables() {
             -e "s|__API_GATEWAY_URL__|$API_GATEWAY_URL|g" \
             -e "s|__USER_POOL_ID__|$USER_POOL_ID|g" \
             -e "s|__USER_POOL_CLIENT_ID__|$USER_POOL_CLIENT_ID|g" \
+            -e "s|__USER_POOL_REGION__|$USER_POOL_REGION|g" \
             -e "s|__CLOUDFRONT_DOMAIN__|$CLOUDFRONT_DOMAIN_VALUE|g" \
+            -e "s|__AWS_REGION__|$REGION|g" \
+            -e "s|__PROJECT_NAME__|$PROJECT_NAME|g" \
+            -e "s|__ENVIRONMENT__|$ENVIRONMENT|g" \
             "$file"
         
         # Remove backup file
         rm -f "$file.bak"
+        
+        # Log replacement for debugging
+        log "Updated environment variables in: $file"
+    done
+    
+    # Update environment variables in CSS files
+    log "Updating CSS files with environment variables..."
+    
+    find build-deployment -name "*.css" -type f | while read file; do
+        # Replace placeholders with actual values
+        sed -i.bak \
+            -e "s|__API_GATEWAY_URL__|$API_GATEWAY_URL|g" \
+            -e "s|__USER_POOL_ID__|$USER_POOL_ID|g" \
+            -e "s|__USER_POOL_CLIENT_ID__|$USER_POOL_CLIENT_ID|g" \
+            -e "s|__USER_POOL_REGION__|$USER_POOL_REGION|g" \
+            -e "s|__CLOUDFRONT_DOMAIN__|$CLOUDFRONT_DOMAIN_VALUE|g" \
+            -e "s|__AWS_REGION__|$REGION|g" \
+            -e "s|__PROJECT_NAME__|$PROJECT_NAME|g" \
+            -e "s|__ENVIRONMENT__|$ENVIRONMENT|g" \
+            "$file"
+        
+        # Remove backup file
+        rm -f "$file.bak"
+        
+        # Log replacement for debugging
+        log "Updated environment variables in: $file"
+    done
+    
+    # Update environment variables in JSON files
+    log "Updating JSON files with environment variables..."
+    
+    find build-deployment -name "*.json" -type f | while read file; do
+        # Replace placeholders with actual values
+        sed -i.bak \
+            -e "s|__API_GATEWAY_URL__|$API_GATEWAY_URL|g" \
+            -e "s|__USER_POOL_ID__|$USER_POOL_ID|g" \
+            -e "s|__USER_POOL_CLIENT_ID__|$USER_POOL_CLIENT_ID|g" \
+            -e "s|__USER_POOL_REGION__|$USER_POOL_REGION|g" \
+            -e "s|__CLOUDFRONT_DOMAIN__|$CLOUDFRONT_DOMAIN_VALUE|g" \
+            -e "s|__AWS_REGION__|$REGION|g" \
+            -e "s|__PROJECT_NAME__|$PROJECT_NAME|g" \
+            -e "s|__ENVIRONMENT__|$ENVIRONMENT|g" \
+            "$file"
+        
+        # Remove backup file
+        rm -f "$file.bak"
+        
+        # Log replacement for debugging
+        log "Updated environment variables in: $file"
     done
     
     # Re-compress updated files if gzip is available
@@ -271,6 +343,24 @@ update_environment_variables() {
         find build-deployment -name "*.js" -o -name "*.css" -o -name "*.html" | while read file; do
             gzip -c "$file" > "$file.gz"
         done
+    fi
+    
+    # Verify replacements were successful
+    log "Verifying environment variable replacements..."
+    
+    UNREPLACED_PLACEHOLDERS=$(find build-deployment -name "*.js" -o -name "*.html" -o -name "*.css" -o -name "*.json" | xargs grep -l "__.*__" 2>/dev/null || true)
+    
+    if [ -n "$UNREPLACED_PLACEHOLDERS" ]; then
+        warning "Found unreplaced placeholders in the following files:"
+        echo "$UNREPLACED_PLACEHOLDERS" | while read file; do
+            echo "  - $file"
+            grep -n "__.*__" "$file" | head -3 | while read line; do
+                echo "    $line"
+            done
+        done
+        warning "Some placeholders may not have been replaced correctly"
+    else
+        success "All placeholders replaced successfully"
     fi
     
     success "Environment variables updated successfully"
