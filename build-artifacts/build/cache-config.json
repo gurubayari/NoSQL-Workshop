@@ -1,0 +1,18 @@
+{
+  "staticAssets": {
+    "pattern": "/static/**",
+    "cacheControl": "public, max-age=31536000, immutable"
+  },
+  "htmlFiles": {
+    "pattern": "*.html",
+    "cacheControl": "public, max-age=0, must-revalidate"
+  },
+  "serviceWorker": {
+    "pattern": "service-worker.js",
+    "cacheControl": "public, max-age=0, must-revalidate"
+  },
+  "manifest": {
+    "pattern": "manifest.json",
+    "cacheControl": "public, max-age=86400"
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "buildTime": "2025-09-06T05:20:18.714Z",
+  "version": "1.0.0",
+  "environment": "production",
+  "files": {
+    "asset-manifest.json": {
+      "size": 243,
+      "modified": "2025-09-06T05:20:18.612Z"
+    },
+    "cache-config.json": {
+      "size": 434,
+      "modified": "2025-09-06T05:20:18.715Z"
+    },
+    "favicon.ico": {
+      "size": 1150,
+      "modified": "2025-09-06T05:20:12.060Z"
+    },
+    "index.html": {
+      "size": 953,
+      "modified": "2025-09-06T05:20:18.714Z"
+    },
+    "static/css/main.d3858aee.css": {
+      "size": 38651,
+      "modified": "2025-09-06T05:20:18.612Z"
+    },
+    "static/js/main.b89296c2.js": {
+      "size": 608217,
+      "modified": "2025-09-06T05:20:18.612Z"
+    },
+    "static/js/main.b89296c2.js.LICENSE.txt": {
+      "size": 1652,
+      "modified": "2025-09-06T05:20:18.612Z"
+    }
+  }
+}
