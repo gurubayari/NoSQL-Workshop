@@ -187,31 +187,6 @@ redeploy_lambda_function() {
         print_error "Failed to redeploy $function_name"
         return 1
     fi
-
-    done
-    
-    if [ $attempt -eq $max_attempts ]; then
-        print_error "Timeout waiting for function $function_name to become active"
-        print_warning "This might be due to VPC ENI creation taking longer than expected"
-        print_info "You can check the function status in the AWS Console and re-run this script"
-        return 1
-    fi
-    
-    # Additional check to ensure function is truly ready
-    print_info "Verifying function $function_name is ready for invocation..."
-    local invoke_test=$(aws lambda invoke \
-        --function-name "$function_name" \
-        --payload '{"httpMethod":"GET","path":"/health"}' \
-        --region "$REGION" \
-        /tmp/test-response.json 2>&1 || echo "failed")
-    
-    if [[ "$invoke_test" == *"failed"* ]] || [[ "$invoke_test" == *"error"* ]]; then
-        print_warning "Function may not be fully ready yet, but continuing deployment..."
-    else
-        print_status "Function $function_name is ready for invocation"
-    fi
-    
-    print_status "Successfully deployed $function_name"
 }
 
 # Deploy a single function in parallel (simplified for redeployment)

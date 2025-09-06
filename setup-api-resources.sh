@@ -30,7 +30,7 @@ fi
 
 # Derive API Gateway and User Pool IDs from project and environment
 API_GATEWAY_ID=$(aws apigateway get-rest-apis --query "items[?name=='${PROJECT_NAME}-${ENVIRONMENT}-api'].id" --output text --region "$REGION")
-USER_POOL_ID=$(aws cognito-idp list-user-pools --max-items 60 --query "UserPools[?Name=='${PROJECT_NAME}-${ENVIRONMENT}-users'].Id" --output text --region "$REGION")
+USER_POOL_ID=$(aws cognito-idp list-user-pools --max-results 60 --query "UserPools[?Name=='${PROJECT_NAME}-${ENVIRONMENT}-users'].Id" --output text --region "$REGION")
 
 if [ -z "$API_GATEWAY_ID" ] || [ "$API_GATEWAY_ID" = "None" ]; then
     echo "❌ Error: API Gateway not found for ${PROJECT_NAME}-${ENVIRONMENT}-api in region $REGION"
