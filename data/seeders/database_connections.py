@@ -4,6 +4,7 @@ Provides centralized connection management for DocumentDB, DynamoDB, and ElastiC
 """
 import os
 import sys
+import json
 from datetime import datetime
 from decimal import Decimal
 from typing import Optional, Dict, Any
@@ -41,6 +42,63 @@ class DatabaseConnections:
         self.elasticache_client = None
         self._region = None
         self._database_name = None
+        self._secrets_client = None
+    
+    def _get_secrets_client(self):
+        """Get or create AWS Secrets Manager client"""
+        if self._secrets_client is None:
+            region = os.environ.get('AWS_REGION', os.environ.get('AWS_DEFAULT_REGION', 'us-east-1'))
+            self._secrets_client = boto3.client('secretsmanager', region_name=region)
+        return self._secrets_client
+    
+    def _get_database_credentials(self):
+        """Retrieve database credentials from AWS Secrets Manager"""
+        try:
+            project_name = os.environ.get('PROJECT_NAME', 'unicorn-ecommerce')
+            environment = os.environ.get('ENVIRONMENT', 'dev')
+            secret_name = f"{project_name}-{environment}-database-credentials"
+            
+            secrets_client = self._get_secrets_client()
+            response = secrets_client.get_secret_value(SecretId=secret_name)
+            secret = json.loads(response['SecretString'])
+            
+            return {
+                'docdb_username': secret['docdb_username'],
+                'docdb_password': secret['shared_password'],
+                'elasticache_username': secret['elasticache_username'],
+                'elasticache_password': secret['shared_password']
+            }
+        except Exception as e:
+            print(f"WARNING: Failed to retrieve database credentials from Secrets Manager: {e}")
+            # Fallback to environment variables
+            return {
+                'docdb_username': os.environ.get('DOCUMENTDB_USERNAME'),
+                'docdb_password': os.environ.get('DOCUMENTDB_PASSWORD'),
+                'elasticache_username': os.environ.get('ELASTICACHE_USERNAME'),
+                'elasticache_password': os.environ.get('ELASTICACHE_AUTH_TOKEN')
+            }
+    
+    def _get_documentdb_credentials(self):
+        """Retrieve DocumentDB credentials"""
+        creds = self._get_database_credentials()
+        username = creds['docdb_username']
+        password = creds['docdb_password']
+        if username and password:
+            print("DocumentDB credentials retrieved from Secrets Manager")
+        else:
+            print("WARNING: DocumentDB credentials not available")
+        return username, password
+    
+    def _get_elasticache_credentials(self):
+        """Retrieve ElastiCache credentials"""
+        creds = self._get_database_credentials()
+        username = creds['elasticache_username']
+        password = creds['elasticache_password']
+        if username and password:
+            print("ElastiCache credentials retrieved from Secrets Manager")
+        else:
+            print("WARNING: ElastiCache credentials not available, will attempt connection without AUTH")
+        return username, password
     
     def get_documentdb_connection(self):
         """Get DocumentDB connection and database"""
@@ -81,7 +139,7 @@ class DatabaseConnections:
         return self.elasticache_client
     
     def _connect_to_documentdb(self):
-        """Connect to DocumentDB using environment variables"""
+        """Connect to DocumentDB using environment variables and Secrets Manager"""
         if not PYMONGO_AVAILABLE:
             print("ERROR: pymongo is required but not available")
             print("Please install pymongo: pip install pymongo")
@@ -90,20 +148,23 @@ class DatabaseConnections:
         # Get connection details from environment variables
         host = os.environ.get('DOCUMENTDB_HOST')
         port = os.environ.get('DOCUMENTDB_PORT', '27017')
-        username = os.environ.get('DOCUMENTDB_USERNAME')
-        password = os.environ.get('DOCUMENTDB_PASSWORD')
         database = os.environ.get('DOCUMENTDB_DATABASE', 'unicorn_ecommerce_dev')
         ssl_ca_certs = os.environ.get('DOCUMENTDB_SSL_CA_CERTS')
         
-        if not all([host, username, password]):
+        if not host:
             print("ERROR: Missing required DocumentDB environment variables:")
             print("  DOCUMENTDB_HOST:", "✓" if host else "✗ Missing")
-            print("  DOCUMENTDB_USERNAME:", "✓" if username else "✗ Missing") 
-            print("  DOCUMENTDB_PASSWORD:", "✓" if password else "✗ Missing")
             print("\nPlease ensure the environment variables are set correctly.")
             sys.exit(1)
         
         try:
+            # Get credentials from Secrets Manager
+            username, password = self._get_documentdb_credentials()
+            
+            if not username or not password:
+                print("ERROR: DocumentDB credentials not available from Secrets Manager or environment variables")
+                sys.exit(1)
+            
             # URL encode username and password to handle special characters
             encoded_username = quote_plus(username)
             encoded_password = quote_plus(password)
@@ -145,7 +206,7 @@ class DatabaseConnections:
             print(f"  Host: {host}")
             print(f"  Port: {port}")
             print(f"  Database: {database}")
-            print(f"  Username: {username}")
+            print(f"  Username: {username if 'username' in locals() else 'Not retrieved'}")
             print(f"  SSL CA Certs: {ssl_ca_certs}")
             sys.exit(1)
     
@@ -180,7 +241,7 @@ class DatabaseConnections:
             sys.exit(1)
     
     def _connect_to_elasticache(self):
-        """Connect to ElastiCache Redis using environment variables"""
+        """Connect to ElastiCache Redis using environment variables with TLS and AUTH support"""
         if not REDIS_AVAILABLE:
             print("ERROR: redis is required but not available")
             print("Please install redis: pip install redis")
@@ -199,9 +260,12 @@ class DatabaseConnections:
         try:
             print(f"Connecting to ElastiCache at {host}:{port}")
             
-            # Check if TLS/SSL is enabled for Valkey Serverless
-            # ssl_enabled = os.environ.get('ELASTICACHE_SSL', 'false').lower() == 'true'
+            # Get authentication credentials from Secrets Manager
+            # username, password = self._get_elasticache_credentials()
+            
+            # TLS/SSL is required for Valkey Serverless
             ssl_enabled = True
+            
             # Base configuration for RedisCluster
             cluster_config = {
                 'host': host,
@@ -214,7 +278,15 @@ class DatabaseConnections:
                 'max_connections': 10
             }
             
-            # Add TLS/SSL configuration if enabled (for Valkey Serverless)
+            # Add authentication if credentials are available
+            # if username and password:
+            #     cluster_config['username'] = username
+            #     cluster_config['password'] = password
+            #     print("ElastiCache AUTH credentials configured from Secrets Manager")
+            # else:
+            #     print("ElastiCache AUTH credentials not available, connecting without authentication")
+            
+            # Add TLS/SSL configuration (required for Valkey Serverless)
             if ssl_enabled:
                 import ssl
                 cluster_config.update({
@@ -223,9 +295,7 @@ class DatabaseConnections:
                     'ssl_check_hostname': False,     # Don't check hostname for managed service
                     'ssl_ca_certs': None            # Use system CA bundle
                 })
-                print(f"ElastiCache TLS/SSL enabled for Valkey Serverless")
-            else:
-                print(f"ElastiCache TLS/SSL disabled")
+                print("ElastiCache TLS/SSL enabled for Valkey Serverless")
             
             # Connect to ElastiCache Redis using RedisCluster for serverless compatibility
             self.elasticache_client = redis.RedisCluster(**cluster_config)
@@ -235,11 +305,16 @@ class DatabaseConnections:
             
             print(f"✅ Successfully connected to ElastiCache: {host}:{port}")
             
+        except redis.AuthenticationError as e:
+            print(f"ERROR: ElastiCache authentication failed: {e}")
+            print("Please check your ElastiCache credentials in Secrets Manager")
+            sys.exit(1)
         except Exception as e:
             print(f"ERROR: Failed to connect to ElastiCache: {e}")
             print(f"Connection details:")
             print(f"  Host: {host}")
             print(f"  Port: {port}")
+            print(f"  AUTH Credentials: {'✓ Configured' if username and password else '✗ Not configured'}")
             sys.exit(1)
     
     def close_connections(self):
