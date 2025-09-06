@@ -143,7 +143,7 @@ export DOCUMENTDB_HOST="$DOCDB_ENDPOINT"
 export DOCUMENTDB_PORT="27017"
 export DOCUMENTDB_USERNAME="$DOCDB_USERNAME"
 export DOCUMENTDB_PASSWORD="$DOCDB_PASSWORD"
-export DOCUMENTDB_DATABASE="${PROJECT_NAME}-${ENVIRONMENT}_dev"
+export DOCUMENTDB_DATABASE="${PROJECT_NAME}-${ENVIRONMENT}"
 export DOCUMENTDB_SSL_CA_CERTS="./../global-bundle.pem"
 export ELASTICACHE_HOST="$ELASTICACHE_ENDPOINT"
 export ELASTICACHE_PORT="6379"
@@ -200,7 +200,7 @@ print_info "Starting database seeding..."
 
 # Seed products to DocumentDB
 print_info "Seeding products to DocumentDB..."
-if python3 data/seeders/product_seeder.py; then
+if python3 data/seeders/product_seeder.py --force; then
     print_status "Products seeded to DocumentDB successfully"
 else
     print_error "Products seeding failed"
@@ -209,7 +209,7 @@ fi
 
 # Seed inventory to DynamoDB
 print_info "Seeding inventory to DynamoDB..."
-if python3 data/seeders/inventory_seeder.py; then
+if python3 data/seeders/inventory_seeder.py --force; then
     print_status "Inventory seeded to DynamoDB successfully"
 else
     print_error "Inventory seeding failed"
