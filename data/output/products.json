@@ -1611,7 +1611,18 @@
     "originalPrice": null,
     "discountPercent": null,
     "currency": "USD",
-    "specifications": {},
+    "specifications": {
+      "display_size": "8.3 inches",
+      "storage": "64GB",
+      "ram": "4GB",
+      "battery_life": "10 hours",
+      "camera": "12MP",
+      "connectivity": "Wi-Fi",
+      "weight": "500g",
+      "brand_warranty": "Manufacturer warranty included",
+      "return_policy": "30-day return policy",
+      "shipping": "Free shipping available"
+    },
     "tags": [
       "jbl",
       "gadget",
@@ -3209,7 +3220,18 @@
     "originalPrice": null,
     "discountPercent": null,
     "currency": "USD",
-    "specifications": {},
+    "specifications": {
+      "display_size": "8.3 inches",
+      "storage": "64GB",
+      "ram": "4GB",
+      "battery_life": "10 hours",
+      "camera": "12MP",
+      "connectivity": "Wi-Fi",
+      "weight": "500g",
+      "brand_warranty": "Manufacturer warranty included",
+      "return_policy": "30-day return policy",
+      "shipping": "Free shipping available"
+    },
     "tags": [
       "portable",
       "gadget",
@@ -8007,7 +8029,15 @@
     "originalPrice": null,
     "discountPercent": null,
     "currency": "USD",
-    "specifications": {},
+    "specifications": {
+      "power": "AC powered",
+      "connectivity": "Wired",
+      "warranty": "1 year",
+      "color": "Black",
+      "brand_warranty": "Manufacturer warranty included",
+      "return_policy": "30-day return policy",
+      "shipping": "Free shipping available"
+    },
     "tags": [
       "gadget",
       "speakers",
@@ -9601,7 +9631,18 @@
     "originalPrice": 1897.96,
     "discountPercent": 33,
     "currency": "USD",
-    "specifications": {},
+    "specifications": {
+      "display_size": "8.3 inches",
+      "storage": "64GB",
+      "ram": "4GB",
+      "battery_life": "10 hours",
+      "camera": "12MP",
+      "connectivity": "Wi-Fi",
+      "weight": "500g",
+      "brand_warranty": "Manufacturer warranty included",
+      "return_policy": "30-day return policy",
+      "shipping": "Free shipping available"
+    },
     "tags": [
       "portable",
       "gadget",
@@ -11197,7 +11238,18 @@
     "originalPrice": null,
     "discountPercent": null,
     "currency": "USD",
-    "specifications": {},
+    "specifications": {
+      "display_size": "8.3 inches",
+      "storage": "64GB",
+      "ram": "4GB",
+      "battery_life": "10 hours",
+      "camera": "12MP",
+      "connectivity": "Wi-Fi",
+      "weight": "500g",
+      "brand_warranty": "Manufacturer warranty included",
+      "return_policy": "30-day return policy",
+      "shipping": "Free shipping available"
+    },
     "tags": [
       "portable",
       "hp",
@@ -48119,7 +48171,15 @@
     "originalPrice": null,
     "discountPercent": null,
     "currency": "USD",
-    "specifications": {},
+    "specifications": {
+      "quality": "High quality",
+      "durability": "Long lasting",
+      "usage": "Multi-purpose",
+      "maintenance": "Easy to maintain",
+      "brand_warranty": "Manufacturer warranty included",
+      "return_policy": "30-day return policy",
+      "shipping": "Free shipping available"
+    },
     "tags": [
       "nike",
       "sports & fitness",
@@ -49713,7 +49773,15 @@
     "originalPrice": null,
     "discountPercent": null,
     "currency": "USD",
-    "specifications": {},
+    "specifications": {
+      "quality": "High quality",
+      "durability": "Long lasting",
+      "usage": "Multi-purpose",
+      "maintenance": "Easy to maintain",
+      "brand_warranty": "Manufacturer warranty included",
+      "return_policy": "30-day return policy",
+      "shipping": "Free shipping available"
+    },
     "tags": [
       "sports & fitness",
       "value",
@@ -51303,7 +51371,15 @@
     "originalPrice": 315.85,
     "discountPercent": 39,
     "currency": "USD",
-    "specifications": {},
+    "specifications": {
+      "quality": "High quality",
+      "durability": "Long lasting",
+      "usage": "Multi-purpose",
+      "maintenance": "Easy to maintain",
+      "brand_warranty": "Manufacturer warranty included",
+      "return_policy": "30-day return policy",
+      "shipping": "Free shipping available"
+    },
     "tags": [
       "sports & fitness",
       "fitbit",
@@ -52893,7 +52969,15 @@
     "originalPrice": null,
     "discountPercent": null,
     "currency": "USD",
-    "specifications": {},
+    "specifications": {
+      "quality": "High quality",
+      "durability": "Long lasting",
+      "usage": "Multi-purpose",
+      "maintenance": "Easy to maintain",
+      "brand_warranty": "Manufacturer warranty included",
+      "return_policy": "30-day return policy",
+      "shipping": "Free shipping available"
+    },
     "tags": [
       "sports & fitness",
       "health",
@@ -54489,7 +54573,15 @@
     "originalPrice": null,
     "discountPercent": null,
     "currency": "USD",
-    "specifications": {},
+    "specifications": {
+      "quality": "High quality",
+      "durability": "Long lasting",
+      "usage": "Multi-purpose",
+      "maintenance": "Easy to maintain",
+      "brand_warranty": "Manufacturer warranty included",
+      "return_policy": "30-day return policy",
+      "shipping": "Free shipping available"
+    },
     "tags": [
       "adidas",
       "sports & fitness",
@@ -56079,7 +56171,15 @@
     "originalPrice": null,
     "discountPercent": null,
     "currency": "USD",
-    "specifications": {},
+    "specifications": {
+      "quality": "High quality",
+      "durability": "Long lasting",
+      "usage": "Multi-purpose",
+      "maintenance": "Easy to maintain",
+      "brand_warranty": "Manufacturer warranty included",
+      "return_policy": "30-day return policy",
+      "shipping": "Free shipping available"
+    },
     "tags": [
       "nike",
       "sports & fitness",
@@ -57673,7 +57773,15 @@
     "originalPrice": 371.29,
     "discountPercent": 31,
     "currency": "USD",
-    "specifications": {},
+    "specifications": {
+      "quality": "High quality",
+      "durability": "Long lasting",
+      "usage": "Multi-purpose",
+      "maintenance": "Easy to maintain",
+      "brand_warranty": "Manufacturer warranty included",
+      "return_policy": "30-day return policy",
+      "shipping": "Free shipping available"
+    },
     "tags": [
       "sports & fitness",
       "premium",
@@ -59269,7 +59377,15 @@
     "originalPrice": 453.87,
     "discountPercent": 36,
     "currency": "USD",
-    "specifications": {},
+    "specifications": {
+      "quality": "High quality",
+      "durability": "Long lasting",
+      "usage": "Multi-purpose",
+      "maintenance": "Easy to maintain",
+      "brand_warranty": "Manufacturer warranty included",
+      "return_policy": "30-day return policy",
+      "shipping": "Free shipping available"
+    },
     "tags": [
       "sports & fitness",
       "premium",
@@ -60859,7 +60975,15 @@
     "originalPrice": null,
     "discountPercent": null,
     "currency": "USD",
-    "specifications": {},
+    "specifications": {
+      "quality": "High quality",
+      "durability": "Long lasting",
+      "usage": "Multi-purpose",
+      "maintenance": "Easy to maintain",
+      "brand_warranty": "Manufacturer warranty included",
+      "return_policy": "30-day return policy",
+      "shipping": "Free shipping available"
+    },
     "tags": [
       "under armour",
       "sports & fitness",
@@ -62455,7 +62579,15 @@
     "originalPrice": null,
     "discountPercent": null,
     "currency": "USD",
-    "specifications": {},
+    "specifications": {
+      "quality": "High quality",
+      "durability": "Long lasting",
+      "usage": "Multi-purpose",
+      "maintenance": "Easy to maintain",
+      "brand_warranty": "Manufacturer warranty included",
+      "return_policy": "30-day return policy",
+      "shipping": "Free shipping available"
+    },
     "tags": [
       "sports & fitness",
       "health",
@@ -64051,7 +64183,15 @@
     "originalPrice": null,
     "discountPercent": null,
     "currency": "USD",
-    "specifications": {},
+    "specifications": {
+      "quality": "High quality",
+      "durability": "Long lasting",
+      "usage": "Multi-purpose",
+      "maintenance": "Easy to maintain",
+      "brand_warranty": "Manufacturer warranty included",
+      "return_policy": "30-day return policy",
+      "shipping": "Free shipping available"
+    },
     "tags": [
       "recommended",
       "books & media",
@@ -65637,7 +65777,15 @@
     "originalPrice": 117.27,
     "discountPercent": 30,
     "currency": "USD",
-    "specifications": {},
+    "specifications": {
+      "quality": "High quality",
+      "durability": "Long lasting",
+      "usage": "Multi-purpose",
+      "maintenance": "Easy to maintain",
+      "brand_warranty": "Manufacturer warranty included",
+      "return_policy": "30-day return policy",
+      "shipping": "Free shipping available"
+    },
     "tags": [
       "movies",
       "value",
@@ -67227,7 +67375,15 @@
     "originalPrice": null,
     "discountPercent": null,
     "currency": "USD",
-    "specifications": {},
+    "specifications": {
+      "quality": "High quality",
+      "durability": "Long lasting",
+      "usage": "Multi-purpose",
+      "maintenance": "Easy to maintain",
+      "brand_warranty": "Manufacturer warranty included",
+      "return_policy": "30-day return policy",
+      "shipping": "Free shipping available"
+    },
     "tags": [
       "fiction",
       "books & media",
@@ -68813,7 +68969,15 @@
     "originalPrice": null,
     "discountPercent": null,
     "currency": "USD",
-    "specifications": {},
+    "specifications": {
+      "quality": "High quality",
+      "durability": "Long lasting",
+      "usage": "Multi-purpose",
+      "maintenance": "Easy to maintain",
+      "brand_warranty": "Manufacturer warranty included",
+      "return_policy": "30-day return policy",
+      "shipping": "Free shipping available"
+    },
     "tags": [
       "fiction",
       "sony pictures",
@@ -70399,7 +70563,15 @@
     "originalPrice": null,
     "discountPercent": null,
     "currency": "USD",
-    "specifications": {},
+    "specifications": {
+      "quality": "High quality",
+      "durability": "Long lasting",
+      "usage": "Multi-purpose",
+      "maintenance": "Easy to maintain",
+      "brand_warranty": "Manufacturer warranty included",
+      "return_policy": "30-day return policy",
+      "shipping": "Free shipping available"
+    },
     "tags": [
       "books & media",
       "textbooks",
@@ -71985,7 +72157,15 @@
     "originalPrice": null,
     "discountPercent": null,
     "currency": "USD",
-    "specifications": {},
+    "specifications": {
+      "quality": "High quality",
+      "durability": "Long lasting",
+      "usage": "Multi-purpose",
+      "maintenance": "Easy to maintain",
+      "brand_warranty": "Manufacturer warranty included",
+      "return_policy": "30-day return policy",
+      "shipping": "Free shipping available"
+    },
     "tags": [
       "premium",
       "bestseller",
@@ -73573,7 +73753,15 @@
     "originalPrice": null,
     "discountPercent": null,
     "currency": "USD",
-    "specifications": {},
+    "specifications": {
+      "quality": "High quality",
+      "durability": "Long lasting",
+      "usage": "Multi-purpose",
+      "maintenance": "Easy to maintain",
+      "brand_warranty": "Manufacturer warranty included",
+      "return_policy": "30-day return policy",
+      "shipping": "Free shipping available"
+    },
     "tags": [
       "fiction",
       "value",
@@ -75161,7 +75349,15 @@
     "originalPrice": 134.82,
     "discountPercent": 19,
     "currency": "USD",
-    "specifications": {},
+    "specifications": {
+      "quality": "High quality",
+      "durability": "Long lasting",
+      "usage": "Multi-purpose",
+      "maintenance": "Easy to maintain",
+      "brand_warranty": "Manufacturer warranty included",
+      "return_policy": "30-day return policy",
+      "shipping": "Free shipping available"
+    },
     "tags": [
       "movies",
       "value",
@@ -76751,7 +76947,15 @@
     "originalPrice": 68.62,
     "discountPercent": 18,
     "currency": "USD",
-    "specifications": {},
+    "specifications": {
+      "quality": "High quality",
+      "durability": "Long lasting",
+      "usage": "Multi-purpose",
+      "maintenance": "Easy to maintain",
+      "brand_warranty": "Manufacturer warranty included",
+      "return_policy": "30-day return policy",
+      "shipping": "Free shipping available"
+    },
     "tags": [
       "harpercollins",
       "recommended",
@@ -78337,7 +78541,15 @@
     "originalPrice": null,
     "discountPercent": null,
     "currency": "USD",
-    "specifications": {},
+    "specifications": {
+      "quality": "High quality",
+      "durability": "Long lasting",
+      "usage": "Multi-purpose",
+      "maintenance": "Easy to maintain",
+      "brand_warranty": "Manufacturer warranty included",
+      "return_policy": "30-day return policy",
+      "shipping": "Free shipping available"
+    },
     "tags": [
       "bestseller",
       "sony pictures",
@@ -79925,7 +80137,16 @@
     "originalPrice": null,
     "discountPercent": null,
     "currency": "USD",
-    "specifications": {},
+    "specifications": {
+      "skin_type": "All skin types",
+      "application": "Easy application",
+      "ingredients": "Quality ingredients",
+      "cruelty_free": true,
+      "size": "Standard size",
+      "brand_warranty": "Manufacturer warranty included",
+      "return_policy": "30-day return policy",
+      "shipping": "Free shipping available"
+    },
     "tags": [
       "oral-b",
       "beauty",
@@ -81521,7 +81742,16 @@
     "originalPrice": null,
     "discountPercent": null,
     "currency": "USD",
-    "specifications": {},
+    "specifications": {
+      "skin_type": "All skin types",
+      "application": "Easy application",
+      "ingredients": "Quality ingredients",
+      "cruelty_free": true,
+      "size": "Standard size",
+      "brand_warranty": "Manufacturer warranty included",
+      "return_policy": "30-day return policy",
+      "shipping": "Free shipping available"
+    },
     "tags": [
       "makeup",
       "beauty",
@@ -83111,7 +83341,16 @@
     "originalPrice": null,
     "discountPercent": null,
     "currency": "USD",
-    "specifications": {},
+    "specifications": {
+      "skin_type": "All skin types",
+      "application": "Easy application",
+      "ingredients": "Quality ingredients",
+      "cruelty_free": true,
+      "size": "Standard size",
+      "brand_warranty": "Manufacturer warranty included",
+      "return_policy": "30-day return policy",
+      "shipping": "Free shipping available"
+    },
     "tags": [
       "personal",
       "cosmetics",
@@ -84703,7 +84942,16 @@
     "originalPrice": null,
     "discountPercent": null,
     "currency": "USD",
-    "specifications": {},
+    "specifications": {
+      "skin_type": "All skin types",
+      "application": "Easy application",
+      "ingredients": "Quality ingredients",
+      "cruelty_free": true,
+      "size": "Standard size",
+      "brand_warranty": "Manufacturer warranty included",
+      "return_policy": "30-day return policy",
+      "shipping": "Free shipping available"
+    },
     "tags": [
       "oral care",
       "beauty",
@@ -86293,7 +86541,16 @@
     "originalPrice": null,
     "discountPercent": null,
     "currency": "USD",
-    "specifications": {},
+    "specifications": {
+      "skin_type": "All skin types",
+      "application": "Easy application",
+      "ingredients": "Quality ingredients",
+      "cruelty_free": true,
+      "size": "Standard size",
+      "brand_warranty": "Manufacturer warranty included",
+      "return_policy": "30-day return policy",
+      "shipping": "Free shipping available"
+    },
     "tags": [
       "beauty",
       "personal",
@@ -87891,7 +88148,16 @@
     "originalPrice": 175.94,
     "discountPercent": 21,
     "currency": "USD",
-    "specifications": {},
+    "specifications": {
+      "skin_type": "All skin types",
+      "application": "Easy application",
+      "ingredients": "Quality ingredients",
+      "cruelty_free": true,
+      "size": "Standard size",
+      "brand_warranty": "Manufacturer warranty included",
+      "return_policy": "30-day return policy",
+      "shipping": "Free shipping available"
+    },
     "tags": [
       "value",
       "personal",
@@ -89485,7 +89751,16 @@
     "originalPrice": null,
     "discountPercent": null,
     "currency": "USD",
-    "specifications": {},
+    "specifications": {
+      "skin_type": "All skin types",
+      "application": "Easy application",
+      "ingredients": "Quality ingredients",
+      "cruelty_free": true,
+      "size": "Standard size",
+      "brand_warranty": "Manufacturer warranty included",
+      "return_policy": "30-day return policy",
+      "shipping": "Free shipping available"
+    },
     "tags": [
       "value",
       "premium",
@@ -91081,7 +91356,16 @@
     "originalPrice": null,
     "discountPercent": null,
     "currency": "USD",
-    "specifications": {},
+    "specifications": {
+      "skin_type": "All skin types",
+      "application": "Easy application",
+      "ingredients": "Quality ingredients",
+      "cruelty_free": true,
+      "size": "Standard size",
+      "brand_warranty": "Manufacturer warranty included",
+      "return_policy": "30-day return policy",
+      "shipping": "Free shipping available"
+    },
     "tags": [
       "value",
       "cosmetics",
@@ -92675,7 +92959,16 @@
     "originalPrice": 63.15,
     "discountPercent": 14,
     "currency": "USD",
-    "specifications": {},
+    "specifications": {
+      "skin_type": "All skin types",
+      "application": "Easy application",
+      "ingredients": "Quality ingredients",
+      "cruelty_free": true,
+      "size": "Standard size",
+      "brand_warranty": "Manufacturer warranty included",
+      "return_policy": "30-day return policy",
+      "shipping": "Free shipping available"
+    },
     "tags": [
       "personal",
       "cosmetics",
@@ -94269,7 +94562,16 @@
     "originalPrice": null,
     "discountPercent": null,
     "currency": "USD",
-    "specifications": {},
+    "specifications": {
+      "skin_type": "All skin types",
+      "application": "Easy application",
+      "ingredients": "Quality ingredients",
+      "cruelty_free": true,
+      "size": "Standard size",
+      "brand_warranty": "Manufacturer warranty included",
+      "return_policy": "30-day return policy",
+      "shipping": "Free shipping available"
+    },
     "tags": [
       "beauty",
       "bestseller",
@@ -95863,7 +96165,15 @@
     "originalPrice": null,
     "discountPercent": null,
     "currency": "USD",
-    "specifications": {},
+    "specifications": {
+      "compatibility": "Vehicle specific",
+      "installation": "Professional installation recommended",
+      "material": "High-grade materials",
+      "warranty": "2 years",
+      "brand_warranty": "Manufacturer warranty included",
+      "return_policy": "30-day return policy",
+      "shipping": "Free shipping available"
+    },
     "tags": [
       "tools",
       "automotive",
@@ -97451,7 +97761,15 @@
     "originalPrice": 484.26,
     "discountPercent": 24,
     "currency": "USD",
-    "specifications": {},
+    "specifications": {
+      "compatibility": "Vehicle specific",
+      "installation": "Professional installation recommended",
+      "material": "High-grade materials",
+      "warranty": "2 years",
+      "brand_warranty": "Manufacturer warranty included",
+      "return_policy": "30-day return policy",
+      "shipping": "Free shipping available"
+    },
     "tags": [
       "automotive",
       "parts",
@@ -99041,7 +99359,15 @@
     "originalPrice": 182.44,
     "discountPercent": 18,
     "currency": "USD",
-    "specifications": {},
+    "specifications": {
+      "compatibility": "Vehicle specific",
+      "installation": "Professional installation recommended",
+      "material": "High-grade materials",
+      "warranty": "2 years",
+      "brand_warranty": "Manufacturer warranty included",
+      "return_policy": "30-day return policy",
+      "shipping": "Free shipping available"
+    },
     "tags": [
       "tools",
       "automotive",
@@ -100629,7 +100955,15 @@
     "originalPrice": null,
     "discountPercent": null,
     "currency": "USD",
-    "specifications": {},
+    "specifications": {
+      "compatibility": "Vehicle specific",
+      "installation": "Professional installation recommended",
+      "material": "High-grade materials",
+      "warranty": "2 years",
+      "brand_warranty": "Manufacturer warranty included",
+      "return_policy": "30-day return policy",
+      "shipping": "Free shipping available"
+    },
     "tags": [
       "3m",
       "automotive",
@@ -102219,7 +102553,15 @@
     "originalPrice": null,
     "discountPercent": null,
     "currency": "USD",
-    "specifications": {},
+    "specifications": {
+      "compatibility": "Vehicle specific",
+      "installation": "Professional installation recommended",
+      "material": "High-grade materials",
+      "warranty": "2 years",
+      "brand_warranty": "Manufacturer warranty included",
+      "return_policy": "30-day return policy",
+      "shipping": "Free shipping available"
+    },
     "tags": [
       "automotive",
       "parts",
@@ -103807,7 +104149,15 @@
     "originalPrice": null,
     "discountPercent": null,
     "currency": "USD",
-    "specifications": {},
+    "specifications": {
+      "compatibility": "Vehicle specific",
+      "installation": "Professional installation recommended",
+      "material": "High-grade materials",
+      "warranty": "2 years",
+      "brand_warranty": "Manufacturer warranty included",
+      "return_policy": "30-day return policy",
+      "shipping": "Free shipping available"
+    },
     "tags": [
       "recommended",
       "automotive",
@@ -105397,7 +105747,15 @@
     "originalPrice": 32.57,
     "discountPercent": 33,
     "currency": "USD",
-    "specifications": {},
+    "specifications": {
+      "compatibility": "Vehicle specific",
+      "installation": "Professional installation recommended",
+      "material": "High-grade materials",
+      "warranty": "2 years",
+      "brand_warranty": "Manufacturer warranty included",
+      "return_policy": "30-day return policy",
+      "shipping": "Free shipping available"
+    },
     "tags": [
       "tools",
       "automotive",
@@ -106983,7 +107341,15 @@
     "originalPrice": null,
     "discountPercent": null,
     "currency": "USD",
-    "specifications": {},
+    "specifications": {
+      "compatibility": "Vehicle specific",
+      "installation": "Professional installation recommended",
+      "material": "High-grade materials",
+      "warranty": "2 years",
+      "brand_warranty": "Manufacturer warranty included",
+      "return_policy": "30-day return policy",
+      "shipping": "Free shipping available"
+    },
     "tags": [
       "quality",
       "automotive",
@@ -108569,7 +108935,15 @@
     "originalPrice": 94.76,
     "discountPercent": 33,
     "currency": "USD",
-    "specifications": {},
+    "specifications": {
+      "compatibility": "Vehicle specific",
+      "installation": "Professional installation recommended",
+      "material": "High-grade materials",
+      "warranty": "2 years",
+      "brand_warranty": "Manufacturer warranty included",
+      "return_policy": "30-day return policy",
+      "shipping": "Free shipping available"
+    },
     "tags": [
       "recommended",
       "automotive",
@@ -110159,7 +110533,15 @@
     "originalPrice": 433.88,
     "discountPercent": 11,
     "currency": "USD",
-    "specifications": {},
+    "specifications": {
+      "compatibility": "Vehicle specific",
+      "installation": "Professional installation recommended",
+      "material": "High-grade materials",
+      "warranty": "2 years",
+      "brand_warranty": "Manufacturer warranty included",
+      "return_policy": "30-day return policy",
+      "shipping": "Free shipping available"
+    },
     "tags": [
       "chemical guys",
       "automotive",
@@ -111749,7 +112131,15 @@
     "originalPrice": null,
     "discountPercent": null,
     "currency": "USD",
-    "specifications": {},
+    "specifications": {
+      "age_range": "3+ years",
+      "players": "1-4 players",
+      "material": "Safe materials",
+      "educational": false,
+      "brand_warranty": "Manufacturer warranty included",
+      "return_policy": "30-day return policy",
+      "shipping": "Free shipping available"
+    },
     "tags": [
       "toys & games",
       "bestseller",
@@ -113337,7 +113727,15 @@
     "originalPrice": null,
     "discountPercent": null,
     "currency": "USD",
-    "specifications": {},
+    "specifications": {
+      "age_range": "3+ years",
+      "players": "1-4 players",
+      "material": "Safe materials",
+      "educational": false,
+      "brand_warranty": "Manufacturer warranty included",
+      "return_policy": "30-day return policy",
+      "shipping": "Free shipping available"
+    },
     "tags": [
       "value",
       "toys & games",
@@ -114927,7 +115325,15 @@
     "originalPrice": 21.89,
     "discountPercent": 38,
     "currency": "USD",
-    "specifications": {},
+    "specifications": {
+      "age_range": "3+ years",
+      "players": "1-4 players",
+      "material": "Safe materials",
+      "educational": false,
+      "brand_warranty": "Manufacturer warranty included",
+      "return_policy": "30-day return policy",
+      "shipping": "Free shipping available"
+    },
     "tags": [
       "hasbro",
       "toys & games",
@@ -116517,7 +116923,15 @@
     "originalPrice": null,
     "discountPercent": null,
     "currency": "USD",
-    "specifications": {},
+    "specifications": {
+      "age_range": "3+ years",
+      "players": "Single player",
+      "material": "Safe materials",
+      "educational": false,
+      "brand_warranty": "Manufacturer warranty included",
+      "return_policy": "30-day return policy",
+      "shipping": "Free shipping available"
+    },
     "tags": [
       "toys & games",
       "popular",
@@ -118105,7 +118519,15 @@
     "originalPrice": null,
     "discountPercent": null,
     "currency": "USD",
-    "specifications": {},
+    "specifications": {
+      "age_range": "3+ years",
+      "players": "Single player",
+      "material": "Safe materials",
+      "educational": false,
+      "brand_warranty": "Manufacturer warranty included",
+      "return_policy": "30-day return policy",
+      "shipping": "Free shipping available"
+    },
     "tags": [
       "fisher-price",
       "toys & games",
@@ -119693,7 +120115,15 @@
     "originalPrice": null,
     "discountPercent": null,
     "currency": "USD",
-    "specifications": {},
+    "specifications": {
+      "age_range": "3+ years",
+      "players": "Single player",
+      "material": "Safe materials",
+      "educational": false,
+      "brand_warranty": "Manufacturer warranty included",
+      "return_policy": "30-day return policy",
+      "shipping": "Free shipping available"
+    },
     "tags": [
       "toys & games",
       "popular",
@@ -121281,7 +121711,15 @@
     "originalPrice": null,
     "discountPercent": null,
     "currency": "USD",
-    "specifications": {},
+    "specifications": {
+      "age_range": "3+ years",
+      "players": "1-4 players",
+      "material": "Safe materials",
+      "educational": false,
+      "brand_warranty": "Manufacturer warranty included",
+      "return_policy": "30-day return policy",
+      "shipping": "Free shipping available"
+    },
     "tags": [
       "mattel",
       "premium",
@@ -122869,7 +123307,15 @@
     "originalPrice": null,
     "discountPercent": null,
     "currency": "USD",
-    "specifications": {},
+    "specifications": {
+      "age_range": "3+ years",
+      "players": "Single player",
+      "material": "Safe materials",
+      "educational": false,
+      "brand_warranty": "Manufacturer warranty included",
+      "return_policy": "30-day return policy",
+      "shipping": "Free shipping available"
+    },
     "tags": [
       "recommended",
       "mattel",
@@ -124455,7 +124901,15 @@
     "originalPrice": 81.26,
     "discountPercent": 20,
     "currency": "USD",
-    "specifications": {},
+    "specifications": {
+      "age_range": "3+ years",
+      "players": "Single player",
+      "material": "Safe materials",
+      "educational": true,
+      "brand_warranty": "Manufacturer warranty included",
+      "return_policy": "30-day return policy",
+      "shipping": "Free shipping available"
+    },
     "tags": [
       "educational",
       "quality",
@@ -126041,7 +126495,15 @@
     "originalPrice": null,
     "discountPercent": null,
     "currency": "USD",
-    "specifications": {},
+    "specifications": {
+      "age_range": "3+ years",
+      "players": "1-4 players",
+      "material": "Safe materials",
+      "educational": false,
+      "brand_warranty": "Manufacturer warranty included",
+      "return_policy": "30-day return policy",
+      "shipping": "Free shipping available"
+    },
     "tags": [
       "mattel",
       "value",
@@ -127631,7 +128093,15 @@
     "originalPrice": 128.7,
     "discountPercent": 11,
     "currency": "USD",
-    "specifications": {},
+    "specifications": {
+      "quality": "High quality",
+      "durability": "Long lasting",
+      "usage": "Multi-purpose",
+      "maintenance": "Easy to maintain",
+      "brand_warranty": "Manufacturer warranty included",
+      "return_policy": "30-day return policy",
+      "shipping": "Free shipping available"
+    },
     "tags": [
       "health",
       "popular",
@@ -129219,7 +129689,15 @@
     "originalPrice": 12.61,
     "discountPercent": 18,
     "currency": "USD",
-    "specifications": {},
+    "specifications": {
+      "quality": "High quality",
+      "durability": "Long lasting",
+      "usage": "Multi-purpose",
+      "maintenance": "Easy to maintain",
+      "brand_warranty": "Manufacturer warranty included",
+      "return_policy": "30-day return policy",
+      "shipping": "Free shipping available"
+    },
     "tags": [
       "dog supplies",
       "bestseller",
@@ -130807,7 +131285,15 @@
     "originalPrice": null,
     "discountPercent": null,
     "currency": "USD",
-    "specifications": {},
+    "specifications": {
+      "quality": "High quality",
+      "durability": "Long lasting",
+      "usage": "Multi-purpose",
+      "maintenance": "Easy to maintain",
+      "brand_warranty": "Manufacturer warranty included",
+      "return_policy": "30-day return policy",
+      "shipping": "Free shipping available"
+    },
     "tags": [
       "food",
       "value",
@@ -132395,7 +132881,15 @@
     "originalPrice": null,
     "discountPercent": null,
     "currency": "USD",
-    "specifications": {},
+    "specifications": {
+      "quality": "High quality",
+      "durability": "Long lasting",
+      "usage": "Multi-purpose",
+      "maintenance": "Easy to maintain",
+      "brand_warranty": "Manufacturer warranty included",
+      "return_policy": "30-day return policy",
+      "shipping": "Free shipping available"
+    },
     "tags": [
       "food",
       "value",
@@ -133985,7 +134479,15 @@
     "originalPrice": 37.36,
     "discountPercent": 17,
     "currency": "USD",
-    "specifications": {},
+    "specifications": {
+      "quality": "High quality",
+      "durability": "Long lasting",
+      "usage": "Multi-purpose",
+      "maintenance": "Easy to maintain",
+      "brand_warranty": "Manufacturer warranty included",
+      "return_policy": "30-day return policy",
+      "shipping": "Free shipping available"
+    },
     "tags": [
       "hill's",
       "pet supplies",
@@ -135571,7 +136073,15 @@
     "originalPrice": null,
     "discountPercent": null,
     "currency": "USD",
-    "specifications": {},
+    "specifications": {
+      "quality": "High quality",
+      "durability": "Long lasting",
+      "usage": "Multi-purpose",
+      "maintenance": "Easy to maintain",
+      "brand_warranty": "Manufacturer warranty included",
+      "return_policy": "30-day return policy",
+      "shipping": "Free shipping available"
+    },
     "tags": [
       "bestseller",
       "blue buffalo",
@@ -137159,7 +137669,15 @@
     "originalPrice": 118.18,
     "discountPercent": 14,
     "currency": "USD",
-    "specifications": {},
+    "specifications": {
+      "quality": "High quality",
+      "durability": "Long lasting",
+      "usage": "Multi-purpose",
+      "maintenance": "Easy to maintain",
+      "brand_warranty": "Manufacturer warranty included",
+      "return_policy": "30-day return policy",
+      "shipping": "Free shipping available"
+    },
     "tags": [
       "value",
       "dog supplies",
@@ -138749,7 +139267,15 @@
     "originalPrice": null,
     "discountPercent": null,
     "currency": "USD",
-    "specifications": {},
+    "specifications": {
+      "quality": "High quality",
+      "durability": "Long lasting",
+      "usage": "Multi-purpose",
+      "maintenance": "Easy to maintain",
+      "brand_warranty": "Manufacturer warranty included",
+      "return_policy": "30-day return policy",
+      "shipping": "Free shipping available"
+    },
     "tags": [
       "kong",
       "pet supplies",
@@ -140335,7 +140861,15 @@
     "originalPrice": 79.1,
     "discountPercent": 15,
     "currency": "USD",
-    "specifications": {},
+    "specifications": {
+      "quality": "High quality",
+      "durability": "Long lasting",
+      "usage": "Multi-purpose",
+      "maintenance": "Easy to maintain",
+      "brand_warranty": "Manufacturer warranty included",
+      "return_policy": "30-day return policy",
+      "shipping": "Free shipping available"
+    },
     "tags": [
       "food",
       "quality",
@@ -141923,7 +142457,15 @@
     "originalPrice": null,
     "discountPercent": null,
     "currency": "USD",
-    "specifications": {},
+    "specifications": {
+      "quality": "High quality",
+      "durability": "Long lasting",
+      "usage": "Multi-purpose",
+      "maintenance": "Easy to maintain",
+      "brand_warranty": "Manufacturer warranty included",
+      "return_policy": "30-day return policy",
+      "shipping": "Free shipping available"
+    },
     "tags": [
       "dog supplies",
       "popular",
@@ -143513,7 +144055,15 @@
     "originalPrice": null,
     "discountPercent": null,
     "currency": "USD",
-    "specifications": {},
+    "specifications": {
+      "quality": "High quality",
+      "durability": "Long lasting",
+      "usage": "Multi-purpose",
+      "maintenance": "Easy to maintain",
+      "brand_warranty": "Manufacturer warranty included",
+      "return_policy": "30-day return policy",
+      "shipping": "Free shipping available"
+    },
     "tags": [
       "stationery",
       "value",
@@ -145103,7 +145653,15 @@
     "originalPrice": null,
     "discountPercent": null,
     "currency": "USD",
-    "specifications": {},
+    "specifications": {
+      "quality": "High quality",
+      "durability": "Long lasting",
+      "usage": "Multi-purpose",
+      "maintenance": "Easy to maintain",
+      "brand_warranty": "Manufacturer warranty included",
+      "return_policy": "30-day return policy",
+      "shipping": "Free shipping available"
+    },
     "tags": [
       "value",
       "premium",
@@ -146693,7 +147251,15 @@
     "originalPrice": 267.27,
     "discountPercent": 22,
     "currency": "USD",
-    "specifications": {},
+    "specifications": {
+      "quality": "High quality",
+      "durability": "Long lasting",
+      "usage": "Multi-purpose",
+      "maintenance": "Easy to maintain",
+      "brand_warranty": "Manufacturer warranty included",
+      "return_policy": "30-day return policy",
+      "shipping": "Free shipping available"
+    },
     "tags": [
       "3m",
       "electronics",
@@ -148279,7 +148845,15 @@
     "originalPrice": null,
     "discountPercent": null,
     "currency": "USD",
-    "specifications": {},
+    "specifications": {
+      "quality": "High quality",
+      "durability": "Long lasting",
+      "usage": "Multi-purpose",
+      "maintenance": "Easy to maintain",
+      "brand_warranty": "Manufacturer warranty included",
+      "return_policy": "30-day return policy",
+      "shipping": "Free shipping available"
+    },
     "tags": [
       "3m",
       "stationery",
@@ -149869,7 +150443,15 @@
     "originalPrice": null,
     "discountPercent": null,
     "currency": "USD",
-    "specifications": {},
+    "specifications": {
+      "quality": "High quality",
+      "durability": "Long lasting",
+      "usage": "Multi-purpose",
+      "maintenance": "Easy to maintain",
+      "brand_warranty": "Manufacturer warranty included",
+      "return_policy": "30-day return policy",
+      "shipping": "Free shipping available"
+    },
     "tags": [
       "3m",
       "value",
@@ -151459,7 +152041,15 @@
     "originalPrice": 311.28,
     "discountPercent": 38,
     "currency": "USD",
-    "specifications": {},
+    "specifications": {
+      "quality": "High quality",
+      "durability": "Long lasting",
+      "usage": "Multi-purpose",
+      "maintenance": "Easy to maintain",
+      "brand_warranty": "Manufacturer warranty included",
+      "return_policy": "30-day return policy",
+      "shipping": "Free shipping available"
+    },
     "tags": [
       "3m",
       "value",
@@ -153045,7 +153635,15 @@
     "originalPrice": null,
     "discountPercent": null,
     "currency": "USD",
-    "specifications": {},
+    "specifications": {
+      "quality": "High quality",
+      "durability": "Long lasting",
+      "usage": "Multi-purpose",
+      "maintenance": "Easy to maintain",
+      "brand_warranty": "Manufacturer warranty included",
+      "return_policy": "30-day return policy",
+      "shipping": "Free shipping available"
+    },
     "tags": [
       "staples",
       "popular",
@@ -154631,7 +155229,15 @@
     "originalPrice": null,
     "discountPercent": null,
     "currency": "USD",
-    "specifications": {},
+    "specifications": {
+      "quality": "High quality",
+      "durability": "Long lasting",
+      "usage": "Multi-purpose",
+      "maintenance": "Easy to maintain",
+      "brand_warranty": "Manufacturer warranty included",
+      "return_policy": "30-day return policy",
+      "shipping": "Free shipping available"
+    },
     "tags": [
       "hp",
       "value",
@@ -156221,7 +156827,15 @@
     "originalPrice": 184.39,
     "discountPercent": 12,
     "currency": "USD",
-    "specifications": {},
+    "specifications": {
+      "quality": "High quality",
+      "durability": "Long lasting",
+      "usage": "Multi-purpose",
+      "maintenance": "Easy to maintain",
+      "brand_warranty": "Manufacturer warranty included",
+      "return_policy": "30-day return policy",
+      "shipping": "Free shipping available"
+    },
     "tags": [
       "sharpie",
       "recommended",
@@ -157807,7 +158421,15 @@
     "originalPrice": null,
     "discountPercent": null,
     "currency": "USD",
-    "specifications": {},
+    "specifications": {
+      "quality": "High quality",
+      "durability": "Long lasting",
+      "usage": "Multi-purpose",
+      "maintenance": "Easy to maintain",
+      "brand_warranty": "Manufacturer warranty included",
+      "return_policy": "30-day return policy",
+      "shipping": "Free shipping available"
+    },
     "tags": [
       "premium",
       "staples",
