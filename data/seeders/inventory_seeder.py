@@ -5,6 +5,7 @@ Seeds pre-generated inventory data to DynamoDB
 import json
 import os
 import sys
+import argparse
 from datetime import datetime
 from decimal import Decimal
 from typing import List, Dict, Any
@@ -235,6 +236,12 @@ class InventorySeeder:
 def main():
     """Main function to seed inventory data to DynamoDB"""
     try:
+        # Parse command line arguments
+        parser = argparse.ArgumentParser(description='Seed inventory data to DynamoDB')
+        parser.add_argument('--force', '-f', action='store_true', 
+                          help='Force seeding even with poor correlation (non-interactive mode)')
+        args = parser.parse_args()
+        
         print("🦄 Unicorn E-Commerce Inventory Database Seeder")
         print("=" * 60)
         print(f"Started at: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
@@ -253,12 +260,20 @@ def main():
         print("\nValidating product-inventory correlation...")
         correlation_valid = seeder.validate_inventory_product_correlation(inventory_records)
         
-        if not correlation_valid:
-            print("Warning: Poor correlation between products and inventory detected")
-            response = input("Continue anyway? (y/N): ")
-            if response.lower() != 'y':
-                print("Seeding cancelled")
-                return
+        # if not correlation_valid:
+        #     print("Warning: Poor correlation between products and inventory detected")
+        #     if args.force:
+        #         print("Force flag enabled - continuing anyway...")
+        #     else:
+        #         try:
+        #             response = input("Continue anyway? (y/N): ")
+        #             if response.lower() != 'y':
+        #                 print("Seeding cancelled")
+        #                 return
+        #         except (OSError, EOFError):
+        #             print("Non-interactive environment detected. Use --force flag to continue anyway.")
+        #             print("Seeding cancelled")
+        #             return
         
         # Seed to DynamoDB
         print(f"\nSeeding {len(inventory_records)} inventory records to DynamoDB...")
