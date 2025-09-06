@@ -148,7 +148,7 @@ class DatabaseConnections:
         # Get connection details from environment variables
         host = os.environ.get('DOCUMENTDB_HOST')
         port = os.environ.get('DOCUMENTDB_PORT', '27017')
-        database = os.environ.get('DOCUMENTDB_DATABASE', 'unicorn_ecommerce_dev')
+        database = os.environ.get('DOCUMENTDB_DATABASE', 'unicorn-ecommerce-dev')
         ssl_ca_certs = os.environ.get('DOCUMENTDB_SSL_CA_CERTS')
         
         if not host:
